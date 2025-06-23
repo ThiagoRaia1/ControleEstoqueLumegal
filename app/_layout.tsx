@@ -3,6 +3,7 @@ import { AuthProvider } from "../context/auth";
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
 import { useEffect } from "react";
+import { ThemeProvider } from "../context/ThemeContext";
 
 export default function Layout() {
   useEffect(() => {
@@ -11,9 +12,11 @@ export default function Layout() {
     // NavigationBar.setBackgroundColorAsync("#ffffff");
   }, []);
   return (
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
         <StatusBar hidden />
         <Slot />
-      </AuthProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }

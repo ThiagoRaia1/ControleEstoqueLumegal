@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { nomePaginas } from "../../utils/nomePaginas";
+import { useThemeContext } from "../../context/ThemeContext";
 
 let prevIndex = 0;
 
@@ -44,6 +45,7 @@ const menuItems: { href: string; icon: FeatherIconName; label: string }[] = [
 ];
 
 export default function MenuInferior() {
+  const { theme } = useThemeContext();
   const iconSize = 30;
   const pathname = usePathname(); // exemplo: "/menus/itensEmFalta"
   const screenWidth = Dimensions.get("window").width;
@@ -64,7 +66,16 @@ export default function MenuInferior() {
   const isActive = (route: string) => pathname === route;
 
   return (
-    <View style={styles.menu}>
+    <View
+      style={[
+        styles.menu,
+        theme === "light"
+          ? {
+              backgroundColor: "#0033a0",
+            }
+          : { backgroundColor: "black" },
+      ]}
+    >
       {/* Fundo branco animado */}
       <Animated.View
         style={[
@@ -111,7 +122,6 @@ export default function MenuInferior() {
 
 const styles = StyleSheet.create({
   menu: {
-    backgroundColor: "#0033a0",
     width: "100%",
     height: 70,
     flexDirection: "row",

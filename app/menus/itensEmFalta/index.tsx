@@ -2,11 +2,19 @@ import { View, StyleSheet, Text, ScrollView } from "react-native";
 import * as Animatable from "react-native-animatable";
 import MenuInferior from "../../components/MenuInferior";
 import BotaoLogout from "../../components/BotaoLogout";
+import { useThemeContext } from "../../../context/ThemeContext";
 
 function renderItemEmFalta() {
+  const { theme } = useThemeContext();
   return (
-    <View style={styles.itemEmFalta}>
-      
+    <View
+      style={[
+        styles.itemEmFalta,
+        theme === "light"
+          ? { backgroundColor: "white" }
+          : { backgroundColor: "#c7c7c7" },
+      ]}
+    >
       <View style={styles.leftSide}>
         <Text style={styles.dadosEpiText}>Nome: EPI</Text>
         <Text style={styles.dadosEpiText}>C.A.: 13347</Text>
@@ -26,14 +34,24 @@ function renderItemEmFalta() {
           Quantidade:{"\n"}10
         </Text>
       </View>
-
     </View>
   );
 }
 
 export default function Inicio() {
+  const { theme } = useThemeContext();
   return (
-    <View style={[styles.background, { flex: 1 }]}>
+    <View
+      style={[
+        styles.background,
+        { flex: 1 },
+        theme === "light"
+          ? {
+              backgroundColor: "#f0f3fa",
+            }
+          : { backgroundColor: "#1c1c1c" },
+      ]}
+    >
       <View style={styles.content}>
         <BotaoLogout />
         <Text style={styles.title}>Itens em falta</Text>
@@ -43,8 +61,18 @@ export default function Inicio() {
           style={styles.mainContent}
         >
           <ScrollView
-            style={styles.itensEmFaltaScroll}
-            contentContainerStyle={styles.scrollContent}
+            style={[
+              styles.itensEmFaltaScroll,
+              theme === "light"
+                ? { borderColor: "#ccc" }
+                : { borderColor: "black" },
+            ]}
+            contentContainerStyle={[
+              styles.scrollContent,
+              theme === "light"
+                ? { backgroundColor: "white" }
+                : { backgroundColor: "#5e5e5e" },
+            ]}
             persistentScrollbar={true}
           >
             <View style={{ padding: 20, gap: 20 }}>
@@ -80,7 +108,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     height: "100%",
-    backgroundColor: "#f0f3fa",
   },
   title: {
     fontSize: 30,
@@ -93,10 +120,8 @@ const styles = StyleSheet.create({
   },
   itensEmFaltaScroll: {
     flex: 1,
-    backgroundColor: "white",
     borderRadius: 20,
-    borderWidth: 2,
-    borderColor: "#ccc",
+    borderWidth: 3,
     alignSelf: "center",
     width: "100%",
     maxWidth: 500,
@@ -104,7 +129,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: "flex-start",
-    backgroundColor: "white",
   },
   leftSide: {
     flex: 1,
