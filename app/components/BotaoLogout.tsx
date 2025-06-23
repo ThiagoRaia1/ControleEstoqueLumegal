@@ -1,13 +1,21 @@
 import { Link } from "expo-router";
 import { Feather } from "@expo/vector-icons"; // Ícones do Expo
+import { View } from "react-native";
 
 export default function LogoutButton({ style = {} }) {
   return (
-    <Link
-      href="/"
-      style={[{ position: "absolute", right: 10, top: 15, zIndex: 999 }, style]}
+    <View
+      style={{
+        width: "100%",
+        height: "5%",
+        justifyContent: "center",
+        alignItems: "flex-end",
+        paddingRight: 10,
+      }}
     >
-      <Feather name="log-out" size={30} color="black" />
-    </Link>
+      <Link href="/" style={[{ zIndex: 999 }, style]}>
+        <Feather name="log-out" size={30} color="black" />
+      </Link>
+    </View>
   );
 }

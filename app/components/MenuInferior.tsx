@@ -18,34 +18,34 @@ type FeatherIconName = keyof typeof Feather.glyphMap;
 const menuItems: { href: string; icon: FeatherIconName; label: string }[] = [
   {
     href: `${nomePaginas.itensEmFalta}`,
-    icon: "home",
+    icon: "archive",
     label: "ITENS EM FALTA",
   },
   {
     href: `${nomePaginas.registrarEpi}`,
-    icon: "clock",
+    icon: "package",
     label: "REGISTRAR EPI",
   },
   {
     href: `${nomePaginas.entradaSaida}`,
-    icon: "calendar",
+    icon: "edit",
     label: "ENTRADA/SAÍDA",
   },
   {
     href: `${nomePaginas.pesquisar}`,
-    icon: "user",
+    icon: "search",
     label: "PESQUISAR",
   },
   {
     href: `${nomePaginas.relatorios}`,
-    icon: "user",
+    icon: "file",
     label: "RELATÓRIOS",
   },
 ];
 
 export default function MenuInferior() {
   const iconSize = 30;
-  const pathname = usePathname(); // exemplo: "/menuPrincipal/inicio"
+  const pathname = usePathname(); // exemplo: "/menus/itensEmFalta"
   const screenWidth = Dimensions.get("window").width;
   const itemWidth = screenWidth / menuItems.length;
   const translateX = useRef(new Animated.Value(prevIndex * itemWidth)).current;
@@ -90,9 +90,15 @@ export default function MenuInferior() {
               <Feather
                 name={icon}
                 size={iconSize}
-                color={active ? "#2AA69F" : "white"}
+                color={active ? "#0033a0" : "white"}
               />
-              <Text style={[styles.text, active && { color: "#2AA69F" }]}>
+              <Text
+                style={[
+                  styles.text,
+                  active && { color: "#0033a0" },
+                  screenWidth > 600 && { fontSize: 14 },
+                ]}
+              >
                 {label}
               </Text>
             </TouchableOpacity>
@@ -105,7 +111,7 @@ export default function MenuInferior() {
 
 const styles = StyleSheet.create({
   menu: {
-    backgroundColor: "#2AA69F",
+    backgroundColor: "#0033a0",
     width: "100%",
     height: 70,
     flexDirection: "row",
@@ -113,7 +119,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
-    fontSize: 16,
+    fontSize: 10,
     fontWeight: "600",
   },
   activeBackground: {

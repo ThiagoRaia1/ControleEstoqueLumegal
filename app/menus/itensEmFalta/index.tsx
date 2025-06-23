@@ -1,48 +1,64 @@
-import { useState, useEffect } from "react";
-import { View, Image, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, ScrollView } from "react-native";
 import * as Animatable from "react-native-animatable";
-import { useAuth } from "../../../context/auth";
 import MenuInferior from "../../components/MenuInferior";
 import BotaoLogout from "../../components/BotaoLogout";
 
-export default function Inicio() {
-  const { usuario } = useAuth();
-  const [mensagemErro, setMensagemErro] = useState("");
-
-
+function renderItemEmFalta() {
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.itemEmFalta}>
+      
+      <View style={styles.leftSide}>
+        <Text style={styles.dadosEpiText}>Nome: EPI</Text>
+        <Text style={styles.dadosEpiText}>C.A.: 13347</Text>
+        <Text style={styles.dadosEpiText}>Unidade/Par: Unidade</Text>
+      </View>
+
+      <View style={styles.rightSide}>
+        <Text
+          style={[
+            styles.dadosEpiText,
+            {
+              textAlign: "center",
+              color: "white",
+            },
+          ]}
+        >
+          Quantidade:{"\n"}10
+        </Text>
+      </View>
+
+    </View>
+  );
+}
+
+export default function Inicio() {
+  return (
+    <View style={[styles.background, { flex: 1 }]}>
       <View style={styles.content}>
         <BotaoLogout />
-        {/* <Image
-          source={require("../../../assets/fundoInicio.png")}
-          style={styles.backgroundImage}
-          resizeMode="stretch"
-        /> */}
-
+        <Text style={styles.title}>Itens em falta</Text>
         <Animatable.View
           animation="fadeInUp"
           duration={1000}
           style={styles.mainContent}
         >
-          <Text style={styles.welcomeText}>
-            {/* Mostra só o primeiro nome */}
-            Bem vindo
-          </Text>
-
-          <View style={styles.proxAulaMainView}>
-            <Text style={{ fontSize: 20, marginBottom: 10 }}>
-              Sua próxima aula é:
-            </Text>
-
-            <View style={styles.proxAulaSubView}>
-              <Text style={styles.proxAulaSubText}>
-                teste
-              </Text>
+          <ScrollView
+            style={styles.itensEmFaltaScroll}
+            contentContainerStyle={styles.scrollContent}
+            persistentScrollbar={true}
+          >
+            <View style={{ padding: 20, gap: 20 }}>
+              {renderItemEmFalta()}
+              {renderItemEmFalta()}
+              {renderItemEmFalta()}
+              {renderItemEmFalta()}
+              {renderItemEmFalta()}
+              {renderItemEmFalta()}
+              {renderItemEmFalta()}
+              {renderItemEmFalta()}
             </View>
-          </View>
+          </ScrollView>
         </Animatable.View>
-
       </View>
       <MenuInferior />
     </View>
@@ -52,50 +68,75 @@ export default function Inicio() {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    justifyContent: "flex-end",
     alignItems: "center",
   },
   mainContent: {
+    flex: 1,
     width: "100%",
     maxWidth: 700,
-    alignSelf: "center",
-    gap: 5,
     padding: 20,
   },
-  backgroundImage: {
+  background: {
     position: "absolute",
     width: "100%",
     height: "100%",
+    backgroundColor: "#f0f3fa",
   },
-  welcomeText: {
-    fontSize: 20,
+  title: {
+    fontSize: 30,
     fontWeight: "700",
     color: "white",
+    textAlign: "center",
     textShadowColor: "black", // Cor da borda
     textShadowOffset: { width: 1, height: 1 }, // Espessura da sombra
     textShadowRadius: 10, // Suaviza a borda
   },
-  proxAulaMainView: {
+  itensEmFaltaScroll: {
+    flex: 1,
     backgroundColor: "white",
+    borderRadius: 20,
     borderWidth: 2,
-    borderRadius: 10,
     borderColor: "#ccc",
-    height: 250,
-    padding: 10,
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 500,
   },
-  proxAulaSubView: {
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "flex-start",
+    backgroundColor: "white",
+  },
+  leftSide: {
+    flex: 1,
+    justifyContent: "space-between",
+    height: "100%",
+    paddingVertical: 5,
+  },
+  rightSide: {
+    flex: 1,
+    height: "100%",
+    justifyContent: "center",
+    alignSelf: "center",
+    backgroundColor: "#4B366D",
+    borderRadius: 10,
+  },
+  itemEmFalta: {
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     padding: 10,
-    borderRadius: 10,
-    borderWidth: 1,
+    backgroundColor: "white",
     borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 20,
     width: "100%",
-    height: "80%",
+    height: 100,
+    gap: 10,
   },
-  proxAulaSubText: {
-    textAlign: "center",
-    color: "#4B366D",
-    fontSize: 24,
+  dadosEpiText: {
+    textAlign: "left",
+    fontSize: 14,
+    color: "black",
+    fontWeight: "400",
   },
 });
