@@ -30,11 +30,6 @@ export default function TelaLogin() {
   return (
     <>
       <View style={{ flex: 1 }}>
-        {/* <Image
-          source={require("../assets/fundoLogin.jpeg")}
-          style={styles.backgroundImage}
-          resizeMode="stretch"
-        /> */}
         <View style={styles.background} />
         <View style={styles.content}>
           <Text
@@ -48,7 +43,12 @@ export default function TelaLogin() {
             Controle de estoque Lumegal
           </Text>
           <View style={styles.inputContainer}>
-            <Feather name="mail" size={20} color="#0033A0" style={styles.icon} />
+            <Feather
+              name="mail"
+              size={20}
+              color="#0033A0"
+              style={styles.icon}
+            />
             <TextInput
               style={[styles.input, { outline: "none" } as any]}
               placeholder="Email"
@@ -59,7 +59,12 @@ export default function TelaLogin() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Feather name="lock" size={20} color="#0033A0" style={styles.icon} />
+            <Feather
+              name="lock"
+              size={20}
+              color="#0033A0"
+              style={styles.icon}
+            />
             <TextInput
               style={[styles.input, { outline: "none" } as any]}
               placeholder="Senha"
@@ -113,7 +118,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#0033A0",
     borderRadius: 20,
-    justifyContent: "space-between", // isso ajuda no alinhamento
+    justifyContent: "space-between",
   },
   icon: {
     marginRight: 10,

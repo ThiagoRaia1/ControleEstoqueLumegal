@@ -44,7 +44,6 @@ export default function Inicio() {
     <View
       style={[
         styles.background,
-        { flex: 1 },
         theme === "light"
           ? {
               backgroundColor: "#f0f3fa",
@@ -52,9 +51,16 @@ export default function Inicio() {
           : { backgroundColor: "#1c1c1c" },
       ]}
     >
+      <BotaoLogout />
       <View style={styles.content}>
-        <BotaoLogout />
-        <Text style={styles.title}>Itens em falta</Text>
+        <Text
+          style={[
+            styles.title,
+            theme === "light" ? { color: "black" } : { color: "white" },
+          ]}
+        >
+          Itens em falta
+        </Text>
         <Animatable.View
           animation="fadeInUp"
           duration={1000}
@@ -94,6 +100,11 @@ export default function Inicio() {
 }
 
 const styles = StyleSheet.create({
+  background: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+  },
   content: {
     flex: 1,
     alignItems: "center",
@@ -104,19 +115,10 @@ const styles = StyleSheet.create({
     maxWidth: 700,
     padding: 20,
   },
-  background: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-  },
   title: {
     fontSize: 30,
     fontWeight: "700",
-    color: "white",
     textAlign: "center",
-    textShadowColor: "black", // Cor da borda
-    textShadowOffset: { width: 1, height: 1 }, // Espessura da sombra
-    textShadowRadius: 10, // Suaviza a borda
   },
   itensEmFaltaScroll: {
     flex: 1,

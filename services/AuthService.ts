@@ -23,9 +23,9 @@ class AuthService {
       this.usuario = user;
       // console.log("Usuário autenticado:", this.usuario);
       router.push(`${nomePaginas.itensEmFalta}`);
-      return user
+      return user;
     } catch (erro: any) {
-      alert("Erro ao autenticar: "+ erro.message);
+      alert("Erro ao autenticar: " + erro.message);
     }
   }
 
