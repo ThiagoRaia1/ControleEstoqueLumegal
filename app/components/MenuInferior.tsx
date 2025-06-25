@@ -1,5 +1,5 @@
 import { Link, usePathname } from "expo-router";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -47,8 +47,22 @@ const menuItems: { href: string; icon: FeatherIconName; label: string }[] = [
 export default function MenuInferior() {
   const { theme } = useThemeContext();
   const iconSize = 30;
-  const pathname = usePathname(); // exemplo: "/menus/itensEmFalta"
-  const screenWidth = Dimensions.get("window").width;
+  const pathname = usePathname();
+
+  const [screenWidth, setScreenWidth] = useState(
+    Dimensions.get("window").width
+  );
+
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener("change", ({ window }) => {
+      setScreenWidth(window.width);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   const itemWidth = screenWidth / menuItems.length;
   const translateX = useRef(new Animated.Value(prevIndex * itemWidth)).current;
 
@@ -61,7 +75,7 @@ export default function MenuInferior() {
       useNativeDriver: true,
     }).start();
     prevIndex = activeIndex;
-  }, [pathname]);
+  }, [pathname, itemWidth]);
 
   const isActive = (route: string) => pathname === route;
 
@@ -70,13 +84,10 @@ export default function MenuInferior() {
       style={[
         styles.menu,
         theme === "light"
-          ? {
-              backgroundColor: "#0033a0",
-            }
+          ? { backgroundColor: "#0033a0" }
           : { backgroundColor: "black" },
       ]}
     >
-      {/* Fundo branco animado */}
       <Animated.View
         style={[
           styles.activeBackground,
@@ -86,7 +97,6 @@ export default function MenuInferior() {
           },
         ]}
       />
-
       {menuItems.map(({ href, icon, label }) => {
         const active = isActive(href);
         return (

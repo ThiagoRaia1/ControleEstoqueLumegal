@@ -38,7 +38,7 @@ function renderItemEmFalta() {
   );
 }
 
-export default function Inicio() {
+export default function itensEmFalta() {
   const { theme } = useThemeContext();
   return (
     <View
