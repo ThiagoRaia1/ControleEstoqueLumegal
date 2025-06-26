@@ -1,17 +1,27 @@
 import { httpClient } from "../adapters/httpClient";
 
 export interface IEpi {
-  _id?: string;
+  _id: string;
   nome?: string;
   descricao?: string;
   certificadoAprovacao?: string;
   quantidade?: number;
-  quantidadeParaAviso?: number;
+  quantidadeParaAviso: number;
   tipoUnidade?: string;
   fornecedor?: string;
 }
 
-export async function registrarEpiApi(epi: IEpi) {
+export interface ICriarEpi {
+  nome: string;
+  descricao?: string;
+  certificadoAprovacao?: string;
+  quantidade: number;
+  quantidadeParaAviso: number;
+  tipoUnidade: string;
+  fornecedor?: string;
+}
+
+export async function registrarEpiApi(epi: ICriarEpi) {
   console.log("registrarEpiApi", epi);
   return await httpClient("/epi", {
     method: "POST",

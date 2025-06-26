@@ -9,13 +9,13 @@ import { getEpisEmFalta } from "../../../services/getEpisEmFalta";
 import { IEpi } from "../../../services/registrarEpiApi";
 
 function renderItemEmFalta(
+  theme: string,
   nome: string,
   ca: string,
   tipoUnidade: string,
   quantidade: number,
   quantidadeParaAviso: number
 ) {
-  const { theme } = useThemeContext();
   return (
     <View
       style={[
@@ -117,6 +117,7 @@ export default function itensEmFalta() {
                 >
                   <View key={epi._id}>
                     {renderItemEmFalta(
+                      theme,
                       epi.nome || "",
                       epi.certificadoAprovacao || "",
                       epi.tipoUnidade || "",
@@ -173,6 +174,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     height: "100%",
     paddingVertical: 5,
+    gap: 5,
   },
   rightSide: {
     flex: 1,
@@ -192,8 +194,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
     width: "100%",
-    height: 100,
-    gap: 10,
+    minHeight: 100,
   },
   dadosEpiText: {
     textAlign: "left",

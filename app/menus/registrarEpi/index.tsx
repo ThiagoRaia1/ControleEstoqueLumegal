@@ -12,7 +12,7 @@ import MenuInferior from "../../components/MenuInferior";
 import Carregando from "../../components/Carregando";
 import { useState } from "react";
 import { Picker } from "@react-native-picker/picker";
-import { IEpi, registrarEpiApi } from "../../../services/registrarEpiApi";
+import { ICriarEpi, IEpi, registrarEpiApi } from "../../../services/registrarEpiApi";
 
 export default function RegistrarEpi() {
   const { theme } = useThemeContext();
@@ -55,7 +55,7 @@ export default function RegistrarEpi() {
         throw new Error("Quantidade para Aviso deve ser um número válido.");
       }
 
-      const epi: IEpi = {
+      const epi: ICriarEpi = {
         nome: nome.trim(),
         descricao: descricao.trim(),
         certificadoAprovacao: certificadoAprovacao.trim(),
