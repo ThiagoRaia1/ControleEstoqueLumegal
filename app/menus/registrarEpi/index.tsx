@@ -5,23 +5,83 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
 import BotaoLogout from "../../components/BotaoLogout";
 import MenuInferior from "../../components/MenuInferior";
+import Carregando from "../../components/Carregando";
 import { useState } from "react";
 import { Picker } from "@react-native-picker/picker";
+import { IEpi, registrarEpiApi } from "../../../services/registrarEpiApi";
 
 export default function RegistrarEpi() {
   const { theme } = useThemeContext();
+  const [carregando, setCarregando] = useState(false);
 
   const [nome, setNome] = useState("");
   const [certificadoAprovacao, setCertificadoAprovacao] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [tipoUnidade, setTipoUnidade] = useState("");
+  const [fornecedores, setFornecedores] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [quantidadeParaAviso, setQuantidadeParaAviso] = useState("");
-  const [tipoUnidade, setTipoUnidade] = useState("");
 
   const tiposDeUnidadeDisponiveis = ["Unidade", "Par"];
+
+  const registrarEpi = async () => {
+    if (
+      !nome ||
+      !nome.trim() ||
+      !tipoUnidade ||
+      !tipoUnidade.trim() ||
+      !quantidade ||
+      !quantidade.trim() ||
+      !quantidadeParaAviso ||
+      !quantidadeParaAviso.trim()
+    ) {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    try {
+      setCarregando(true);
+      if (!parseInt(quantidade, 10) || parseInt(quantidade, 10) < 0) {
+        throw new Error("Quantidade deve ser um número válido.");
+      }
+      if (
+        !parseInt(quantidadeParaAviso, 10) ||
+        parseInt(quantidadeParaAviso, 10) < 0
+      ) {
+        throw new Error("Quantidade para Aviso deve ser um número válido.");
+      }
+
+      const epi: IEpi = {
+        nome: nome.trim(),
+        descricao: descricao.trim(),
+        certificadoAprovacao: certificadoAprovacao.trim(),
+        quantidade: parseInt(quantidade.trim(), 10),
+        quantidadeParaAviso: parseInt(quantidadeParaAviso.trim(), 10),
+        tipoUnidade: tipoUnidade.trim(),
+        fornecedor: fornecedores.trim(),
+      };
+
+      const retornoDaApi = await registrarEpiApi(epi);
+
+      alert("EPI registrado com sucesso!");
+      // Limpa os campos após o registro
+      setNome("");
+      setCertificadoAprovacao("");
+      setDescricao("");
+      setTipoUnidade("");
+      setFornecedores("");
+      setQuantidade("");
+      setQuantidadeParaAviso("");
+    } catch (erro: any) {
+      alert(erro.message);
+    } finally {
+      setCarregando(false);
+    }
+  };
 
   return (
     <View
@@ -44,7 +104,11 @@ export default function RegistrarEpi() {
         >
           Registrar EPI
         </Text>
-        <View style={styles.mainContent}>
+        <Animatable.View
+          animation="fadeInUp"
+          duration={1000}
+          style={styles.mainContent}
+        >
           <View style={styles.labelInputContainer}>
             <Text
               style={[
@@ -52,7 +116,7 @@ export default function RegistrarEpi() {
                 theme === "light" ? { color: "black" } : { color: "white" },
               ]}
             >
-              NOME:
+              NOME: *
             </Text>
             <TextInput
               style={[
@@ -63,7 +127,8 @@ export default function RegistrarEpi() {
                   : { color: "white", borderColor: "white" },
               ]}
               placeholder="Nome do EPI"
-              placeholderTextColor="#ccc"
+              placeholderTextColor="#888"
+              value={nome}
               onChangeText={(text) => setNome(text)}
             />
           </View>
@@ -86,7 +151,8 @@ export default function RegistrarEpi() {
                   : { color: "white", borderColor: "white" },
               ]}
               placeholder="C.A. do EPI"
-              placeholderTextColor="#ccc"
+              placeholderTextColor="#888"
+              value={certificadoAprovacao}
               onChangeText={(text) => setCertificadoAprovacao(text)}
             />
           </View>
@@ -109,7 +175,8 @@ export default function RegistrarEpi() {
                   : { color: "white", borderColor: "white" },
               ]}
               placeholder="Descrição do EPI"
-              placeholderTextColor="#ccc"
+              placeholderTextColor="#888"
+              value={descricao}
               onChangeText={(text) => setDescricao(text)}
             />
           </View>
@@ -121,7 +188,7 @@ export default function RegistrarEpi() {
                 { color: theme === "light" ? "black" : "white" },
               ]}
             >
-              Tipo de unidade:
+              TIPO DE UNIDADE: *
             </Text>
 
             <View
@@ -138,8 +205,17 @@ export default function RegistrarEpi() {
                 onValueChange={(tipo) => setTipoUnidade(tipo)}
                 style={[
                   styles.input,
-                  tipoUnidade === "" && { color: "#ccc" }, // cor do placeholder
                   { outline: "none" } as any,
+                  {
+                    color:
+                      tipoUnidade === ""
+                        ? theme === "light"
+                          ? "#888"
+                          : "#aaa"
+                        : theme === "light"
+                        ? "black"
+                        : "white",
+                  },
                   {
                     backgroundColor: theme === "light" ? "#F0F3FA" : "#1C1C1C", // fundo do picker
                     borderWidth: 0,
@@ -151,7 +227,7 @@ export default function RegistrarEpi() {
                 <Picker.Item
                   label="Tipo de unidade"
                   value=""
-                  color={theme === "light" ? "black" : "#ccc"} // texto do placeholder
+                  color={theme === "light" ? "black" : "#888"} // texto do placeholder
                 />
                 {tiposDeUnidadeDisponiveis.map((tipo) => (
                   <Picker.Item
@@ -165,10 +241,35 @@ export default function RegistrarEpi() {
             </View>
           </View>
 
+          <View style={styles.labelInputContainer}>
+            <Text
+              style={[
+                styles.label,
+                theme === "light" ? { color: "black" } : { color: "white" },
+              ]}
+            >
+              FORNECEDOR:
+            </Text>
+            <TextInput
+              style={[
+                styles.input,
+                { outline: "none" } as any,
+                theme === "light"
+                  ? { color: "black", borderColor: "black" }
+                  : { color: "white", borderColor: "white" },
+              ]}
+              placeholder="Fornecedores do EPI"
+              placeholderTextColor="#888"
+              value={fornecedores}
+              onChangeText={(text) => setFornecedores(text)}
+            />
+          </View>
+
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
+              alignItems: "flex-end",
               gap: 20,
             }}
           >
@@ -179,7 +280,7 @@ export default function RegistrarEpi() {
                   theme === "light" ? { color: "black" } : { color: "white" },
                 ]}
               >
-                QUANTIDADE:
+                QUANTIDADE: *
               </Text>
               <TextInput
                 style={[
@@ -190,7 +291,8 @@ export default function RegistrarEpi() {
                     : { color: "white", borderColor: "white" },
                 ]}
                 placeholder="Quantidade inicial do EPI"
-                placeholderTextColor="#ccc"
+                placeholderTextColor="#888"
+                value={quantidade}
                 onChangeText={(text) => setQuantidade(text)}
               />
             </View>
@@ -201,7 +303,7 @@ export default function RegistrarEpi() {
                   theme === "light" ? { color: "black" } : { color: "white" },
                 ]}
               >
-                QUANTIDADE PARA AVISO:
+                QUANTIDADE PARA AVISO: *
               </Text>
               <TextInput
                 style={[
@@ -212,31 +314,20 @@ export default function RegistrarEpi() {
                     : { color: "white", borderColor: "white" },
                 ]}
                 placeholder="Quantidade para o item ser exibido no aviso"
-                placeholderTextColor="#ccc"
+                placeholderTextColor="#888"
+                value={quantidadeParaAviso}
                 onChangeText={(text) => setQuantidadeParaAviso(text)}
               />
             </View>
           </View>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              // Adicionar a lógica para registrar o EPI
-              console.log("EPI registrado:", {
-                nome,
-                certificadoAprovacao,
-                descricao,
-                quantidade,
-                quantidadeParaAviso,
-                tipoUnidade,
-              });
-            }}
-          >
+          <TouchableOpacity style={styles.button} onPress={registrarEpi}>
             <Text style={styles.buttonText}>Salvar</Text>
           </TouchableOpacity>
-        </View>
+        </Animatable.View>
       </View>
       <MenuInferior />
+      {carregando && <Carregando />}
     </View>
   );
 }
@@ -257,9 +348,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   mainContent: {
-    height: "100%",
-    width: "100%",
     justifyContent: "center",
+    height: "90%",
+    width: "100%",
+    maxWidth: 800,
     padding: 20,
     gap: 20,
   },
@@ -275,7 +367,7 @@ const styles = StyleSheet.create({
     width: "100%",
     fontSize: 16,
     borderWidth: 1,
-    padding: 10,
+    paddingHorizontal: 10,
     borderRadius: 10,
   },
   pickerContainer: {

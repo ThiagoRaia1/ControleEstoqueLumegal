@@ -2,9 +2,19 @@ import { View, StyleSheet, Text, ScrollView } from "react-native";
 import * as Animatable from "react-native-animatable";
 import MenuInferior from "../../components/MenuInferior";
 import BotaoLogout from "../../components/BotaoLogout";
+import Carregando from "../../components/Carregando";
 import { useThemeContext } from "../../../context/ThemeContext";
+import { useEffect, useState } from "react";
+import { getEpisEmFalta } from "../../../services/getEpisEmFalta";
+import { IEpi } from "../../../services/registrarEpiApi";
 
-function renderItemEmFalta() {
+function renderItemEmFalta(
+  nome: string,
+  ca: string,
+  tipoUnidade: string,
+  quantidade: number,
+  quantidadeParaAviso: number
+) {
   const { theme } = useThemeContext();
   return (
     <View
@@ -16,9 +26,9 @@ function renderItemEmFalta() {
       ]}
     >
       <View style={styles.leftSide}>
-        <Text style={styles.dadosEpiText}>Nome: EPI</Text>
-        <Text style={styles.dadosEpiText}>C.A.: 13347</Text>
-        <Text style={styles.dadosEpiText}>Unidade/Par: Unidade</Text>
+        <Text style={styles.dadosEpiText}>Nome: {nome}</Text>
+        <Text style={styles.dadosEpiText}>C.A.: {ca}</Text>
+        <Text style={styles.dadosEpiText}>Unidade/Par: {tipoUnidade}</Text>
       </View>
 
       <View style={styles.rightSide}>
@@ -28,10 +38,12 @@ function renderItemEmFalta() {
             {
               textAlign: "center",
               color: "white",
+              fontSize: 18,
             },
           ]}
         >
-          Quantidade:{"\n"}10
+          Quantidade:{"\n"}
+          {quantidade}/{quantidadeParaAviso}
         </Text>
       </View>
     </View>
@@ -40,6 +52,24 @@ function renderItemEmFalta() {
 
 export default function itensEmFalta() {
   const { theme } = useThemeContext();
+  const [carregando, setCarregando] = useState(false);
+  const [episEmFalta, setEpisEmFalta] = useState([]);
+
+  useEffect(() => {
+    const carregarEpisEmFalta = async () => {
+      try {
+        setCarregando(true);
+        setEpisEmFalta(await getEpisEmFalta());
+      } catch (erro: any) {
+        alert(erro.message);
+      } finally {
+        setCarregando(false);
+      }
+    };
+
+    carregarEpisEmFalta();
+  }, []);
+
   return (
     <View
       style={[
@@ -61,11 +91,7 @@ export default function itensEmFalta() {
         >
           Itens em falta
         </Text>
-        <Animatable.View
-          animation="fadeInUp"
-          duration={1000}
-          style={styles.mainContent}
-        >
+        <View style={styles.mainContent}>
           <ScrollView
             style={[
               styles.itensEmFaltaScroll,
@@ -82,19 +108,30 @@ export default function itensEmFalta() {
             persistentScrollbar={true}
           >
             <View style={{ padding: 20, gap: 20 }}>
-              {renderItemEmFalta()}
-              {renderItemEmFalta()}
-              {renderItemEmFalta()}
-              {renderItemEmFalta()}
-              {renderItemEmFalta()}
-              {renderItemEmFalta()}
-              {renderItemEmFalta()}
-              {renderItemEmFalta()}
+              {episEmFalta.map((epi: IEpi, index: number) => (
+                <Animatable.View
+                  key={epi._id}
+                  animation="fadeInUp"
+                  duration={1000}
+                  delay={index * 150}
+                >
+                  <View key={epi._id}>
+                    {renderItemEmFalta(
+                      epi.nome || "",
+                      epi.certificadoAprovacao || "",
+                      epi.tipoUnidade || "",
+                      epi.quantidade || 0,
+                      epi.quantidadeParaAviso || 0
+                    )}
+                  </View>
+                </Animatable.View>
+              ))}
             </View>
           </ScrollView>
-        </Animatable.View>
+        </View>
       </View>
       <MenuInferior />
+      {carregando && <Carregando />}
     </View>
   );
 }
@@ -112,7 +149,7 @@ const styles = StyleSheet.create({
   mainContent: {
     flex: 1,
     width: "100%",
-    maxWidth: 700,
+    maxWidth: 800,
     padding: 20,
   },
   title: {
@@ -126,7 +163,6 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     alignSelf: "center",
     width: "100%",
-    maxWidth: 500,
   },
   scrollContent: {
     flexGrow: 1,
@@ -143,7 +179,7 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "center",
     alignSelf: "center",
-    backgroundColor: "#4B366D",
+    backgroundColor: "#0033A0",
     borderRadius: 10,
   },
   itemEmFalta: {
@@ -163,6 +199,6 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontSize: 14,
     color: "black",
-    fontWeight: "400",
+    fontWeight: "500",
   },
 });
