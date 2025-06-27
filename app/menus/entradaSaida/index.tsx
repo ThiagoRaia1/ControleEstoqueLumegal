@@ -41,13 +41,17 @@ function renderItem(
       ]}
     >
       <View style={styles.leftSide}>
-        <Text style={styles.dadosEpiText}>Nome: {nome}</Text>
-        <Text style={styles.dadosEpiText}>C.A.: {ca}</Text>
-        <Text style={styles.dadosEpiText}>Unidade/Par: {tipoUnidade}</Text>
-        <Text style={styles.dadosEpiText}>Quantidade: {quantidade}</Text>
-        <Text style={styles.dadosEpiText}>
-          Quantidade para aviso: {quantidadeParaAviso}
-        </Text>
+        <ScrollView
+          contentContainerStyle={{ paddingRight: 10, borderRadius: 20 }}
+        >
+          <Text style={styles.dadosEpiText}>Nome: {nome}</Text>
+          <Text style={styles.dadosEpiText}>C.A.: {ca}</Text>
+          <Text style={styles.dadosEpiText}>Unidade/Par: {tipoUnidade}</Text>
+          <Text style={styles.dadosEpiText}>Quantidade: {quantidade}</Text>
+          <Text style={[styles.dadosEpiText, {marginBottom: 0}]}>
+            Quantidade para aviso: {quantidadeParaAviso}
+          </Text>
+        </ScrollView>
       </View>
 
       <View
@@ -328,7 +332,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
     width: "100%",
-    minHeight: 100,
+    height: 170,
     gap: 10,
   },
   leftSide: {
@@ -353,6 +357,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "black",
     fontWeight: "500",
+    marginBottom: 10,
   },
   plusMinusButtonContainer: {
     flex: 1,

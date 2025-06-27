@@ -26,9 +26,15 @@ function renderItemEmFalta(
       ]}
     >
       <View style={styles.leftSide}>
-        <Text style={styles.dadosEpiText}>Nome: {nome}</Text>
-        <Text style={styles.dadosEpiText}>C.A.: {ca}</Text>
-        <Text style={styles.dadosEpiText}>Unidade/Par: {tipoUnidade}</Text>
+        <ScrollView
+          contentContainerStyle={{ paddingRight: 10, borderRadius: 20 }}
+        >
+          <Text style={styles.dadosEpiText}>Nome: {nome}</Text>
+          <Text style={styles.dadosEpiText}>C.A.: {ca}</Text>
+          <Text style={[styles.dadosEpiText, { marginBottom: 0 }]}>
+            Unidade/Par: {tipoUnidade}
+          </Text>
+        </ScrollView>
       </View>
 
       <View style={styles.rightSide}>
@@ -39,6 +45,7 @@ function renderItemEmFalta(
               textAlign: "center",
               color: "white",
               fontSize: 18,
+              marginBottom: 0,
             },
           ]}
         >
@@ -193,17 +200,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 10,
+    gap: 10,
     backgroundColor: "white",
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 20,
     width: "100%",
-    minHeight: 100,
+    height: 110,
   },
   dadosEpiText: {
     textAlign: "left",
     fontSize: 14,
     color: "black",
     fontWeight: "500",
+    marginBottom: 10,
   },
 });
