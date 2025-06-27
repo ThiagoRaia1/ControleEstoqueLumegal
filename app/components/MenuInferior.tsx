@@ -117,7 +117,11 @@ export default function MenuInferior() {
                 style={[
                   styles.text,
                   active && { color: "#0033a0" },
-                  screenWidth > 600 && { fontSize: 14 },
+                  screenWidth > 600
+                    ? { fontSize: 14 }
+                    : screenWidth > 420
+                    ? { fontSize: 10 }
+                    : { fontSize: 8 },
                 ]}
               >
                 {label}
@@ -139,7 +143,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
-    fontSize: 10,
+    fontSize: 14,
     fontWeight: "600",
   },
   activeBackground: {
