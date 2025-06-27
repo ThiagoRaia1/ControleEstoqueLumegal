@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  TextInput,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
@@ -15,6 +16,7 @@ import { useEffect, useState } from "react";
 import { getEpis } from "../../../services/getEpis";
 import ModalConfirmacao from "../../components/ModalConfirmacao";
 import { excluirEpiApi } from "../../../services/excluirEpiApi";
+import { Feather } from "@expo/vector-icons";
 
 export default function Pesquisar() {
   const { theme } = useThemeContext();
@@ -23,6 +25,27 @@ export default function Pesquisar() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [epiSelecionado, setEpiSelecionado] = useState<IEpi | null>(null);
+
+  const [pesquisa, setPesquisa] = useState("");
+
+  // Funcao para ignorar acentuacao na pesquisa
+  const normalizar = (texto: string) =>
+    texto
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  // Funcao para filtrar a lista de epis de acordo com a pesquisa
+  const episFiltrados = epis.filter((epi) => {
+    const termo = normalizar(pesquisa);
+    const nome = normalizar(epi.nome || "");
+    const ca = normalizar(epi.certificadoAprovacao || "");
+    return nome.startsWith(termo) || ca.startsWith(termo);
+  });
+
+  const editar = async () => {
+    console.log("Epi selecionado: ", epiSelecionado?.nome);
+  };
 
   const excluirItem = async () => {
     if (!epiSelecionado) return;
@@ -59,8 +82,8 @@ export default function Pesquisar() {
         style={[
           styles.item,
           theme === "light"
-            ? { backgroundColor: "white", borderColor: "#ccc" }
-            : { backgroundColor: "#c7c7c7", borderColor: "black" },
+            ? { backgroundColor: "white" }
+            : { backgroundColor: "#c7c7c7" },
         ]}
       >
         <View style={styles.leftSide}>
@@ -107,11 +130,12 @@ export default function Pesquisar() {
               style={[
                 styles.button,
                 theme === "light"
-                  ? { borderColor: "#ccc" }
+                  ? { borderColor: "#888" }
                   : { borderColor: "black" },
               ]}
               onPress={() => {
-                alert("Funcionalidade de edição em desenvolvimento.");
+                setEpiSelecionado(epi);
+                editar();
               }}
             >
               <Text style={styles.buttonText}>Editar</Text>
@@ -121,7 +145,7 @@ export default function Pesquisar() {
                 styles.button,
                 { backgroundColor: "#b30f02" },
                 theme === "light"
-                  ? { borderColor: "#ccc" }
+                  ? { borderColor: "#888" }
                   : { borderColor: "black" },
               ]}
               onPress={() => {
@@ -163,12 +187,37 @@ export default function Pesquisar() {
           duration={1000}
           style={styles.mainContent}
         >
+          <View
+            style={[
+              styles.searchBar,
+              theme === "light"
+                ? { backgroundColor: "white", borderColor: "#888" }
+                : { borderColor: "#888" },
+            ]}
+          >
+            <Feather
+              name={"search"}
+              size={30}
+              color={theme === "light" ? "black" : "white"}
+              style={{ paddingHorizontal: 10 }}
+            />
+            <TextInput
+              style={[
+                styles.input,
+                { outlineStyle: "none" as any },
+                theme === "light" ? { color: "black" } : { color: "white" },
+              ]}
+              placeholder="Pesquisar"
+              placeholderTextColor="#888"
+              onChangeText={(text) => setPesquisa(text)}
+            />
+          </View>
           <ScrollView
             style={[
               styles.itensScroll,
               theme === "light"
-                ? { borderColor: "#ccc" }
-                : { borderColor: "black" },
+                ? { borderColor: "#888" }
+                : { borderColor: "#888" },
             ]}
             contentContainerStyle={[
               styles.scrollContent,
@@ -179,7 +228,7 @@ export default function Pesquisar() {
             persistentScrollbar={true}
           >
             <View style={{ padding: 20, gap: 20 }}>
-              {epis.map((epi: IEpi, index: number) => (
+              {episFiltrados.map((epi: IEpi, index: number) => (
                 <Animatable.View
                   key={epi._id}
                   animation="fadeInUp"
@@ -227,6 +276,7 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 800,
     padding: 20,
+    gap: 20,
   },
   itensScroll: {
     flex: 1,
@@ -246,6 +296,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderRadius: 20,
+    borderColor: "#888",
     width: "100%",
     height: 200,
     gap: 10,
@@ -285,5 +336,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 500,
     color: "white",
+  },
+  input: {
+    flex: 1,
+    height: 50,
+    fontSize: 16,
+  },
+  searchBar: {
+    width: "100%",
+    flexDirection: "row",
+    borderWidth: 2,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

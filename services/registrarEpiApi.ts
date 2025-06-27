@@ -2,7 +2,7 @@ import { httpClient } from "../adapters/httpClient";
 
 export interface IEpi {
   _id: string;
-  nome?: string;
+  nome: string;
   descricao?: string;
   certificadoAprovacao?: string;
   quantidade?: number;
