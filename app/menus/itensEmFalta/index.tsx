@@ -91,7 +91,11 @@ export default function itensEmFalta() {
         >
           Itens em falta
         </Text>
-        <View style={styles.mainContent}>
+        <Animatable.View
+          animation="fadeInUp"
+          duration={1000}
+          style={styles.mainContent}
+        >
           <ScrollView
             style={[
               styles.itensEmFaltaScroll,
@@ -129,7 +133,7 @@ export default function itensEmFalta() {
               ))}
             </View>
           </ScrollView>
-        </View>
+        </Animatable.View>
       </View>
       <MenuInferior />
       {carregando && <Carregando />}

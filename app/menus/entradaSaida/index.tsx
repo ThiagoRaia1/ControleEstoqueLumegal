@@ -66,7 +66,7 @@ function renderItem(
             <AntDesign name="pluscircleo" size={24} color="white" />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.plusMinusButton, { backgroundColor: "red" }]}
+            style={[styles.plusMinusButton, { backgroundColor: "#b30f02" }]}
             onPress={() => setQuantidadeItem(id, quantidadeASerMovida - 1)}
           >
             <AntDesign name="minuscircleo" size={24} color="white" />
@@ -221,7 +221,11 @@ export default function EntradaSaida() {
         >
           Entrada/Saída
         </Text>
-        <View style={styles.mainContent}>
+        <Animatable.View
+          animation="fadeInUp"
+          duration={1000}
+          style={styles.mainContent}
+        >
           <ScrollView
             style={[
               styles.itensScroll,
@@ -276,7 +280,7 @@ export default function EntradaSaida() {
               Confirmar movimentações
             </Text>
           </TouchableOpacity>
-        </View>
+        </Animatable.View>
       </View>
       <MenuInferior />
       {carregando && <Carregando />}
@@ -294,16 +298,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
+  title: {
+    fontSize: 30,
+    fontWeight: "700",
+    textAlign: "center",
+  },
   mainContent: {
     flex: 1,
     width: "100%",
     maxWidth: 800,
     padding: 20,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: "700",
-    textAlign: "center",
   },
   itensScroll: {
     flex: 1,

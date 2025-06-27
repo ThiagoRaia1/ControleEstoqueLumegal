@@ -12,7 +12,10 @@ import MenuInferior from "../../components/MenuInferior";
 import Carregando from "../../components/Carregando";
 import { useState } from "react";
 import { Picker } from "@react-native-picker/picker";
-import { ICriarEpi, IEpi, registrarEpiApi } from "../../../services/registrarEpiApi";
+import {
+  ICriarEpi,
+  registrarEpiApi,
+} from "../../../services/registrarEpiApi";
 
 export default function RegistrarEpi() {
   const { theme } = useThemeContext();
@@ -209,9 +212,7 @@ export default function RegistrarEpi() {
                   {
                     color:
                       tipoUnidade === ""
-                        ? theme === "light"
-                          ? "#888"
-                          : "#aaa"
+                        ? "#888"
                         : theme === "light"
                         ? "black"
                         : "white",
