@@ -12,10 +12,7 @@ import MenuInferior from "../../components/MenuInferior";
 import Carregando from "../../components/Carregando";
 import { useState } from "react";
 import { Picker } from "@react-native-picker/picker";
-import {
-  ICriarEpi,
-  registrarEpiApi,
-} from "../../../services/registrarEpiApi";
+import { ICriarEpi, registrarEpiApi } from "../../../services/registrarEpiApi";
 
 export default function RegistrarEpi() {
   const { theme } = useThemeContext();
@@ -132,7 +129,7 @@ export default function RegistrarEpi() {
               placeholder="Nome do EPI"
               placeholderTextColor="#888"
               value={nome}
-              onChangeText={(text) => setNome(text)}
+              onChangeText={(text) => setNome(text.slice(0, 30))}
             />
           </View>
 
@@ -156,7 +153,9 @@ export default function RegistrarEpi() {
               placeholder="C.A. do EPI"
               placeholderTextColor="#888"
               value={certificadoAprovacao}
-              onChangeText={(text) => setCertificadoAprovacao(text)}
+              onChangeText={(text) =>
+                setCertificadoAprovacao(text.slice(0, 20))
+              }
             />
           </View>
 
@@ -294,7 +293,11 @@ export default function RegistrarEpi() {
                 placeholder="Quantidade inicial do EPI"
                 placeholderTextColor="#888"
                 value={quantidade}
-                onChangeText={(text) => setQuantidade(text)}
+                onChangeText={(text) => {
+                  const numeric = text.replace(/[^0-9]/g, "");
+                  const valor = parseInt(numeric || "0", 10);
+                  setQuantidade(valor > 999 ? "999" : numeric);
+                }}
               />
             </View>
             <View style={[styles.labelInputContainer, { flex: 1 }]}>
@@ -317,7 +320,11 @@ export default function RegistrarEpi() {
                 placeholder="Quantidade para o item ser exibido no aviso"
                 placeholderTextColor="#888"
                 value={quantidadeParaAviso}
-                onChangeText={(text) => setQuantidadeParaAviso(text)}
+                onChangeText={(text) => {
+                  const numeric = text.replace(/[^0-9]/g, "");
+                  const valor = parseInt(numeric || "0", 10);
+                  setQuantidadeParaAviso(valor > 999 ? "999" : numeric);
+                }}
               />
             </View>
           </View>

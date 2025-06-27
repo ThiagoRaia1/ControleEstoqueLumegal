@@ -48,7 +48,7 @@ function renderItem(
           <Text style={styles.dadosEpiText}>C.A.: {ca}</Text>
           <Text style={styles.dadosEpiText}>Unidade/Par: {tipoUnidade}</Text>
           <Text style={styles.dadosEpiText}>Quantidade: {quantidade}</Text>
-          <Text style={[styles.dadosEpiText, {marginBottom: 0}]}>
+          <Text style={[styles.dadosEpiText, { marginBottom: 0 }]}>
             Quantidade para aviso: {quantidadeParaAviso}
           </Text>
         </ScrollView>
@@ -84,7 +84,12 @@ function renderItem(
             gap: 5,
           }}
         >
-          <Text style={[styles.dadosEpiText, { textAlign: "center" }]}>
+          <Text
+            style={[
+              styles.dadosEpiText,
+              { textAlign: "center", marginBottom: 0 },
+            ]}
+          >
             Quantidade a ser movida:
           </Text>
           <TextInput
