@@ -103,10 +103,22 @@ function renderItem(
             keyboardType="numeric"
             value={quantidadeASerMovida.toString()}
             onChangeText={(text: string) => {
-              // Remove qualquer coisa que não seja número
-              const numericValue = text.replace(/[^0-9]/g, "");
-              const valor =
-                numericValue === "" ? 0 : parseInt(numericValue, 10);
+              // Permite apenas "-" no início e números
+              const numericValue = text.replace(/(?!^-)-|[^0-9-]/g, "");
+
+              // Trata campo vazio ou apenas "-"
+              if (numericValue === "" || numericValue === "-") {
+                setQuantidadeItem(id, numericValue === "-" ? -0 : 0);
+                return;
+              }
+
+              let valor = parseInt(numericValue, 10);
+
+              // Se for negativo e o valor absoluto for maior que a quantidade, limita
+              if (valor < 0 && Math.abs(valor) > quantidade) {
+                valor = -quantidade;
+              }
+
               setQuantidadeItem(id, valor);
             }}
           />
