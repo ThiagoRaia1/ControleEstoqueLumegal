@@ -11,9 +11,20 @@ import { useThemeContext } from "../../../context/ThemeContext";
 import BotaoLogout from "../../components/BotaoLogout";
 import MenuInferior from "../../components/MenuInferior";
 import Carregando from "../../components/Carregando";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
-import { ICriarEpi, registrarEpiApi } from "../../../services/registrarEpiApi";
+import { ICriarEpi } from "../../../interfaces/epi";
+import { registrarEpiApi } from "../../../services/epiApi";
+import {
+  getTiposUnidade,
+  getTipoUnidade,
+} from "../../../services/tipoUnidadeApi";
+import { ITipoUnidade } from "../../../interfaces/tipoUnidade";
+import {
+  getFornecedores,
+  getFornecedorPorNome,
+} from "../../../services/fornecedor";
+import { IFornecedor } from "../../../interfaces/fornecedor";
 
 export default function RegistrarEpi() {
   const { theme } = useThemeContext();
@@ -23,13 +34,52 @@ export default function RegistrarEpi() {
   const [certificadoAprovacao, setCertificadoAprovacao] = useState("");
   const [descricao, setDescricao] = useState("");
   const [tipoUnidade, setTipoUnidade] = useState("");
-  const [fornecedores, setFornecedores] = useState("");
+  const [fornecedores, setFornecedores] = useState<string[]>([""]);
   const [quantidade, setQuantidade] = useState("");
   const [quantidadeParaAviso, setQuantidadeParaAviso] = useState("");
 
-  const tiposDeUnidadeDisponiveis = ["Unidade", "Par"];
+  // Estado com lista completa de fornecedores vindos do backend
+  const [fornecedoresDisponiveis, setFornecedoresDisponiveis] = useState<
+    { label: string; value: string }[]
+  >([]);
+
+  // Estado com lista completa de tipos de unidade vindos do backend
+  const [tiposUnidadeDisponiveis, setTiposUnidadeDisponiveis] = useState<
+    { label: string; value: string }[]
+  >([]);
+
+  useEffect(() => {
+    async function carregarDados() {
+      const listaTiposUnidadeDisponiveis = await getTiposUnidade();
+      const itensTiposUnidade = listaTiposUnidadeDisponiveis.map((f: any) => ({
+        label: f.tipo,
+        value: f.tipo, // use f.id se quiser o ID como value
+      }));
+      setTiposUnidadeDisponiveis(itensTiposUnidade);
+
+      const listaFornecedores = await getFornecedores();
+      const itensFornecedores = listaFornecedores.map((f: any) => ({
+        label: f.nome,
+        value: f.nome, // use f.id se quiser o ID como value
+      }));
+      setFornecedoresDisponiveis(itensFornecedores);
+    }
+    carregarDados();
+  }, []);
+
+  // Função para setar fornecedor selecionado no índice
+  const setFornecedor = (index: number, valor: string) => {
+    setFornecedores((prev) => {
+      const novos = [...prev];
+      novos[index] = valor;
+      return novos;
+    });
+  };
 
   const registrarEpi = async () => {
+    // Validação dos fornecedores: só passa os não vazios
+    const fornecedoresValidos = fornecedores.filter((f) => f.trim() !== "");
+
     if (
       !nome ||
       !nome.trim() ||
@@ -56,14 +106,25 @@ export default function RegistrarEpi() {
         throw new Error("Quantidade para Aviso deve ser um número válido.");
       }
 
+      const tipoUnidadeId: ITipoUnidade = await getTipoUnidade(tipoUnidade);
+
+      let fornecedoresId: number[] = [];
+      for (let i: number = 0; i < fornecedoresValidos.length; i++) {
+        const fornecedorObj: IFornecedor = await getFornecedorPorNome(
+          fornecedoresValidos[i]
+        );
+        fornecedoresId.push(fornecedorObj.id);
+      }
+
+      console.log(fornecedoresId);
       const epi: ICriarEpi = {
         nome: nome.trim(),
         descricao: descricao.trim(),
         certificadoAprovacao: certificadoAprovacao.trim(),
         quantidade: parseInt(quantidade.trim(), 10),
         quantidadeParaAviso: parseInt(quantidadeParaAviso.trim(), 10),
-        tipoUnidade: tipoUnidade.trim(),
-        fornecedor: fornecedores.trim(),
+        tipoUnidadeId: tipoUnidadeId.id,
+        fornecedores: fornecedoresId,
       };
 
       const retornoDaApi = await registrarEpiApi(epi);
@@ -74,7 +135,7 @@ export default function RegistrarEpi() {
       setCertificadoAprovacao("");
       setDescricao("");
       setTipoUnidade("");
-      setFornecedores("");
+      setFornecedores([""]);
       setQuantidade("");
       setQuantidadeParaAviso("");
     } catch (erro: any) {
@@ -236,12 +297,12 @@ export default function RegistrarEpi() {
                     value=""
                     color={theme === "light" ? "black" : "#888"} // texto do placeholder
                   />
-                  {tiposDeUnidadeDisponiveis.map((tipo) => (
+                  {tiposUnidadeDisponiveis.map((tipo) => (
                     <Picker.Item
-                      key={tipo}
-                      label={tipo}
-                      value={tipo}
-                      color={theme === "light" ? "black" : "white"} // cor de cada item
+                      key={tipo.value}
+                      label={tipo.label}
+                      value={tipo.value}
+                      color={theme === "light" ? "black" : "white"}
                     />
                   ))}
                 </Picker>
@@ -255,21 +316,109 @@ export default function RegistrarEpi() {
                   theme === "light" ? { color: "black" } : { color: "white" },
                 ]}
               >
-                FORNECEDOR:
+                FORNECEDORES:
               </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  { outline: "none" } as any,
-                  theme === "light"
-                    ? { color: "black", borderColor: "black" }
-                    : { color: "white", borderColor: "white" },
-                ]}
-                placeholder="Fornecedores do EPI"
-                placeholderTextColor="#888"
-                value={fornecedores}
-                onChangeText={(text) => setFornecedores(text)}
-              />
+
+              {fornecedores.map((forn, index) => {
+                // Filtra os fornecedores já selecionados, exceto o atual
+                const usados = fornecedores.filter((_, i) => i !== index);
+                const opcoesFiltradas = fornecedoresDisponiveis.filter(
+                  (f) => !usados.includes(f.value)
+                );
+
+                return (
+                  <View
+                    key={index}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 10,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <View
+                      style={[
+                        styles.pickerContainer,
+                        {
+                          flex: 1,
+                          backgroundColor:
+                            theme === "light" ? "#fff" : "#2a2a2a",
+                          borderColor: theme === "light" ? "black" : "white",
+                        },
+                      ]}
+                    >
+                      <Picker
+                        selectedValue={fornecedores[index]}
+                        onValueChange={(valor) => setFornecedor(index, valor)}
+                        style={[
+                          styles.input,
+                          { outline: "none" } as any,
+                          {
+                            flex: 1,
+                            color:
+                              fornecedores[index] === ""
+                                ? "#888"
+                                : theme === "light"
+                                ? "black"
+                                : "white",
+                            backgroundColor:
+                              theme === "light" ? "#F0F3FA" : "#1C1C1C",
+                            borderWidth: 0,
+                          },
+                        ]}
+                        mode="dropdown"
+                        dropdownIconColor={
+                          theme === "light" ? "black" : "white"
+                        }
+                      >
+                        <Picker.Item
+                          label="Selecione o fornecedor"
+                          value=""
+                          color={"#888"}
+                        />
+                        {opcoesFiltradas.map((fornecedor) => (
+                          <Picker.Item
+                            key={fornecedor.value}
+                            label={fornecedor.label}
+                            value={fornecedor.value}
+                            color={theme === "light" ? "black" : "white"}
+                          />
+                        ))}
+                      </Picker>
+                    </View>
+
+                    {index > 0 && (
+                      <TouchableOpacity
+                        onPress={() =>
+                          setFornecedores((prev) =>
+                            prev.filter((_, i) => i !== index)
+                          )
+                        }
+                        style={{
+                          backgroundColor: "#d9534f",
+                          borderRadius: 8,
+                          paddingVertical: 4,
+                          paddingHorizontal: 8,
+                        }}
+                      >
+                        <Text style={{ color: "white", fontWeight: "bold" }}>
+                          X
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                );
+              })}
+
+              {fornecedores.length < 3 &&
+                fornecedores[fornecedores.length - 1].trim() !== "" && (
+                  <TouchableOpacity
+                    onPress={() => setFornecedores((prev) => [...prev, ""])}
+                    style={[styles.button, { marginTop: 0 }]}
+                  >
+                    <Text style={styles.buttonText}>Adicionar fornecedor</Text>
+                  </TouchableOpacity>
+                )}
             </View>
 
             <View
@@ -366,12 +515,13 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     maxWidth: 800,
-    paddingHorizontal: 20,
-    paddingRight: 10,
+    paddingLeft: 20,
   },
   scrollContent: {
     gap: 20,
-    paddingRight: 10,
+    paddingVertical: 20,
+    paddingLeft: 10,
+    paddingRight: 20,
   },
   labelInputContainer: {
     gap: 10,
@@ -390,6 +540,7 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     width: "100%",
+    height: 50,
     backgroundColor: "#aaa",
     borderRadius: 10,
     borderWidth: 1,

@@ -10,13 +10,12 @@ import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
 import BotaoLogout from "../../components/BotaoLogout";
 import MenuInferior from "../../components/MenuInferior";
-import { IEpi } from "../../../services/registrarEpiApi";
 import Carregando from "../../components/Carregando";
 import { useEffect, useState } from "react";
-import { getEpis } from "../../../services/getEpis";
 import ModalConfirmacao from "../../components/ModalConfirmacao";
-import { excluirEpiApi } from "../../../services/excluirEpiApi";
 import { Feather } from "@expo/vector-icons";
+import { IEpi } from "../../../interfaces/epi";
+import { excluirEpiApi, getEpis } from "../../../services/epiApi";
 
 export default function Pesquisar() {
   const { theme } = useThemeContext();
@@ -51,7 +50,7 @@ export default function Pesquisar() {
     if (!epiSelecionado) return;
     try {
       setCarregando(true);
-      await excluirEpiApi(epiSelecionado._id);
+      await excluirEpiApi(epiSelecionado.id);
       alert(`EPI "${epiSelecionado.nome}" excluído com sucesso!`);
       setModalVisible(false);
       setEpiSelecionado(null);
@@ -95,7 +94,7 @@ export default function Pesquisar() {
               C.A.: {epi.certificadoAprovacao}
             </Text>
             <Text style={styles.dadosEpiText}>
-              Unidade/Par: {epi.tipoUnidade}
+              Unidade/Par: {epi.tipoUnidade.tipo}
             </Text>
             <Text style={styles.dadosEpiText}>
               Quantidade: {epi.quantidade}
@@ -103,9 +102,17 @@ export default function Pesquisar() {
             <Text style={styles.dadosEpiText}>
               Quantidade para aviso: {epi.quantidadeParaAviso}
             </Text>
-            <Text style={[styles.dadosEpiText, { marginBottom: -10 }]}>
-              Fornecedores: {epi.fornecedor}
+            <Text style={[styles.dadosEpiText, { marginBottom: 0 }]}>
+              Fornecedores:
             </Text>
+            {epi.fornecedores.slice(0, 3).map((fornecedor, index) => (
+              <Text
+                key={index}
+                style={[styles.dadosEpiText, { marginBottom: 0 }]}
+              >
+                {"    -"} {fornecedor.nome}
+              </Text>
+            ))}
           </ScrollView>
         </View>
 
@@ -230,7 +237,7 @@ export default function Pesquisar() {
             <View style={{ padding: 20, gap: 20 }}>
               {episFiltrados.map((epi: IEpi, index: number) => (
                 <Animatable.View
-                  key={epi._id}
+                  key={epi.id}
                   animation="fadeInUp"
                   duration={1000}
                   delay={index * 150}

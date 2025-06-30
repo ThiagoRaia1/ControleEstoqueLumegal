@@ -5,14 +5,15 @@ import BotaoLogout from "../../components/BotaoLogout";
 import Carregando from "../../components/Carregando";
 import { useThemeContext } from "../../../context/ThemeContext";
 import { useEffect, useState } from "react";
-import { getEpisEmFalta } from "../../../services/getEpisEmFalta";
-import { IEpi } from "../../../services/registrarEpiApi";
+import { getEpisEmFalta } from "../../../services/epiApi";
+import { IEpi } from "../../../interfaces/epi";
+import { ITipoUnidade } from "../../../interfaces/tipoUnidade";
 
 function renderItemEmFalta(
   theme: string,
   nome: string,
   ca: string,
-  tipoUnidade: string,
+  tipoUnidade: ITipoUnidade,
   quantidade: number,
   quantidadeParaAviso: number
 ) {
@@ -32,7 +33,7 @@ function renderItemEmFalta(
           <Text style={styles.dadosEpiText}>Nome: {nome}</Text>
           <Text style={styles.dadosEpiText}>C.A.: {ca}</Text>
           <Text style={[styles.dadosEpiText, { marginBottom: 0 }]}>
-            Unidade/Par: {tipoUnidade}
+            Unidade/Par: {tipoUnidade.tipo}
           </Text>
         </ScrollView>
       </View>
@@ -121,17 +122,17 @@ export default function itensEmFalta() {
             <View style={{ padding: 20, gap: 20 }}>
               {episEmFalta.map((epi: IEpi, index: number) => (
                 <Animatable.View
-                  key={epi._id}
+                  key={epi.id}
                   animation="fadeInUp"
                   duration={1000}
                   delay={index * 150}
                 >
-                  <View key={epi._id}>
+                  <View key={epi.id}>
                     {renderItemEmFalta(
                       theme,
                       epi.nome || "",
                       epi.certificadoAprovacao || "",
-                      epi.tipoUnidade || "",
+                      epi.tipoUnidade,
                       epi.quantidade || 0,
                       epi.quantidadeParaAviso || 0
                     )}

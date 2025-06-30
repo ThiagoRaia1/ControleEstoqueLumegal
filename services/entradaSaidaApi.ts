@@ -1,9 +1,5 @@
 import { httpClient } from "../adapters/httpClient";
-
-export interface IMovimentacaoEpi {
-  _id: string;
-  quantidade: number;
-}
+import { IMovimentacaoEpi } from "../interfaces/entradaSaida";
 
 export async function entradaSaidaApi(movimentacoes: IMovimentacaoEpi[]) {
   return await httpClient("/epi/entradaSaida", {

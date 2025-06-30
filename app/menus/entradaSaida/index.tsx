@@ -10,15 +10,15 @@ import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
 import BotaoLogout from "../../components/BotaoLogout";
 import MenuInferior from "../../components/MenuInferior";
-import { IEpi } from "../../../services/registrarEpiApi";
 import { useEffect, useState } from "react";
 import Carregando from "../../components/Carregando";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
   entradaSaidaApi,
-  IMovimentacaoEpi,
 } from "../../../services/entradaSaidaApi";
-import { getEpis } from "../../../services/getEpis";
+import { IEpi } from "../../../interfaces/epi";
+import { getEpis } from "../../../services/epiApi";
+import { IMovimentacaoEpi } from "../../../interfaces/entradaSaida";
 
 function renderItem(
   theme: string,
@@ -31,6 +31,7 @@ function renderItem(
   quantidadeASerMovida: number,
   setQuantidadeItem: (id: string, novaQuantidade: number) => void
 ) {
+  console.log(tipoUnidade)
   return (
     <View
       style={[
@@ -167,10 +168,10 @@ export default function EntradaSaida() {
     const mov = Object.entries(quantidadeASerMovida)
       .filter(([_, quantidade]) => quantidade !== 0)
       .map(([id, quantidade]) => {
-        const epi = epis.find((e) => e._id === id);
+        const epi = epis.find((e) => String(e.id) === String(id));
         return {
           id,
-          nome: epi?.nome || "Desconhecido",
+          nome: epi?.nome ?? "[EPI não encontrado]",
           quantidade,
         };
       });
@@ -185,7 +186,7 @@ export default function EntradaSaida() {
     )
       .filter(([_, quantidade]) => quantidade !== 0)
       .map(([id, quantidade]) => ({
-        _id: id,
+        id: id,
         quantidade,
       }));
 
@@ -253,21 +254,21 @@ export default function EntradaSaida() {
             <View style={{ padding: 20, gap: 20 }}>
               {epis.map((epi: IEpi, index: number) => (
                 <Animatable.View
-                  key={epi._id}
+                  key={epi.id}
                   animation="fadeInUp"
                   duration={1000}
                   delay={index * 150}
                 >
-                  <View key={epi._id}>
+                  <View key={epi.id}>
                     {renderItem(
                       theme,
-                      epi._id,
+                      epi.id,
                       epi.nome || "",
                       epi.certificadoAprovacao || "",
-                      epi.tipoUnidade || "",
+                      `${epi.tipoUnidade.tipo}`,
                       epi.quantidade || 0,
                       epi.quantidadeParaAviso || 0,
-                      quantidadeASerMovida[epi._id] || 0,
+                      quantidadeASerMovida[epi.id] || 0,
                       setQuantidadeItem
                     )}
                   </View>
