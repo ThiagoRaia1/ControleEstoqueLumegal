@@ -13,9 +13,7 @@ import MenuInferior from "../../components/MenuInferior";
 import { useEffect, useState } from "react";
 import Carregando from "../../components/Carregando";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import {
-  entradaSaidaApi,
-} from "../../../services/entradaSaidaApi";
+import { entradaSaidaApi } from "../../../services/entradaSaidaApi";
 import { IEpi } from "../../../interfaces/epi";
 import { getEpis } from "../../../services/epiApi";
 import { IMovimentacaoEpi } from "../../../interfaces/entradaSaida";
@@ -199,7 +197,7 @@ export default function EntradaSaida() {
       setQuantidadeASerMovida({}); // limpa estado
       await carregarEpis(); // atualiza a lista com dados atualizados
     } catch (erro: any) {
-      console.log(erro.message);
+      alert(erro.message);
     } finally {
       setCarregando(false);
     }

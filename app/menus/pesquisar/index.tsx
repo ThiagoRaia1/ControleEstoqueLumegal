@@ -678,19 +678,20 @@ export default function Pesquisar() {
                           : { color: "white" },
                       ]}
                     >
-                      QUANTIDADE: *
+                      QUANTIDADE:
                     </Text>
                     <TextInput
                       style={[
                         styles.inputEditar,
                         { outline: "none" } as any,
                         theme === "light"
-                          ? { color: "black", borderColor: "black" }
-                          : { color: "white", borderColor: "white" },
+                          ? { color: "black", borderColor: "black", backgroundColor: "#ccc" }
+                          : { color: "#888", borderColor: "white", backgroundColor: "black" },
                       ]}
                       placeholder="Quantidade inicial do EPI"
                       placeholderTextColor="#888"
                       value={quantidade}
+                      editable={false}
                       onChangeText={(text) => {
                         const numeric = text.replace(/[^0-9]/g, "");
                         const valor = parseInt(numeric || "0", 10);
