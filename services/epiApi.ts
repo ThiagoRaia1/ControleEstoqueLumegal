@@ -14,10 +14,15 @@ export async function getEpisEmFalta() {
 }
 
 export async function registrarEpiApi(epi: ICriarEpi) {
-  console.log("registrarEpiApi", epi);
-
   return await httpClient("/epi", {
     method: "POST",
+    body: JSON.stringify(epi),
+  });
+}
+
+export async function editarEpiApi(nome: string, epi: ICriarEpi) {
+  return await httpClient(`/epi/${nome}`, {
+    method: "PATCH",
     body: JSON.stringify(epi),
   });
 }

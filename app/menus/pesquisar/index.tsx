@@ -15,12 +15,19 @@ import Carregando from "../../components/Carregando";
 import { useEffect, useState } from "react";
 import ModalConfirmacao from "../../components/ModalConfirmacao";
 import { Feather } from "@expo/vector-icons";
-import { IEpi } from "../../../interfaces/epi";
-import { excluirEpiApi, getEpis } from "../../../services/epiApi";
+import { ICriarEpi, IEpi } from "../../../interfaces/epi";
+import { editarEpiApi, excluirEpiApi, getEpis } from "../../../services/epiApi";
 import { Picker } from "@react-native-picker/picker";
-import { getFornecedores } from "../../../services/fornecedor";
-import { getTiposUnidade } from "../../../services/tipoUnidadeApi";
-import registrarEpi from "../registrarEpi";
+import {
+  getFornecedores,
+  getFornecedorPorNome,
+} from "../../../services/fornecedor";
+import {
+  getTiposUnidade,
+  getTipoUnidade,
+} from "../../../services/tipoUnidadeApi";
+import { IFornecedor } from "../../../interfaces/fornecedor";
+import { ITipoUnidade } from "../../../interfaces/tipoUnidade";
 
 export default function Pesquisar() {
   const { theme } = useThemeContext();
@@ -109,7 +116,68 @@ export default function Pesquisar() {
 
   const editar = async () => {
     if (editando) {
-      console.log("Editando epi selecionado: ", epiSelecionado?.nome);
+      if (
+        !nome ||
+        !nome.trim() ||
+        !tipoUnidade ||
+        !tipoUnidade.trim() ||
+        !quantidade ||
+        !quantidade.trim() ||
+        !quantidadeParaAviso ||
+        !quantidadeParaAviso.trim()
+      ) {
+        alert("Por favor, preencha todos os campos obrigatórios.");
+        return;
+      }
+
+      try {
+        setCarregando(true);
+        if (!parseInt(quantidade, 10) || parseInt(quantidade, 10) < 0) {
+          throw new Error("Quantidade deve ser um número válido.");
+        }
+        if (
+          !parseInt(quantidadeParaAviso, 10) ||
+          parseInt(quantidadeParaAviso, 10) < 0
+        ) {
+          throw new Error("Quantidade para Aviso deve ser um número válido.");
+        }
+        if (!descricao) {
+          setDescricao(" ");
+        }
+
+        const tipoUnidadeId: ITipoUnidade = await getTipoUnidade(tipoUnidade);
+
+        const fornecedoresValidos = fornecedores.filter((f) => f.trim() !== "");
+        let fornecedoresIds: number[] = [];
+        for (let i: number = 0; i < fornecedoresValidos.length; i++) {
+          const fornecedorObj: IFornecedor = await getFornecedorPorNome(
+            fornecedoresValidos[i]
+          );
+          fornecedoresIds.push(fornecedorObj.id);
+        }
+
+        const epiEditado: ICriarEpi = {
+          nome,
+          descricao: descricao?.trim() || "",
+          certificadoAprovacao,
+          quantidade: parseInt(quantidade, 10),
+          quantidadeParaAviso: parseInt(quantidadeParaAviso, 10),
+          tipoUnidadeId: tipoUnidadeId.id,
+          fornecedores: fornecedoresIds,
+        };
+        if (epiSelecionado) {
+          const editado = await editarEpiApi(epiSelecionado?.nome, epiEditado);
+          alert("Epi editado com sucesso!");
+          console.log("Editando epi selecionado: ", epiSelecionado?.nome);
+          console.log(editado);
+          await carregarEpis();
+          setEditando(false);
+        }
+      } catch (erro: any) {
+        console.log(erro.message);
+      } finally {
+        setCarregando(false);
+      }
     }
   };
 

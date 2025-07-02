@@ -110,15 +110,15 @@ export default function RegistrarEpi() {
 
       const tipoUnidadeId: ITipoUnidade = await getTipoUnidade(tipoUnidade);
 
-      let fornecedoresId: number[] = [];
+      let fornecedoresIds: number[] = [];
       for (let i: number = 0; i < fornecedoresValidos.length; i++) {
         const fornecedorObj: IFornecedor = await getFornecedorPorNome(
           fornecedoresValidos[i]
         );
-        fornecedoresId.push(fornecedorObj.id);
+        fornecedoresIds.push(fornecedorObj.id);
       }
 
-      console.log(fornecedoresId);
+      console.log(fornecedoresIds);
       const epi: ICriarEpi = {
         nome: nome.trim(),
         descricao: descricao.trim(),
@@ -126,7 +126,7 @@ export default function RegistrarEpi() {
         quantidade: parseInt(quantidade.trim(), 10),
         quantidadeParaAviso: parseInt(quantidadeParaAviso.trim(), 10),
         tipoUnidadeId: tipoUnidadeId.id,
-        fornecedores: fornecedoresId,
+        fornecedores: fornecedoresIds,
       };
 
       const retornoDaApi = await registrarEpiApi(epi);
