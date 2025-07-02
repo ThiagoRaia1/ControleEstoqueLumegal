@@ -31,7 +31,6 @@ function renderItem(
   quantidadeASerMovida: number,
   setQuantidadeItem: (id: string, novaQuantidade: number) => void
 ) {
-  console.log(tipoUnidade)
   return (
     <View
       style={[
