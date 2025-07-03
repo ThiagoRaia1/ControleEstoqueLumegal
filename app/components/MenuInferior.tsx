@@ -23,7 +23,7 @@ const menuItems: { href: string; icon: FeatherIconName; label: string }[] = [
     label: "ITENS EM FALTA",
   },
   {
-    href: `${nomePaginas.registrarEpi}`,
+    href: `${nomePaginas.registrarItem}`,
     icon: "package",
     label: "REGISTRAR EPI",
   },

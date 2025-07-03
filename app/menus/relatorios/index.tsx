@@ -136,20 +136,28 @@ export default function Relatorios() {
           }
         });
 
-        // ==== Segunda tabela: Totais por EPI ====
-        const totaisPorEpi: Record<string, number> = {};
+        // ==== Segunda tabela: Entradas e Saídas por EPI ====
+        const saidasPorEpi: Record<string, number> = {};
+        const entradasPorEpi: Record<string, number> = {};
+
         for (const entrada of entradasSaidas) {
           const nome = entrada.epi.nome;
-          totaisPorEpi[nome] = (totaisPorEpi[nome] || 0) + entrada.quantidade;
+          if (entrada.quantidade > 0) {
+            entradasPorEpi[nome] =
+              (entradasPorEpi[nome] || 0) + entrada.quantidade;
+          } else if (entrada.quantidade < 0) {
+            saidasPorEpi[nome] = (saidasPorEpi[nome] || 0) + entrada.quantidade;
+          }
         }
 
         const startResumoRow = entradasSaidas.length + 4;
 
-        // Cabeçalho da segunda tabela
+        // Cabeçalho da tabela
         worksheet.getCell(`A${startResumoRow}`).value = "EPI";
-        worksheet.getCell(`B${startResumoRow}`).value = "Quantidade Total";
+        worksheet.getCell(`B${startResumoRow}`).value = "Total de Entradas";
+        worksheet.getCell(`C${startResumoRow}`).value = "Total de Saídas";
 
-        ["A", "B"].forEach((col) => {
+        ["A", "B", "C"].forEach((col) => {
           const cell = worksheet.getCell(`${col}${startResumoRow}`);
           cell.fill = azulClaro;
           cell.font = { bold: true, size: 12, color: { argb: "FFFFFFFF" } };
@@ -159,24 +167,32 @@ export default function Relatorios() {
 
         worksheet.getRow(startResumoRow).height = alturaPts;
 
-        // Corpo da segunda tabela
+        // Unifica os nomes de EPIs
+        const nomesEpi = new Set([
+          ...Object.keys(entradasPorEpi),
+          ...Object.keys(saidasPorEpi),
+        ]);
+
+        // Corpo da tabela
         let linha = startResumoRow + 1;
-        Object.entries(totaisPorEpi).forEach(([nome, total], index) => {
+        Array.from(nomesEpi).forEach((nome, index) => {
+          const entradaTotal = entradasPorEpi[nome] || 0;
+          const saidaTotal = saidasPorEpi[nome] || 0;
+
           worksheet.getCell(`A${linha}`).value = nome;
-          worksheet.getCell(`B${linha}`).value = total;
+          worksheet.getCell(`B${linha}`).value = entradaTotal;
+          worksheet.getCell(`C${linha}`).value = saidaTotal;
 
           const isPar = index % 2 === 0;
-          ["A", "B"].forEach((col) => {
+          ["A", "B", "C"].forEach((col) => {
             const cell = worksheet.getCell(`${col}${linha}`);
             cell.alignment = { vertical: "middle", horizontal: "center" };
-
-            // Aplica o fundo: cinza se par, branco se ímpar
             cell.fill = isPar
               ? cinzaClaro
               : {
                   type: "pattern",
                   pattern: "solid",
-                  fgColor: { argb: "FFFFFFFF" }, // branco
+                  fgColor: { argb: "FFFFFFFF" },
                 };
           });
 
@@ -218,30 +234,44 @@ export default function Relatorios() {
           margin: { top: 20 },
         });
 
-        // --- Agrupamento por EPI ---
-        const totaisPorEpi: Record<string, number> = {};
+        // --- Agrupamento por EPI: Entradas e Saídas ---
+        const entradasPorEpi: Record<string, number> = {};
+        const saidasPorEpi: Record<string, number> = {};
+
         for (const entrada of entradasSaidas) {
           const nome = entrada.epi.nome;
-          totaisPorEpi[nome] = (totaisPorEpi[nome] || 0) + entrada.quantidade;
+          if (entrada.quantidade > 0) {
+            entradasPorEpi[nome] =
+              (entradasPorEpi[nome] || 0) + entrada.quantidade;
+          } else if (entrada.quantidade < 0) {
+            saidasPorEpi[nome] = (saidasPorEpi[nome] || 0) + entrada.quantidade;
+          }
         }
 
-        const resumoBody = Object.entries(totaisPorEpi).map(
-          ([nome, total]) => ({
-            epi: nome,
-            total,
-          })
-        );
+        // Unifica todos os nomes de EPI
+        const nomesUnicos = new Set([
+          ...Object.keys(entradasPorEpi),
+          ...Object.keys(saidasPorEpi),
+        ]);
 
-        // --- Tabela 2: Resumo ---
+        // Monta o corpo da tabela
+        const resumoBody = Array.from(nomesUnicos).map((nome) => ({
+          epi: nome,
+          entradas: entradasPorEpi[nome] || 0,
+          saidas: saidasPorEpi[nome] || 0,
+        }));
+
+        // --- Tabela 2: Resumo de Entradas e Saídas ---
         autoTable(doc, {
           startY: (doc as any).lastAutoTable.finalY + 10,
           columns: [
             { header: "EPI", dataKey: "epi" },
-            { header: "Quantidade Total", dataKey: "total" },
+            { header: "Total de Entradas", dataKey: "entradas" },
+            { header: "Total de Saídas", dataKey: "saidas" },
           ],
           body: resumoBody,
           styles: { halign: "center", valign: "middle" },
-          headStyles: { fillColor: "#46c8f2" },
+          headStyles: { fillColor: "#46c8f2", textColor: "#ffffff" },
         });
 
         doc.save("relatorio_epi.pdf");

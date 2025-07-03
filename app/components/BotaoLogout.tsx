@@ -4,7 +4,6 @@ import { View, TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAuth } from "../../context/auth";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function LogoutButton({ style = {} }) {
