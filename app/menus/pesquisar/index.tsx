@@ -284,21 +284,6 @@ export default function Pesquisar() {
             >
               <Text style={styles.buttonText}>Editar</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                { backgroundColor: "#b30f02" },
-                theme === "light"
-                  ? { borderColor: "#888" }
-                  : { borderColor: "black" },
-              ]}
-              onPress={() => {
-                setEpiSelecionado(epi);
-                setModalVisible(true);
-              }}
-            >
-              <Text style={styles.buttonText}>Excluir</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </View>
