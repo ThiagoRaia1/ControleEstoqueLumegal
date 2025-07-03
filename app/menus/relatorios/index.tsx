@@ -68,9 +68,9 @@ export default function Relatorios() {
         const worksheet = workbook.addWorksheet("Relatório");
 
         const alturaPx = 30;
-        const alturaPts = alturaPx / 1.33; // aproximadamente 22.5
+        const alturaPts = alturaPx / 1.33;
 
-        // Define largura das colunas
+        // Define colunas da primeira tabela
         worksheet.columns = [
           { header: "idEntradaSaida", key: "idEntradaSaida", width: 30 },
           { header: "EPI", key: "epi", width: 30 },
@@ -78,29 +78,11 @@ export default function Relatorios() {
           { header: "Data", key: "data", width: 30 },
         ];
 
-        // Adiciona linhas e aplica estilo
-        entradasSaidas.forEach((entradaSaida) => {
-          worksheet.addRow({
-            idEntradaSaida: entradaSaida.id,
-            epi: entradaSaida.epi.nome,
-            quantidade: entradaSaida.quantidade,
-            data: new Date(entradaSaida.data).toLocaleString("pt-BR"),
-          });
-        });
-
-        // Centraliza o conteúdo das células
-        worksheet.eachRow((row) => {
-          row.height = alturaPts; // por exemplo
-          row.eachCell((cell) => {
-            cell.alignment = { vertical: "middle", horizontal: "center" };
-          });
-        });
-
-        // Pintar células A1 a A4 de azul claro
+        // Estilos globais
         const azulClaro: ExcelJS.FillPattern = {
           type: "pattern",
           pattern: "solid",
-          fgColor: { argb: "FF46C8F2" }, // Light Blue
+          fgColor: { argb: "FF46C8F2" }, // azul claro
         };
 
         const cinzaClaro: ExcelJS.FillPattern = {
@@ -109,51 +91,101 @@ export default function Relatorios() {
           fgColor: { argb: "FFF5F5F5" }, // cinza claro
         };
 
-        // Suponha que o cabeçalho está na linha 1, dados começam na linha 2
-        for (let i = 2; i <= entradasSaidas.length + 1; i++) {
-          if (i % 2 === 0) {
-            // Aplica o fill cinza claro nas linhas pares
-            const row = worksheet.getRow(i);
+        const branco: ExcelJS.FillPattern = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFFFFFFF" }, // branco
+        };
+
+        // Preenche os dados da primeira tabela
+        entradasSaidas.forEach((entradaSaida, index) => {
+          const row = worksheet.addRow({
+            idEntradaSaida: entradaSaida.id,
+            epi: entradaSaida.epi.nome,
+            quantidade: entradaSaida.quantidade,
+            data: new Date(entradaSaida.data).toLocaleString("pt-BR"),
+          });
+
+          const isPar = index % 2 === 0;
+          const fill = isPar ? cinzaClaro : branco;
+
+          row.eachCell((cell) => {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+            cell.fill = fill;
+          });
+
+          row.height = alturaPts;
+        });
+
+        // Aplica estilo à primeira tabela
+        worksheet.eachRow((row, rowNumber) => {
+          row.height = alturaPts;
+          row.eachCell((cell) => {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          });
+
+          if (rowNumber === 1) {
+            row.eachCell((cell) => {
+              cell.fill = azulClaro;
+              cell.font = { bold: true, size: 12, color: { argb: "FFFFFFFF" } };
+            });
+          } else if (rowNumber % 2 === 0) {
             row.eachCell((cell) => {
               cell.fill = cinzaClaro;
             });
           }
-        }
-
-        ["A1", "B1", "C1", "D1"].forEach((cell) => {
-          worksheet.getCell(cell).font = {
-            bold: true,
-            size: 12,
-            color: { argb: "FFFFFFFF" }, // branco
-          };
         });
 
-        worksheet.getCell("A1").fill = azulClaro;
-        worksheet.getCell("B1").fill = azulClaro;
-        worksheet.getCell("C1").fill = azulClaro;
-        worksheet.getCell("D1").fill = azulClaro;
+        // ==== Segunda tabela: Totais por EPI ====
+        const totaisPorEpi: Record<string, number> = {};
+        for (const entrada of entradasSaidas) {
+          const nome = entrada.epi.nome;
+          totaisPorEpi[nome] = (totaisPorEpi[nome] || 0) + entrada.quantidade;
+        }
 
-        // // Define as bordas completas
-        // const bordaCompleta: ExcelJS.Borders = {
-        //   top: { style: "thin" },
-        //   left: { style: "thin" },
-        //   bottom: { style: "thin" },
-        //   right: { style: "thin" },
-        //   diagonal: {},
-        // };
+        const startResumoRow = entradasSaidas.length + 4;
 
-        // // Aplica bordas nas células de A1 até o fim dos dados na coluna D
-        // for (let row = 1; row <= entradasSaidas.length + 1; row++) {
-        //   for (let col = 1; col <= 4; col++) {
-        //     const cell = worksheet.getRow(row).getCell(col);
-        //     cell.border = bordaCompleta;
-        //   }
-        // }
+        // Cabeçalho da segunda tabela
+        worksheet.getCell(`A${startResumoRow}`).value = "EPI";
+        worksheet.getCell(`B${startResumoRow}`).value = "Quantidade Total";
 
-        // Gera o arquivo
+        ["A", "B"].forEach((col) => {
+          const cell = worksheet.getCell(`${col}${startResumoRow}`);
+          cell.fill = azulClaro;
+          cell.font = { bold: true, size: 12, color: { argb: "FFFFFFFF" } };
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+          worksheet.getColumn(col).width = 30;
+        });
+
+        worksheet.getRow(startResumoRow).height = alturaPts;
+
+        // Corpo da segunda tabela
+        let linha = startResumoRow + 1;
+        Object.entries(totaisPorEpi).forEach(([nome, total], index) => {
+          worksheet.getCell(`A${linha}`).value = nome;
+          worksheet.getCell(`B${linha}`).value = total;
+
+          const isPar = index % 2 === 0;
+          ["A", "B"].forEach((col) => {
+            const cell = worksheet.getCell(`${col}${linha}`);
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+
+            // Aplica o fundo: cinza se par, branco se ímpar
+            cell.fill = isPar
+              ? cinzaClaro
+              : {
+                  type: "pattern",
+                  pattern: "solid",
+                  fgColor: { argb: "FFFFFFFF" }, // branco
+                };
+          });
+
+          worksheet.getRow(linha).height = alturaPts;
+          linha++;
+        });
+
+        // Gera e salva o arquivo
         const buffer = await workbook.xlsx.writeBuffer();
-
-        // Para frontend (React/React Native Web)
         const blob = new Blob([buffer], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
@@ -161,10 +193,9 @@ export default function Relatorios() {
       }
 
       if (tipoRelatorio === "PDF") {
-        // Cria a instância do jsPDF
         const doc = new jsPDF();
 
-        // Define as colunas da tabela com header e dataKey
+        // --- Tabela 1: Detalhada ---
         const columns = [
           { header: "idEntradaSaida", dataKey: "id" },
           { header: "EPI", dataKey: "epi" },
@@ -172,7 +203,6 @@ export default function Relatorios() {
           { header: "Data", dataKey: "data" },
         ];
 
-        // Mapeia os dados para o formato esperado pela tabela
         const rows = entradasSaidas.map((entrada) => ({
           id: entrada.id,
           epi: entrada.epi.nome,
@@ -180,16 +210,40 @@ export default function Relatorios() {
           data: new Date(entrada.data).toLocaleString("pt-BR"),
         }));
 
-        // Gera a tabela no PDF
         autoTable(doc, {
           columns,
           body: rows,
           styles: { halign: "center", valign: "middle" },
-          headStyles: { fillColor: "#46c8f2" }, // azul claro no cabeçalho
+          headStyles: { fillColor: "#46c8f2" },
           margin: { top: 20 },
         });
 
-        // Salva o PDF
+        // --- Agrupamento por EPI ---
+        const totaisPorEpi: Record<string, number> = {};
+        for (const entrada of entradasSaidas) {
+          const nome = entrada.epi.nome;
+          totaisPorEpi[nome] = (totaisPorEpi[nome] || 0) + entrada.quantidade;
+        }
+
+        const resumoBody = Object.entries(totaisPorEpi).map(
+          ([nome, total]) => ({
+            epi: nome,
+            total,
+          })
+        );
+
+        // --- Tabela 2: Resumo ---
+        autoTable(doc, {
+          startY: (doc as any).lastAutoTable.finalY + 10,
+          columns: [
+            { header: "EPI", dataKey: "epi" },
+            { header: "Quantidade Total", dataKey: "total" },
+          ],
+          body: resumoBody,
+          styles: { halign: "center", valign: "middle" },
+          headStyles: { fillColor: "#46c8f2" },
+        });
+
         doc.save("relatorio_epi.pdf");
       }
     } catch (erro: any) {
