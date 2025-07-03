@@ -110,7 +110,9 @@ export default function Pesquisar() {
       setTipoUnidade(epiSelecionado.tipoUnidade?.tipo || "");
       setQuantidade(String(epiSelecionado.quantidade ?? ""));
       setQuantidadeParaAviso(String(epiSelecionado.quantidadeParaAviso ?? ""));
-      setFornecedores(epiSelecionado.fornecedores.map((f) => f.nome));
+      if (epiSelecionado.fornecedores.length != 0) {
+        setFornecedores(epiSelecionado.fornecedores.map((f) => f.nome));
+      }
     }
   }, [epiSelecionado, editando]);
 
@@ -685,8 +687,16 @@ export default function Pesquisar() {
                         styles.inputEditar,
                         { outline: "none" } as any,
                         theme === "light"
-                          ? { color: "black", borderColor: "black", backgroundColor: "#ccc" }
-                          : { color: "#888", borderColor: "white", backgroundColor: "black" },
+                          ? {
+                              color: "black",
+                              borderColor: "black",
+                              backgroundColor: "#ccc",
+                            }
+                          : {
+                              color: "#888",
+                              borderColor: "white",
+                              backgroundColor: "black",
+                            },
                       ]}
                       placeholder="Quantidade inicial do EPI"
                       placeholderTextColor="#888"
