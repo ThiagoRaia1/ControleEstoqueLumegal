@@ -304,19 +304,19 @@ export default function Pesquisar() {
       ]}
     >
       <BotaoLogout />
-      {usuario.tipoAcesso === "Almoxarifado" ||
-      usuario.tipoAcesso === "AlmoxarifadoAdm" ? (
-        <View style={styles.content}>
-          <Text
-            style={[
-              styles.title,
-              theme === "light" ? { color: "black" } : { color: "white" },
-            ]}
-          >
-            {!editando ? "Pesquisar" : "Editando"}
-          </Text>
-          {!editando ? (
-            <>
+      <View style={styles.content}>
+        <Text
+          style={[
+            styles.title,
+            theme === "light" ? { color: "black" } : { color: "white" },
+          ]}
+        >
+          {!editando ? "Pesquisar" : "Editando"}
+        </Text>
+        {usuario.tipoAcesso === "Almoxarifado" ||
+        usuario.tipoAcesso === "AlmoxarifadoAdm" ? (
+          <>
+            {!editando ? (
               <Animatable.View
                 animation="fadeInUp"
                 duration={1000}
@@ -378,9 +378,7 @@ export default function Pesquisar() {
                   </View>
                 </ScrollView>
               </Animatable.View>
-            </>
-          ) : (
-            <>
+            ) : (
               <Animatable.View
                 animation="fadeInUp"
                 duration={1000}
@@ -754,12 +752,26 @@ export default function Pesquisar() {
                   </TouchableOpacity>
                 </View>
               </Animatable.View>
-            </>
-          )}
-        </View>
-      ) : (
-        <Text>:P</Text>
-      )}
+            )}
+          </>
+        ) : (
+          <Animatable.View
+            animation="fadeInUp"
+            duration={1000}
+            style={styles.mainContent}
+          >
+            <Text
+              style={[
+                theme === "light" ? { color: "black" } : { color: "white" },
+                { textAlign: "center" },
+              ]}
+            >
+              Nesta área será exibida a mesma tela, porém além dos epis serão
+              exibidos os suprimentos também
+            </Text>
+          </Animatable.View>
+        )}
+      </View>
 
       <MenuInferior />
       {carregando && <Carregando />}
@@ -793,6 +805,7 @@ const styles = StyleSheet.create({
   mainContent: {
     flex: 1,
     width: "100%",
+    justifyContent: "center",
     maxWidth: 800,
     padding: 20,
     gap: 20,
