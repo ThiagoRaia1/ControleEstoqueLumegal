@@ -21,7 +21,7 @@ export async function registrarEpiApi(epi: ICriarEpi) {
 }
 
 export async function editarEpiApi(nome: string, epi: ICriarEpi) {
-  return await httpClient(`/epi/${nome}`, {
+  return await httpClient(`/epi/editarDados/${nome}`, {
     method: "PATCH",
     body: JSON.stringify(epi),
   });

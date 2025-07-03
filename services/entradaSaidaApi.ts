@@ -1,6 +1,15 @@
 import { httpClient } from "../adapters/httpClient";
 import { IMovimentacaoEpi } from "../interfaces/entradaSaida";
 
+export async function getEntradasSaidas(
+  dataInicial: string,
+  dataFinal: string
+) {
+  return await httpClient(`/entrada-saida/${dataInicial}/${dataFinal}`, {
+    method: "GET",
+  });
+}
+
 export async function entradaSaidaApi(movimentacoes: IMovimentacaoEpi[]) {
   const registroEntradaSaida = movimentacoes.map(({ id, quantidade }) => ({
     idEpi: id,

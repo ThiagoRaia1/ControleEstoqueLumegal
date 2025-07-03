@@ -13,6 +13,13 @@ import { useThemeContext } from "../../../context/ThemeContext";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
+import Carregando from "../../components/Carregando";
+import { getEntradasSaidas } from "../../../services/entradaSaidaApi";
+import { IEntradaSaida } from "../../../interfaces/entradaSaida";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver"; // apenas se for no frontend
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function Relatorios() {
   const { theme } = useThemeContext();
@@ -29,23 +36,162 @@ export default function Relatorios() {
   const [mostrarPickerInicial, setMostrarPickerInicial] = useState(false);
   const [mostrarPickerFinal, setMostrarPickerFinal] = useState(false);
 
-  function gerarRelatorio(tipoRelatorio: string) {
+  const [carregando, setCarregando] = useState(false);
+
+  async function gerarRelatorio(tipoRelatorio: string) {
     try {
-      console.log("dataInicial: " + dataInicial.toLocaleString());
+      setCarregando(true);
+      // console.log("dataInicial: " + dataInicial.toISOString());
 
       const dataFinalSelecionada = new Date(dataFinal);
       dataFinalSelecionada.setUTCHours(23, 59, 59, 0);
 
-      console.log("dataFinalSelecionada: " + dataFinalSelecionada.toLocaleString());
+      // console.log(
+      //   "dataFinalSelecionada: " + dataFinalSelecionada.toISOString()
+      // );
 
-      if (dataInicial > hojeComecoDoDia) throw new Error("dataInicial > hojeComecoDoDia");
+      if (dataInicial > hojeComecoDoDia)
+        throw new Error("dataInicial > hojeComecoDoDia");
       if (dataInicial > dataFinalSelecionada)
         throw new Error("dataInicial > dataFinalSelecionada");
       if (dataFinalSelecionada > hojeFinalDoDia)
         throw new Error("dataFinalSelecionada > hojeFinalDoDia");
 
-      console.log("Nenhum erro, fazer a lógica dos relatórios aqui");
+      const entradasSaidas: IEntradaSaida[] = await getEntradasSaidas(
+        dataInicial.toISOString(),
+        dataFinalSelecionada.toISOString()
+      );
+      // console.log(entradasSaidas);
 
+      if (tipoRelatorio === "XLSX") {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Relatório");
+
+        const alturaPx = 30;
+        const alturaPts = alturaPx / 1.33; // aproximadamente 22.5
+
+        // Define largura das colunas
+        worksheet.columns = [
+          { header: "idEntradaSaida", key: "idEntradaSaida", width: 30 },
+          { header: "EPI", key: "epi", width: 30 },
+          { header: "Quantidade", key: "quantidade", width: 30 },
+          { header: "Data", key: "data", width: 30 },
+        ];
+
+        // Adiciona linhas e aplica estilo
+        entradasSaidas.forEach((entradaSaida) => {
+          worksheet.addRow({
+            idEntradaSaida: entradaSaida.id,
+            epi: entradaSaida.epi.nome,
+            quantidade: entradaSaida.quantidade,
+            data: new Date(entradaSaida.data).toLocaleString("pt-BR"),
+          });
+        });
+
+        // Centraliza o conteúdo das células
+        worksheet.eachRow((row) => {
+          row.height = alturaPts; // por exemplo
+          row.eachCell((cell) => {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          });
+        });
+
+        // Pintar células A1 a A4 de azul claro
+        const azulClaro: ExcelJS.FillPattern = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FF46C8F2" }, // Light Blue
+        };
+
+        const cinzaClaro: ExcelJS.FillPattern = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFF5F5F5" }, // cinza claro
+        };
+
+        // Suponha que o cabeçalho está na linha 1, dados começam na linha 2
+        for (let i = 2; i <= entradasSaidas.length + 1; i++) {
+          if (i % 2 === 0) {
+            // Aplica o fill cinza claro nas linhas pares
+            const row = worksheet.getRow(i);
+            row.eachCell((cell) => {
+              cell.fill = cinzaClaro;
+            });
+          }
+        }
+
+        ["A1", "B1", "C1", "D1"].forEach((cell) => {
+          worksheet.getCell(cell).font = {
+            bold: true,
+            size: 12,
+            color: { argb: "FFFFFFFF" }, // branco
+          };
+        });
+
+        worksheet.getCell("A1").fill = azulClaro;
+        worksheet.getCell("B1").fill = azulClaro;
+        worksheet.getCell("C1").fill = azulClaro;
+        worksheet.getCell("D1").fill = azulClaro;
+
+        // // Define as bordas completas
+        // const bordaCompleta: ExcelJS.Borders = {
+        //   top: { style: "thin" },
+        //   left: { style: "thin" },
+        //   bottom: { style: "thin" },
+        //   right: { style: "thin" },
+        //   diagonal: {},
+        // };
+
+        // // Aplica bordas nas células de A1 até o fim dos dados na coluna D
+        // for (let row = 1; row <= entradasSaidas.length + 1; row++) {
+        //   for (let col = 1; col <= 4; col++) {
+        //     const cell = worksheet.getRow(row).getCell(col);
+        //     cell.border = bordaCompleta;
+        //   }
+        // }
+
+        // Gera o arquivo
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        // Para frontend (React/React Native Web)
+        const blob = new Blob([buffer], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        saveAs(blob, "relatorio_epi.xlsx");
+      }
+
+      if (tipoRelatorio === "PDF") {
+        // Cria a instância do jsPDF
+        const doc = new jsPDF();
+
+        // Define as colunas da tabela com header e dataKey
+        const columns = [
+          { header: "idEntradaSaida", dataKey: "id" },
+          { header: "EPI", dataKey: "epi" },
+          { header: "Quantidade", dataKey: "quantidade" },
+          { header: "Data", dataKey: "data" },
+        ];
+
+        // Mapeia os dados para o formato esperado pela tabela
+        const rows = entradasSaidas.map((entrada) => ({
+          id: entrada.id,
+          epi: entrada.epi.nome,
+          quantidade: entrada.quantidade,
+          data: new Date(entrada.data).toLocaleString("pt-BR"),
+        }));
+
+        // Gera a tabela no PDF
+        autoTable(doc, {
+          columns,
+          body: rows,
+          styles: { halign: "center", valign: "middle" },
+          headStyles: { fillColor: "#46c8f2" }, // azul claro no cabeçalho
+          margin: { top: 20 },
+        });
+
+        // Salva o PDF
+        doc.save("relatorio_epi.pdf");
+      }
     } catch (erro: any) {
       switch (erro.message) {
         case "dataInicial > hojeComecoDoDia": {
@@ -65,10 +211,11 @@ export default function Relatorios() {
           break;
         }
         default: {
-          console.log(erro.message);
+          alert(erro.message);
         }
       }
     } finally {
+      setCarregando(false);
     }
   }
 
@@ -263,7 +410,7 @@ export default function Relatorios() {
                   ? { borderColor: "black" }
                   : { borderColor: "white" },
               ]}
-              onPress={() => gerarRelatorio("XLS")}
+              onPress={() => gerarRelatorio("XLSX")}
             >
               <Text
                 style={[
@@ -283,6 +430,7 @@ export default function Relatorios() {
         </View>
       </Animatable.View>
       <MenuInferior />
+      {carregando && <Carregando />}
     </View>
   );
 }
