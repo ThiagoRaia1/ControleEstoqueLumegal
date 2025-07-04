@@ -25,6 +25,7 @@
     "react-dom": "19.0.0",
     "react-native": "0.79.5",
     "react-native-animatable": "^1.4.0",
+    "react-native-mask-input": "^1.2.3",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-web": "^0.20.0"
   },

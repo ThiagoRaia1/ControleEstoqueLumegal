@@ -27,6 +27,7 @@ import {
 } from "../../../services/fornecedor";
 import { IFornecedor } from "../../../interfaces/fornecedor";
 import { useAuth } from "../../../context/auth";
+import MaskInput, { Masks } from "react-native-mask-input";
 
 export default function RegistrarEpi() {
   const { theme } = useThemeContext();
@@ -41,6 +42,7 @@ export default function RegistrarEpi() {
   const [fornecedores, setFornecedores] = useState<string[]>([""]);
   const [quantidade, setQuantidade] = useState("");
   const [quantidadeParaAviso, setQuantidadeParaAviso] = useState("");
+  const [preco, setPreco] = useState("");
 
   // Estado com lista completa de fornecedores vindos do backend
   const [fornecedoresDisponiveis, setFornecedoresDisponiveis] = useState<
@@ -207,7 +209,7 @@ export default function RegistrarEpi() {
                       ? { color: "black", borderColor: "black" }
                       : { color: "white", borderColor: "white" },
                   ]}
-                  placeholder="Nome do EPI"
+                  placeholder="Nome do item"
                   placeholderTextColor="#888"
                   value={nome}
                   onChangeText={(text) => setNome(text.slice(0, 30))}
@@ -257,7 +259,7 @@ export default function RegistrarEpi() {
                       ? { color: "black", borderColor: "black" }
                       : { color: "white", borderColor: "white" },
                   ]}
-                  placeholder="Descrição do EPI"
+                  placeholder="Descrição do item"
                   placeholderTextColor="#888"
                   value={descricao}
                   onChangeText={(text) => setDescricao(text)}
@@ -464,7 +466,7 @@ export default function RegistrarEpi() {
                         ? { color: "black", borderColor: "black" }
                         : { color: "white", borderColor: "white" },
                     ]}
-                    placeholder="Quantidade inicial do EPI"
+                    placeholder="Quantidade inicial do item"
                     placeholderTextColor="#888"
                     value={quantidade}
                     onChangeText={(text) => {
@@ -503,6 +505,36 @@ export default function RegistrarEpi() {
                     }}
                   />
                 </View>
+
+                {usuario.tipoAcesso === "Compras" ||
+                  (usuario.tipoAcesso === "ComprasAdm" && (
+                    <View style={[styles.labelInputContainer, { flex: 1 }]}>
+                      <Text
+                        style={[
+                          styles.label,
+                          theme === "light"
+                            ? { color: "black" }
+                            : { color: "white" },
+                        ]}
+                      >
+                        PRECO:
+                      </Text>
+                      <MaskInput
+                        style={[
+                          styles.input,
+                          { outline: "none" } as any,
+                          theme === "light"
+                            ? { color: "black", borderColor: "black" }
+                            : { color: "white", borderColor: "white" },
+                        ]}
+                        placeholder="Preço médio do item"
+                        placeholderTextColor="#888"
+                        value={preco}
+                        onChangeText={(text) => setPreco(text)}
+                        mask={Masks.BRL_CURRENCY}
+                      />
+                    </View>
+                  ))}
               </View>
             </ScrollView>
           </Animatable.View>
