@@ -12,42 +12,51 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { nomePaginas } from "../../utils/nomePaginas";
 import { useThemeContext } from "../../context/ThemeContext";
+import { useAuth } from "../../context/auth";
 
 let prevIndex = 0;
 
-type FeatherIconName = keyof typeof Feather.glyphMap;
-const menuItems: { href: string; icon: FeatherIconName; label: string }[] = [
-  {
-    href: `${nomePaginas.itensEmFalta}`,
-    icon: "archive",
-    label: "ITENS EM FALTA",
-  },
-  {
-    href: `${nomePaginas.registrarItem}`,
-    icon: "package",
-    label: "REGISTRAR EPI",
-  },
-  {
-    href: `${nomePaginas.entradaSaida}`,
-    icon: "edit",
-    label: "ENTRADA/SAÍDA",
-  },
-  {
-    href: `${nomePaginas.pesquisar}`,
-    icon: "search",
-    label: "PESQUISAR",
-  },
-  {
-    href: `${nomePaginas.relatorios}`,
-    icon: "file",
-    label: "RELATÓRIOS",
-  },
-];
-
 export default function MenuInferior() {
   const { theme } = useThemeContext();
+  const { usuario } = useAuth();
   const iconSize = 30;
   const pathname = usePathname();
+
+  type FeatherIconName = keyof typeof Feather.glyphMap;
+  const menuItems: { href: string; icon: FeatherIconName; label: string }[] = [
+    {
+      href: `${nomePaginas.itensEmFalta}`,
+      icon: "archive",
+      label: "ITENS EM FALTA",
+    },
+    {
+      href: `${nomePaginas.registrarItem}`,
+      icon: "package",
+      label:
+        usuario.tipoAcesso === "Almoxarifado" ||
+        usuario.tipoAcesso === "AlmoxarifadoAdm"
+          ? "REGISTRAR EPI"
+          : usuario.tipoAcesso === "Compras" ||
+            usuario.tipoAcesso === "ComprasAdm"
+          ? "REGISTRAR ITEM"
+          : "",
+    },
+    {
+      href: `${nomePaginas.entradaSaida}`,
+      icon: "edit",
+      label: "ENTRADA/SAÍDA",
+    },
+    {
+      href: `${nomePaginas.pesquisar}`,
+      icon: "search",
+      label: "PESQUISAR",
+    },
+    {
+      href: `${nomePaginas.relatorios}`,
+      icon: "file",
+      label: "RELATÓRIOS",
+    },
+  ];
 
   const [screenWidth, setScreenWidth] = useState(
     Dimensions.get("window").width

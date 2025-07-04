@@ -97,12 +97,19 @@ export default function Pesquisar() {
       .replace(/[\u0300-\u036f]/g, "");
 
   // Funcao para filtrar a lista de epis de acordo com a pesquisa
-  const episFiltrados = epis.filter((epi) => {
-    const termo = normalizar(pesquisa);
-    const nome = normalizar(epi.nome || "");
-    const ca = normalizar(epi.certificadoAprovacao || "");
-    return nome.startsWith(termo) || ca.startsWith(termo);
-  });
+  const episFiltrados = epis
+    .slice() // cria uma cópia para não modificar o estado original
+    .sort((a, b) =>
+      (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+        sensitivity: "base",
+      })
+    )
+    .filter((epi) => {
+      const termo = normalizar(pesquisa);
+      const nome = normalizar(epi.nome || "");
+      const ca = normalizar(epi.certificadoAprovacao || "");
+      return nome.startsWith(termo) || ca.startsWith(termo);
+    });
 
   useEffect(() => {
     if (epiSelecionado && editando) {

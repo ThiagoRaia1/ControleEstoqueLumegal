@@ -17,6 +17,7 @@ import { entradaSaidaApi } from "../../../services/entradaSaidaApi";
 import { IEpi } from "../../../interfaces/epi";
 import { getEpis } from "../../../services/epiApi";
 import { IMovimentacaoEpi } from "../../../interfaces/entradaSaida";
+import Feather from "@expo/vector-icons/Feather";
 
 function renderItem(
   theme: string,
@@ -142,6 +143,13 @@ export default function EntradaSaida() {
   const [quantidadeASerMovida, setQuantidadeASerMovida] = useState<{
     [key: string]: number;
   }>({});
+  const [pesquisa, setPesquisa] = useState("");
+
+  const normalizar = (texto: string) =>
+    texto
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
 
   const carregarEpis = async () => {
     try {
@@ -192,7 +200,12 @@ export default function EntradaSaida() {
       await entradaSaidaApi(movimentacoes);
       alert(
         "Movimentações confirmadas:\n" +
-          mov.map((m) => `${m.nome}: ${m.quantidade}`).join("\n")
+          mov
+            .sort((a, b) =>
+              a.nome.localeCompare(b.nome, "pt", { sensitivity: "base" })
+            )
+            .map((m) => `${m.nome}: ${m.quantidade}`)
+            .join("\n")
       );
       setQuantidadeASerMovida({}); // limpa estado
       await carregarEpis(); // atualiza a lista com dados atualizados
@@ -233,6 +246,33 @@ export default function EntradaSaida() {
           duration={1000}
           style={styles.mainContent}
         >
+          <View
+            style={[
+              styles.searchBar,
+              theme === "light"
+                ? { backgroundColor: "white", borderColor: "#888" }
+                : { borderColor: "#888" },
+            ]}
+          >
+            <Feather
+              name={"search"}
+              size={30}
+              color={theme === "light" ? "black" : "white"}
+              style={{ paddingHorizontal: 10 }}
+            />
+            <TextInput
+              style={[
+                styles.input,
+                { outlineStyle: "none" as any },
+                theme === "light" ? { color: "black" } : { color: "white" },
+              ]}
+              placeholder="Pesquisar por nome ou C.A."
+              placeholderTextColor="#888"
+              onChangeText={(text) => setPesquisa(text)}
+              value={pesquisa}
+            />
+          </View>
+
           <ScrollView
             style={[
               styles.itensScroll,
@@ -249,37 +289,51 @@ export default function EntradaSaida() {
             persistentScrollbar={true}
           >
             <View style={{ padding: 20, gap: 20 }}>
-              {epis.map((epi: IEpi, index: number) => (
-                <Animatable.View
-                  key={epi.id}
-                  animation="fadeInUp"
-                  duration={1000}
-                  delay={index * 150}
-                >
-                  <View key={epi.id}>
-                    {renderItem(
-                      theme,
-                      epi.id,
-                      epi.nome || "",
-                      epi.certificadoAprovacao || "",
-                      `${epi.tipoUnidade.tipo}`,
-                      epi.quantidade || 0,
-                      epi.quantidadeParaAviso || 0,
-                      quantidadeASerMovida[epi.id] || 0,
-                      setQuantidadeItem
-                    )}
-                  </View>
-                </Animatable.View>
-              ))}
+              {epis
+                .slice()
+                .sort((a, b) =>
+                  (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+                    sensitivity: "base",
+                  })
+                )
+                .filter((epi) => {
+                  const termo = normalizar(pesquisa);
+                  const nome = normalizar(epi.nome || "");
+                  const ca = normalizar(epi.certificadoAprovacao || "");
+                  return nome.startsWith(termo) || ca.startsWith(termo);
+                })
+                .map((epi: IEpi, index: number) => (
+                  <Animatable.View
+                    key={epi.id}
+                    animation="fadeInUp"
+                    duration={1000}
+                    delay={index * 150}
+                  >
+                    <View key={epi.id}>
+                      {renderItem(
+                        theme,
+                        epi.id,
+                        epi.nome || "",
+                        epi.certificadoAprovacao || "",
+                        `${epi.tipoUnidade.tipo}`,
+                        epi.quantidade || 0,
+                        epi.quantidadeParaAviso || 0,
+                        quantidadeASerMovida[epi.id] || 0,
+                        setQuantidadeItem
+                      )}
+                    </View>
+                  </Animatable.View>
+                ))}
             </View>
           </ScrollView>
           <TouchableOpacity
             onPress={handleConfirmarMovimentacoes}
             style={{
               backgroundColor: "#0033a0",
-              padding: 15,
+              height: 50,
               borderRadius: 10,
               marginTop: 20,
+              justifyContent: "center",
               alignItems: "center",
             }}
           >
@@ -315,6 +369,20 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 800,
     padding: 20,
+  },
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 2,
+    borderRadius: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    padding: 5,
   },
   itensScroll: {
     flex: 1,
