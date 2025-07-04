@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
-import BotaoLogout from "../../components/BotaoLogout";
+import MenuSuperior from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
 import { useEffect, useState } from "react";
 import Carregando from "../../components/Carregando";
@@ -231,7 +231,7 @@ export default function EntradaSaida() {
           : { backgroundColor: "#1c1c1c" },
       ]}
     >
-      <BotaoLogout />
+      <MenuSuperior />
       <View style={styles.content}>
         <Text
           style={[
@@ -239,7 +239,7 @@ export default function EntradaSaida() {
             theme === "light" ? { color: "black" } : { color: "white" },
           ]}
         >
-          Entrada/Saída
+          ENTRADA/SAÍDA
         </Text>
         <Animatable.View
           animation="fadeInUp"

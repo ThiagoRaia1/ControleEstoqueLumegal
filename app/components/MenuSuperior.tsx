@@ -1,12 +1,12 @@
 import { useThemeContext } from "../../context/ThemeContext";
 import { Feather } from "@expo/vector-icons";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, Text } from "react-native";
 import { Link } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAuth } from "../../context/auth";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
-export default function LogoutButton({ style = {} }) {
+export default function MenuSuperior({ style = {} }) {
   const { theme, toggleTheme } = useThemeContext();
   const { usuario, setUsuario } = useAuth();
 
@@ -71,7 +71,13 @@ export default function LogoutButton({ style = {} }) {
             <Entypo
               name="shop"
               size={30}
-              color={theme === "light" ? "black" : "white"}
+              color={
+                usuario.tipoAcesso === "ComprasAdm"
+                  ? "#0033A0"
+                  : theme === "light"
+                  ? "black"
+                  : "white"
+              }
             />
           </TouchableOpacity>
 
@@ -83,9 +89,23 @@ export default function LogoutButton({ style = {} }) {
             <MaterialCommunityIcons
               name="warehouse"
               size={30}
-              color={theme === "light" ? "black" : "white"}
+              color={
+                usuario.tipoAcesso === "AlmoxarifadoAdm"
+                  ? "#0033A0"
+                  : theme === "light"
+                  ? "black"
+                  : "white"
+              }
             />
           </TouchableOpacity>
+          <Text
+            style={[
+              theme === "light" ? { color: "black" } : { color: "white" },
+              { fontSize: 20 },
+            ]}
+          >
+            {"Tipo de acesso: "+usuario.tipoAcesso}
+          </Text>
           {renderThemeLogoutButtons()}
         </View>
       ) : (

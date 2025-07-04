@@ -1,7 +1,7 @@
 import { View, StyleSheet, Text, ScrollView } from "react-native";
 import * as Animatable from "react-native-animatable";
+import MenuSuperior from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
-import BotaoLogout from "../../components/BotaoLogout";
 import Carregando from "../../components/Carregando";
 import { useThemeContext } from "../../../context/ThemeContext";
 import { useEffect, useState } from "react";
@@ -89,7 +89,7 @@ export default function itensEmFalta() {
           : { backgroundColor: "#1c1c1c" },
       ]}
     >
-      <BotaoLogout />
+      <MenuSuperior />
       <View style={styles.content}>
         <Text
           style={[
@@ -97,7 +97,7 @@ export default function itensEmFalta() {
             theme === "light" ? { color: "black" } : { color: "white" },
           ]}
         >
-          Itens em falta
+          ITENS EM FALTA
         </Text>
         <Animatable.View
           animation="fadeInUp"

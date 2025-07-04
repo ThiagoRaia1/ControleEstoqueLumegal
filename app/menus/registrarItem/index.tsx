@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
-import BotaoLogout from "../../components/BotaoLogout";
+import MenuSuperior from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
 import Carregando from "../../components/Carregando";
 import { useEffect, useState } from "react";
@@ -26,9 +26,11 @@ import {
   getFornecedorPorNome,
 } from "../../../services/fornecedor";
 import { IFornecedor } from "../../../interfaces/fornecedor";
+import { useAuth } from "../../../context/auth";
 
 export default function RegistrarEpi() {
   const { theme } = useThemeContext();
+  const { usuario } = useAuth();
   const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
 
@@ -118,7 +120,7 @@ export default function RegistrarEpi() {
         fornecedoresIds.push(fornecedorObj.id);
       }
 
-      console.log(fornecedoresIds);
+      // console.log(fornecedoresIds);
       const epi: ICriarEpi = {
         nome: nome.trim(),
         descricao: descricao.trim(),
@@ -158,7 +160,7 @@ export default function RegistrarEpi() {
           : { backgroundColor: "#1c1c1c" },
       ]}
     >
-      <BotaoLogout />
+      <MenuSuperior />
       <View style={styles.content}>
         <Text
           style={[
@@ -166,7 +168,13 @@ export default function RegistrarEpi() {
             theme === "light" ? { color: "black" } : { color: "white" },
           ]}
         >
-          Registrar EPI
+          {usuario.tipoAcesso === "Almoxarifado" ||
+          usuario.tipoAcesso === "AlmoxarifadoAdm"
+            ? "REGISTRAR EPI"
+            : usuario.tipoAcesso === "Compras" ||
+              usuario.tipoAcesso === "ComprasAdm"
+            ? "REGISTRAR ITEM"
+            : " "}
         </Text>
         <View style={{ flex: 1, width: "100%", maxWidth: 800 }}>
           <Animatable.View
@@ -524,6 +532,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 20,
+    paddingTop: 0,
   },
   title: {
     fontSize: 30,

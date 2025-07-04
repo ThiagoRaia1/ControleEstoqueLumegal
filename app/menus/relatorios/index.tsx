@@ -7,8 +7,8 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import MenuSuperior from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
-import BotaoLogout from "../../components/BotaoLogout";
 import { useThemeContext } from "../../../context/ThemeContext";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -312,14 +312,14 @@ export default function Relatorios() {
           : { backgroundColor: "#1c1c1c" },
       ]}
     >
-      <BotaoLogout />
+      <MenuSuperior />
       <Text
         style={[
           styles.title,
           theme === "light" ? { color: "black" } : { color: "white" },
         ]}
       >
-        Gerar relatório
+        GERAR RELATÓRIO
       </Text>
       <Animatable.View
         animation="fadeInUp"
