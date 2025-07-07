@@ -152,7 +152,6 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
-    fontSize: 14,
     fontWeight: "600",
   },
   activeBackground: {

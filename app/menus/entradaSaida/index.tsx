@@ -17,64 +17,76 @@ import { entradaSaidaApi } from "../../../services/entradaSaidaApi";
 import { IEpi } from "../../../interfaces/epi";
 import { getEpis } from "../../../services/epiApi";
 import { IMovimentacaoEpi } from "../../../interfaces/entradaSaida";
-import Feather from "@expo/vector-icons/Feather";
+import { getGlobalStyles } from "../../../globalStyles";
+import SearchBar from "../../components/SearchBar";
 
-function renderItem(
-  theme: string,
-  id: string,
-  nome: string,
-  ca: string,
-  tipoUnidade: string,
-  quantidade: number,
-  quantidadeParaAviso: number,
-  quantidadeASerMovida: number,
-  setQuantidadeItem: (id: string, novaQuantidade: number) => void
-) {
+function RenderItem({
+  globalStyles,
+  epi,
+  setQuantidadeItem,
+  quantidadeASerMovida,
+}: {
+  globalStyles: any;
+  epi: IEpi;
+  setQuantidadeItem: (id: string, novaQuantidade: number) => void;
+  quantidadeASerMovida: number;
+}) {
   return (
-    <View
-      style={[
-        styles.item,
-        theme === "light"
-          ? { backgroundColor: "white", borderColor: "#ccc" }
-          : { backgroundColor: "#c7c7c7", borderColor: "black" },
-      ]}
-    >
-      <View style={styles.leftSide}>
+    <View style={globalStyles.item}>
+      <View style={globalStyles.leftSide}>
         <ScrollView
-          contentContainerStyle={{ paddingRight: 10, borderRadius: 20 }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "space-between",
+            paddingRight: 10,
+          }}
         >
-          <Text style={styles.dadosEpiText}>Nome: {nome}</Text>
-          <Text style={styles.dadosEpiText}>C.A.: {ca}</Text>
-          <Text style={styles.dadosEpiText}>Unidade/Par: {tipoUnidade}</Text>
-          <Text style={styles.dadosEpiText}>Quantidade: {quantidade}</Text>
-          <Text style={[styles.dadosEpiText, { marginBottom: 0 }]}>
-            Quantidade para aviso: {quantidadeParaAviso}
+          <Text style={globalStyles.dadosEpiText}>Nome: {epi.nome || " "}</Text>
+          <Text style={globalStyles.dadosEpiText}>
+            C.A.: {epi.certificadoAprovacao}
+          </Text>
+          <Text style={globalStyles.dadosEpiText}>
+            Unidade/Par: {epi.tipoUnidade.tipo}
+          </Text>
+          <Text style={globalStyles.dadosEpiText}>
+            Quantidade: {epi.quantidade}
+          </Text>
+          <Text style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}>
+            Quantidade para aviso: {epi.quantidadeParaAviso}
           </Text>
         </ScrollView>
       </View>
 
       <View
         style={[
-          styles.rightSide,
-          theme === "light"
-            ? { borderColor: "#ccc" }
-            : { borderColor: "black" },
+          globalStyles.rightSide,
+          {
+            justifyContent: "center",
+            alignSelf: "center",
+            height: "100%",
+            borderWidth: 1,
+            borderRadius: 20,
+            borderColor: "#888",
+            padding: 10,
+          },
         ]}
       >
         <View style={styles.plusMinusButtonContainer}>
           <TouchableOpacity
             style={[styles.plusMinusButton, { backgroundColor: "green" }]}
-            onPress={() => setQuantidadeItem(id, quantidadeASerMovida + 1)}
+            onPress={() => setQuantidadeItem(epi.id, quantidadeASerMovida + 1)}
           >
             <AntDesign name="pluscircleo" size={24} color="white" />
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.plusMinusButton, { backgroundColor: "#b30f02" }]}
-            onPress={() => setQuantidadeItem(id, quantidadeASerMovida - 1)}
+            onPress={() => setQuantidadeItem(epi.id, quantidadeASerMovida - 1)}
           >
             <AntDesign name="minuscircleo" size={24} color="white" />
           </TouchableOpacity>
         </View>
+
+        {/* texto "Quantidade a ser movida:" + input*/}
         <View
           style={{
             flex: 1,
@@ -85,29 +97,14 @@ function renderItem(
         >
           <Text
             style={[
-              styles.dadosEpiText,
+              globalStyles.dadosEpiText,
               { textAlign: "center", marginBottom: 0 },
             ]}
           >
             Quantidade a ser movida:
           </Text>
           <TextInput
-            style={[
-              {
-                width: "100%",
-                textAlign: "center",
-                color: "black",
-                borderWidth: 1,
-                borderRadius: 20,
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-                fontWeight: 500,
-              },
-              theme === "light"
-                ? { borderColor: "#ccc" }
-                : { borderColor: "black" },
-              { outlineStyle: "none" } as any,
-            ]}
+            style={styles.quantidadeInput}
             keyboardType="numeric"
             value={quantidadeASerMovida.toString()}
             onChangeText={(text: string) => {
@@ -116,18 +113,18 @@ function renderItem(
 
               // Trata campo vazio ou apenas "-"
               if (numericValue === "" || numericValue === "-") {
-                setQuantidadeItem(id, numericValue === "-" ? -0 : 0);
+                setQuantidadeItem(epi.id, numericValue === "-" ? -0 : 0);
                 return;
               }
 
               let valor = parseInt(numericValue, 10);
 
               // Se for negativo e o valor absoluto for maior que a quantidade, limita
-              if (valor < 0 && Math.abs(valor) > quantidade) {
-                valor = -quantidade;
+              if (valor < 0 && Math.abs(valor) > (epi.quantidade ?? 0)) {
+                valor = -(epi.quantidade ?? 0);
               }
 
-              setQuantidadeItem(id, valor);
+              setQuantidadeItem(epi.id, valor);
             }}
           />
         </View>
@@ -138,6 +135,7 @@ function renderItem(
 
 export default function EntradaSaida() {
   const { theme } = useThemeContext();
+  const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
   const [epis, setEpis] = useState<IEpi[]>([]);
   const [quantidadeASerMovida, setQuantidadeASerMovida] = useState<{
@@ -221,128 +219,66 @@ export default function EntradaSaida() {
   }, []);
 
   return (
-    <View
-      style={[
-        styles.background,
-        theme === "light"
-          ? {
-              backgroundColor: "#f0f3fa",
-            }
-          : { backgroundColor: "#1c1c1c" },
-      ]}
-    >
+    <View style={globalStyles.background}>
       <MenuSuperior />
-      <View style={styles.content}>
-        <Text
-          style={[
-            styles.title,
-            theme === "light" ? { color: "black" } : { color: "white" },
-          ]}
-        >
-          ENTRADA/SAÍDA
-        </Text>
-        <Animatable.View
-          animation="fadeInUp"
-          duration={1000}
-          style={styles.mainContent}
-        >
-          <View
-            style={[
-              styles.searchBar,
-              theme === "light"
-                ? { backgroundColor: "white", borderColor: "#888" }
-                : { borderColor: "#888" },
-            ]}
-          >
-            <Feather
-              name={"search"}
-              size={30}
-              color={theme === "light" ? "black" : "white"}
-              style={{ paddingHorizontal: 10 }}
-            />
-            <TextInput
-              style={[
-                styles.input,
-                { outlineStyle: "none" as any },
-                theme === "light" ? { color: "black" } : { color: "white" },
-              ]}
-              placeholder="Pesquisar por nome ou C.A."
-              placeholderTextColor="#888"
-              onChangeText={(text) => setPesquisa(text)}
-              value={pesquisa}
-            />
-          </View>
+      <Text style={globalStyles.title}>ENTRADA/SAÍDA</Text>
+      <Animatable.View
+        animation="fadeInUp"
+        duration={1000}
+        style={globalStyles.mainContent}
+      >
+        <SearchBar
+          value={pesquisa}
+          onChangeText={setPesquisa}
+          placeholder="Pesquisar por nome ou C.A."
+        />
 
-          <ScrollView
-            style={[
-              styles.itensScroll,
-              theme === "light"
-                ? { borderColor: "#ccc" }
-                : { borderColor: "black" },
-            ]}
-            contentContainerStyle={[
-              styles.scrollContent,
-              theme === "light"
-                ? { backgroundColor: "white" }
-                : { backgroundColor: "#5e5e5e" },
-            ]}
-            persistentScrollbar={true}
-          >
-            <View style={{ padding: 20, gap: 20 }}>
-              {epis
-                .slice()
-                .sort((a, b) =>
-                  (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
-                    sensitivity: "base",
-                  })
-                )
-                .filter((epi) => {
-                  const termo = normalizar(pesquisa);
-                  const nome = normalizar(epi.nome || "");
-                  const ca = normalizar(epi.certificadoAprovacao || "");
-                  return nome.startsWith(termo) || ca.startsWith(termo);
+        <ScrollView
+          style={globalStyles.itensScroll}
+          contentContainerStyle={globalStyles.scrollContent}
+          persistentScrollbar={true}
+        >
+          <View style={{ padding: 20, gap: 20 }}>
+            {epis
+              .slice()
+              .sort((a, b) =>
+                (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+                  sensitivity: "base",
                 })
-                .map((epi: IEpi, index: number) => (
-                  <Animatable.View
-                    key={epi.id}
-                    animation="fadeInUp"
-                    duration={1000}
-                    delay={index * 150}
-                  >
-                    <View key={epi.id}>
-                      {renderItem(
-                        theme,
-                        epi.id,
-                        epi.nome || "",
-                        epi.certificadoAprovacao || "",
-                        `${epi.tipoUnidade.tipo}`,
-                        epi.quantidade || 0,
-                        epi.quantidadeParaAviso || 0,
-                        quantidadeASerMovida[epi.id] || 0,
-                        setQuantidadeItem
-                      )}
-                    </View>
-                  </Animatable.View>
-                ))}
-            </View>
-          </ScrollView>
-          <TouchableOpacity
-            onPress={handleConfirmarMovimentacoes}
-            style={{
-              backgroundColor: "#0033a0",
-              height: 50,
-              borderRadius: 10,
-              marginTop: 20,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>
-              Confirmar movimentações
-            </Text>
-          </TouchableOpacity>
-        </Animatable.View>
-      </View>
+              )
+              .filter((epi) => {
+                const termo = normalizar(pesquisa);
+                const nome = normalizar(epi.nome || "");
+                const ca = normalizar(epi.certificadoAprovacao || "");
+                return nome.startsWith(termo) || ca.startsWith(termo);
+              })
+              .map((epi: IEpi, index: number) => (
+                <Animatable.View
+                  key={epi.id}
+                  animation="fadeInUp"
+                  duration={1000}
+                  delay={index * 150}
+                >
+                  <View key={epi.id}>
+                    <RenderItem
+                      globalStyles={globalStyles}
+                      epi={epi}
+                      setQuantidadeItem={setQuantidadeItem}
+                      quantidadeASerMovida={quantidadeASerMovida[epi.id] || 0}
+                    />
+                  </View>
+                </Animatable.View>
+              ))}
+          </View>
+        </ScrollView>
+        <TouchableOpacity
+          onPress={handleConfirmarMovimentacoes}
+          style={globalStyles.button}
+        >
+          <Text style={globalStyles.buttonText}>Confirmar movimentações</Text>
+        </TouchableOpacity>
+      </Animatable.View>
+
       <MenuInferior />
       {carregando && <Carregando />}
     </View>
@@ -350,86 +286,6 @@ export default function EntradaSaida() {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  mainContent: {
-    flex: 1,
-    width: "100%",
-    maxWidth: 800,
-    padding: 20,
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 2,
-    borderRadius: 20,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    padding: 5,
-  },
-  itensScroll: {
-    flex: 1,
-    borderRadius: 20,
-    borderWidth: 3,
-    alignSelf: "center",
-    width: "100%",
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: "flex-start",
-  },
-  item: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 10,
-    borderWidth: 1,
-    borderRadius: 20,
-    width: "100%",
-    height: 170,
-    gap: 10,
-  },
-  leftSide: {
-    flex: 1,
-    justifyContent: "space-between",
-    height: "100%",
-    paddingVertical: 5,
-    gap: 5,
-  },
-  rightSide: {
-    flex: 1,
-    height: "100%",
-    justifyContent: "center",
-    alignSelf: "center",
-    borderWidth: 1,
-    borderRadius: 20,
-    padding: 10,
-    gap: 10,
-  },
-  dadosEpiText: {
-    textAlign: "left",
-    fontSize: 14,
-    color: "black",
-    fontWeight: "500",
-    marginBottom: 10,
-  },
   plusMinusButtonContainer: {
     flex: 1,
     flexDirection: "row",
@@ -442,9 +298,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
   },
-  plusMinusButtonText: {
-    fontSize: 30,
-    fontWeight: 900,
-    color: "white",
+  quantidadeInput: {
+    width: "100%",
+    textAlign: "center",
+    color: "black",
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    fontWeight: 500,
+    borderColor: "#888",
+    outlineStyle: "none" as any,
   },
 });

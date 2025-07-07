@@ -20,9 +20,11 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver"; // apenas se for no frontend
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { getGlobalStyles } from "../../../globalStyles";
 
 export default function Relatorios() {
   const { theme } = useThemeContext();
+  const globalStyles = getGlobalStyles(theme);
 
   const hojeComecoDoDia = new Date();
   hojeComecoDoDia.setUTCHours(0, 0, 0, 0);
@@ -304,34 +306,27 @@ export default function Relatorios() {
   }
 
   return (
-    <View
-      style={[
-        styles.background,
-        theme === "light"
-          ? { backgroundColor: "#f0f3fa" }
-          : { backgroundColor: "#1c1c1c" },
-      ]}
-    >
+    <View style={globalStyles.background}>
       <MenuSuperior />
-      <Text
-        style={[
-          styles.title,
-          theme === "light" ? { color: "black" } : { color: "white" },
-        ]}
-      >
-        GERAR RELATÓRIO
-      </Text>
+      <Text style={globalStyles.title}>GERAR RELATÓRIO</Text>
       <Animatable.View
         animation="fadeInUp"
         duration={1000}
-        style={styles.mainView}
+        style={[
+          globalStyles.mainContent,
+          {
+            gap: 100,
+          },
+        ]}
       >
         <View style={[styles.buttonsView, { alignItems: "flex-end" }]}>
-          <View style={styles.alignItems}>
+          <View style={styles.alignButtons}>
             <Text
               style={[
-                { fontSize: 20 },
-                theme === "light" ? { color: "black" } : { color: "white" },
+                {
+                  fontSize: 20,
+                  color: theme === "light" ? "black" : "white",
+                },
               ]}
             >
               Data inicial
@@ -344,15 +339,7 @@ export default function Relatorios() {
                   const novaData = new Date(dataInicialStr.target.value);
                   if (!isNaN(novaData.getTime())) setDataInicial(novaData); // evita erro ao digitar
                 }}
-                style={{
-                  padding: 10,
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  borderColor: theme === "light" ? "black" : "white",
-                  backgroundColor: theme === "light" ? "#fff" : "#2a2a2a",
-                  color: theme === "light" ? "black" : "white",
-                  fontSize: 16,
-                }}
+                style={globalStyles.dataPicker}
               />
             ) : (
               <>
@@ -392,7 +379,7 @@ export default function Relatorios() {
             )}
           </View>
 
-          <View style={styles.alignItems}>
+          <View style={styles.alignButtons}>
             <Text
               style={[
                 { fontSize: 20 },
@@ -410,26 +397,13 @@ export default function Relatorios() {
                   novaData.setHours(23, 59, 59, 59);
                   if (!isNaN(novaData.getTime())) setDataFinal(novaData); // evita erro ao digitar
                 }}
-                style={{
-                  padding: 10,
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  borderColor: theme === "light" ? "black" : "white",
-                  backgroundColor: theme === "light" ? "#fff" : "#2a2a2a",
-                  color: theme === "light" ? "black" : "white",
-                  fontSize: 16,
-                }}
+                style={globalStyles.dataPicker}
               />
             ) : (
               <>
                 <TouchableOpacity
                   onPress={() => setMostrarPickerFinal(true)}
-                  style={[
-                    styles.dataButton,
-                    theme === "light"
-                      ? { borderColor: "black", backgroundColor: "#fff" }
-                      : { borderColor: "white", backgroundColor: "#2a2a2a" },
-                  ]}
+                  style={styles.dataButton}
                 >
                   <Text
                     style={[
@@ -460,24 +434,15 @@ export default function Relatorios() {
         </View>
 
         <View style={[styles.buttonsView, { alignItems: "flex-start" }]}>
-          <View style={styles.alignItems}>
+          <View style={styles.alignButtons}>
             <TouchableOpacity
               style={[
-                styles.gerarRelatorioButton,
-                theme === "light"
-                  ? { borderColor: "black" }
-                  : { borderColor: "white" },
+                globalStyles.optionButton,
+                { maxWidth: 300, justifyContent: "center" },
               ]}
               onPress={() => gerarRelatorio("PDF")}
             >
-              <Text
-                style={[
-                  { fontSize: 20 },
-                  theme === "light" ? { color: "black" } : { color: "white" },
-                ]}
-              >
-                Gerar PDF
-              </Text>
+              <Text style={globalStyles.optionButtonText}>Gerar PDF</Text>
               <AntDesign
                 name="pdffile1"
                 size={24}
@@ -486,24 +451,15 @@ export default function Relatorios() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.alignItems}>
+          <View style={styles.alignButtons}>
             <TouchableOpacity
               style={[
-                styles.gerarRelatorioButton,
-                theme === "light"
-                  ? { borderColor: "black" }
-                  : { borderColor: "white" },
+                globalStyles.optionButton,
+                { maxWidth: 300, justifyContent: "center" },
               ]}
               onPress={() => gerarRelatorio("XLSX")}
             >
-              <Text
-                style={[
-                  { fontSize: 20 },
-                  theme === "light" ? { color: "black" } : { color: "white" },
-                ]}
-              >
-                Gerar XLSX
-              </Text>
+              <Text style={globalStyles.optionButtonText}>Gerar XLSX</Text>
               <MaterialCommunityIcons
                 name="microsoft-excel"
                 size={28}
@@ -520,25 +476,7 @@ export default function Relatorios() {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-  },
-  mainView: {
-    flex: 1,
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    width: "100%",
-    gap: 100,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  alignItems: {
+  alignButtons: {
     flex: 1,
     alignItems: "center",
     gap: 10,
@@ -548,18 +486,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-  },
-  gerarRelatorioButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "40%",
-    minWidth: 150,
-    maxWidth: 300,
-    gap: 10,
-    borderWidth: 2,
-    borderRadius: 100,
-    paddingVertical: 10,
+    gap: 20,
   },
   dataButton: {
     paddingVertical: 10,

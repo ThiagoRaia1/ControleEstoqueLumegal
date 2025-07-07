@@ -14,7 +14,6 @@ import MenuInferior from "../../components/MenuInferior";
 import Carregando from "../../components/Carregando";
 import { useEffect, useState } from "react";
 import ModalConfirmacao from "../../components/ModalConfirmacao";
-import { Feather } from "@expo/vector-icons";
 import { ICriarEpi, IEpi } from "../../../interfaces/epi";
 import { editarEpiApi, excluirEpiApi, getEpis } from "../../../services/epiApi";
 import { Picker } from "@react-native-picker/picker";
@@ -28,11 +27,12 @@ import {
 } from "../../../services/tipoUnidadeApi";
 import { IFornecedor } from "../../../interfaces/fornecedor";
 import { ITipoUnidade } from "../../../interfaces/tipoUnidade";
-import { useAuth } from "../../../context/auth";
+import { getGlobalStyles } from "../../../globalStyles";
+import SearchBar from "../../components/SearchBar";
 
 export default function Pesquisar() {
-  const { usuario } = useAuth();
   const { theme } = useThemeContext();
+  const globalStyles = getGlobalStyles(theme);
   const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
   const [epis, setEpis] = useState<IEpi[]>([]);
@@ -223,38 +223,31 @@ export default function Pesquisar() {
 
   function ItemEpi({ epi }: { epi: IEpi }) {
     return (
-      <View
-        style={[
-          styles.item,
-          theme === "light"
-            ? { backgroundColor: "white" }
-            : { backgroundColor: "#c7c7c7" },
-        ]}
-      >
-        <View style={styles.leftSide}>
+      <View style={globalStyles.item}>
+        <View style={globalStyles.leftSide}>
           <ScrollView
             contentContainerStyle={{ paddingRight: 10, borderRadius: 20 }}
           >
-            <Text style={styles.dadosEpiText}>Nome: {epi.nome}</Text>
-            <Text style={styles.dadosEpiText}>
+            <Text style={globalStyles.dadosEpiText}>Nome: {epi.nome}</Text>
+            <Text style={globalStyles.dadosEpiText}>
               C.A.: {epi.certificadoAprovacao}
             </Text>
-            <Text style={styles.dadosEpiText}>
+            <Text style={globalStyles.dadosEpiText}>
               Unidade/Par: {epi.tipoUnidade.tipo}
             </Text>
-            <Text style={styles.dadosEpiText}>
+            <Text style={globalStyles.dadosEpiText}>
               Quantidade: {epi.quantidade}
             </Text>
-            <Text style={styles.dadosEpiText}>
+            <Text style={globalStyles.dadosEpiText}>
               Quantidade para aviso: {epi.quantidadeParaAviso}
             </Text>
-            <Text style={[styles.dadosEpiText, { marginBottom: 0 }]}>
+            <Text style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}>
               Fornecedores:
             </Text>
             {epi.fornecedores.slice(0, 3).map((fornecedor, index) => (
               <Text
                 key={index}
-                style={[styles.dadosEpiText, { marginBottom: 0 }]}
+                style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}
               >
                 {"    -"} {fornecedor.nome}
               </Text>
@@ -262,8 +255,8 @@ export default function Pesquisar() {
           </ScrollView>
         </View>
 
-        <View style={styles.rightSide}>
-          <Text style={[styles.dadosEpiText, { marginBottom: -5 }]}>
+        <View style={globalStyles.rightSide}>
+          <Text style={[globalStyles.dadosEpiText, { marginBottom: -5 }]}>
             Descrição:
           </Text>
           <ScrollView
@@ -271,7 +264,7 @@ export default function Pesquisar() {
           >
             <Text
               style={[
-                styles.dadosEpiText,
+                globalStyles.dadosEpiText,
                 { flex: 1, marginBottom: 0, textAlign: "justify" },
               ]}
             >
@@ -280,18 +273,13 @@ export default function Pesquisar() {
           </ScrollView>
           <View style={{ flexDirection: "row", gap: 10 }}>
             <TouchableOpacity
-              style={[
-                styles.button,
-                theme === "light"
-                  ? { borderColor: "#888" }
-                  : { borderColor: "black" },
-              ]}
+              style={[globalStyles.button, { height: 40 }]}
               onPress={() => {
                 setEpiSelecionado(epi);
                 setEditando(true);
               }}
             >
-              <Text style={styles.buttonText}>Editar</Text>
+              <Text style={globalStyles.buttonText}>Editar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -300,70 +288,26 @@ export default function Pesquisar() {
   }
 
   return (
-    <View
-      style={[
-        styles.background,
-        theme === "light"
-          ? {
-              backgroundColor: "#f0f3fa",
-            }
-          : { backgroundColor: "#1c1c1c" },
-      ]}
-    >
+    <View style={globalStyles.background}>
       <MenuSuperior />
-      <View style={styles.content}>
-        <Text
-          style={[
-            styles.title,
-            theme === "light" ? { color: "black" } : { color: "white" },
-          ]}
-        >
-          {!editando ? "PESQUISAR" : "EDITANDO"}
-        </Text>
+      <Text style={globalStyles.title}>
+        {!editando ? "PESQUISAR" : "EDITANDO"}
+      </Text>
+      <Animatable.View
+        animation="fadeInUp"
+        duration={1000}
+        style={globalStyles.mainContent}
+      >
         {!editando ? (
-          <Animatable.View
-            animation="fadeInUp"
-            duration={1000}
-            style={styles.mainContent}
-          >
-            <View
-              style={[
-                styles.searchBar,
-                theme === "light"
-                  ? { backgroundColor: "white", borderColor: "#888" }
-                  : { borderColor: "#888" },
-              ]}
-            >
-              <Feather
-                name={"search"}
-                size={30}
-                color={theme === "light" ? "black" : "white"}
-                style={{ paddingHorizontal: 10 }}
-              />
-              <TextInput
-                style={[
-                  styles.input,
-                  { outlineStyle: "none" as any },
-                  theme === "light" ? { color: "black" } : { color: "white" },
-                ]}
-                placeholder="Pesquisar"
-                placeholderTextColor="#888"
-                onChangeText={(text) => setPesquisa(text)}
-              />
-            </View>
+          <>
+            <SearchBar
+              value={pesquisa}
+              onChangeText={setPesquisa}
+              placeholder="Pesquisar por nome ou C.A."
+            />
             <ScrollView
-              style={[
-                styles.itensScroll,
-                theme === "light"
-                  ? { borderColor: "#888" }
-                  : { borderColor: "#888" },
-              ]}
-              contentContainerStyle={[
-                styles.scrollContent,
-                theme === "light"
-                  ? { backgroundColor: "white" }
-                  : { backgroundColor: "#5e5e5e" },
-              ]}
+              style={globalStyles.itensScroll}
+              contentContainerStyle={globalStyles.scrollContent}
               persistentScrollbar={true}
             >
               <View style={{ padding: 20, gap: 20 }}>
@@ -379,38 +323,22 @@ export default function Pesquisar() {
                 ))}
               </View>
             </ScrollView>
-          </Animatable.View>
+          </>
         ) : (
-          <Animatable.View
-            animation="fadeInUp"
-            duration={1000}
-            style={styles.mainContentEditar}
-          >
+          <>
             <ScrollView
+              style={{ width: "100%" }}
               contentContainerStyle={[
-                styles.scrollContentEditar,
+                globalStyles.scrollContentForm,
                 height < 973 && { paddingRight: 20 },
                 height < 997 && width < 534 && { paddingRight: 20 },
               ]}
               persistentScrollbar={true}
             >
-              <View style={styles.labelInputContainer}>
-                <Text
-                  style={[
-                    styles.label,
-                    theme === "light" ? { color: "black" } : { color: "white" },
-                  ]}
-                >
-                  NOME: *
-                </Text>
+              <View style={globalStyles.labelInputContainer}>
+                <Text style={globalStyles.label}>NOME: *</Text>
                 <TextInput
-                  style={[
-                    styles.inputEditar,
-                    { outline: "none" } as any,
-                    theme === "light"
-                      ? { color: "black", borderColor: "black" }
-                      : { color: "white", borderColor: "white" },
-                  ]}
+                  style={globalStyles.inputEditar}
                   placeholder="Nome do EPI"
                   placeholderTextColor="#888"
                   value={nome}
@@ -418,23 +346,12 @@ export default function Pesquisar() {
                 />
               </View>
 
-              <View style={styles.labelInputContainer}>
-                <Text
-                  style={[
-                    styles.label,
-                    theme === "light" ? { color: "black" } : { color: "white" },
-                  ]}
-                >
+              <View style={globalStyles.labelInputContainer}>
+                <Text style={globalStyles.label}>
                   CERTIFICADO DE APROVAÇÃO:
                 </Text>
                 <TextInput
-                  style={[
-                    styles.inputEditar,
-                    { outline: "none" } as any,
-                    theme === "light"
-                      ? { color: "black", borderColor: "black" }
-                      : { color: "white", borderColor: "white" },
-                  ]}
+                  style={globalStyles.inputEditar}
                   placeholder="C.A. do EPI"
                   placeholderTextColor="#888"
                   value={certificadoAprovacao}
@@ -444,23 +361,10 @@ export default function Pesquisar() {
                 />
               </View>
 
-              <View style={styles.labelInputContainer}>
-                <Text
-                  style={[
-                    styles.label,
-                    theme === "light" ? { color: "black" } : { color: "white" },
-                  ]}
-                >
-                  DESCRIÇÃO:
-                </Text>
+              <View style={globalStyles.labelInputContainer}>
+                <Text style={globalStyles.label}>DESCRIÇÃO:</Text>
                 <TextInput
-                  style={[
-                    styles.inputEditar,
-                    { outline: "none" } as any,
-                    theme === "light"
-                      ? { color: "black", borderColor: "black" }
-                      : { color: "white", borderColor: "white" },
-                  ]}
+                  style={globalStyles.inputEditar}
                   placeholder="Descrição do EPI"
                   placeholderTextColor="#888"
                   value={descricao}
@@ -468,15 +372,8 @@ export default function Pesquisar() {
                 />
               </View>
 
-              <View style={styles.labelInputContainer}>
-                <Text
-                  style={[
-                    styles.label,
-                    { color: theme === "light" ? "black" : "white" },
-                  ]}
-                >
-                  TIPO DE UNIDADE: *
-                </Text>
+              <View style={globalStyles.labelInputContainer}>
+                <Text style={globalStyles.label}>TIPO DE UNIDADE: *</Text>
 
                 <View
                   style={[
@@ -491,8 +388,7 @@ export default function Pesquisar() {
                     selectedValue={tipoUnidade}
                     onValueChange={(tipo) => setTipoUnidade(tipo)}
                     style={[
-                      styles.inputEditar,
-                      { outline: "none" } as any,
+                      globalStyles.inputEditar,
                       {
                         color:
                           tipoUnidade === ""
@@ -527,15 +423,8 @@ export default function Pesquisar() {
                 </View>
               </View>
 
-              <View style={styles.labelInputContainer}>
-                <Text
-                  style={[
-                    styles.label,
-                    theme === "light" ? { color: "black" } : { color: "white" },
-                  ]}
-                >
-                  FORNECEDORES:
-                </Text>
+              <View style={globalStyles.labelInputContainer}>
+                <Text style={globalStyles.label}>FORNECEDORES:</Text>
 
                 {fornecedores.map((forn, index) => {
                   // Filtra os fornecedores já selecionados, exceto o atual
@@ -569,8 +458,7 @@ export default function Pesquisar() {
                           selectedValue={fornecedores[index]}
                           onValueChange={(valor) => setFornecedor(index, valor)}
                           style={[
-                            styles.inputEditar,
-                            { outline: "none" } as any,
+                            globalStyles.inputEditar,
                             {
                               flex: 1,
                               color:
@@ -632,9 +520,9 @@ export default function Pesquisar() {
                   fornecedores[fornecedores.length - 1].trim() !== "" && (
                     <TouchableOpacity
                       onPress={() => setFornecedores((prev) => [...prev, ""])}
-                      style={styles.buttonEditandoAdicionarFornecedor}
+                      style={globalStyles.button}
                     >
-                      <Text style={styles.buttonEditandoText}>
+                      <Text style={globalStyles.buttonText}>
                         Adicionar fornecedor
                       </Text>
                     </TouchableOpacity>
@@ -649,30 +537,17 @@ export default function Pesquisar() {
                   gap: 20,
                 }}
               >
-                <View style={[styles.labelInputContainer, { flex: 1 }]}>
-                  <Text
-                    style={[
-                      styles.label,
-                      theme === "light"
-                        ? { color: "black" }
-                        : { color: "white" },
-                    ]}
-                  >
-                    QUANTIDADE:
-                  </Text>
+                <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
+                  <Text style={globalStyles.label}>QUANTIDADE:</Text>
                   <TextInput
                     style={[
-                      styles.inputEditar,
-                      { outline: "none" } as any,
+                      globalStyles.inputEditar,
                       theme === "light"
                         ? {
-                            color: "black",
-                            borderColor: "black",
                             backgroundColor: "#ccc",
                           }
                         : {
                             color: "#888",
-                            borderColor: "white",
                             backgroundColor: "black",
                           },
                     ]}
@@ -687,25 +562,12 @@ export default function Pesquisar() {
                     }}
                   />
                 </View>
-                <View style={[styles.labelInputContainer, { flex: 1 }]}>
-                  <Text
-                    style={[
-                      styles.label,
-                      theme === "light"
-                        ? { color: "black" }
-                        : { color: "white" },
-                    ]}
-                  >
+                <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
+                  <Text style={globalStyles.label}>
                     QUANTIDADE PARA AVISO: *
                   </Text>
                   <TextInput
-                    style={[
-                      styles.inputEditar,
-                      { outline: "none" } as any,
-                      theme === "light"
-                        ? { color: "black", borderColor: "black" }
-                        : { color: "white", borderColor: "white" },
-                    ]}
+                    style={globalStyles.inputEditar}
                     placeholder="Quantidade para o item ser exibido no aviso"
                     placeholderTextColor="#888"
                     value={quantidadeParaAviso}
@@ -718,21 +580,26 @@ export default function Pesquisar() {
                 </View>
               </View>
             </ScrollView>
-            <View style={{ flexDirection: "row", gap: 20 }}>
-              <TouchableOpacity style={styles.buttonEditando} onPress={editar}>
-                <Text style={styles.buttonEditandoText}>Salvar</Text>
+            <View style={{ flexDirection: "row", gap: 20, width: "100%" }}>
+              <TouchableOpacity
+                style={[globalStyles.button, { flex: 1 }]}
+                onPress={editar}
+              >
+                <Text style={globalStyles.buttonText}>Salvar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.buttonEditando, { backgroundColor: "#B30F03" }]}
+                style={[
+                  globalStyles.button,
+                  { flex: 1, backgroundColor: "#B30F03" },
+                ]}
                 onPress={() => setEditando(false)}
               >
-                <Text style={styles.buttonEditandoText}>Cancelar</Text>
+                <Text style={globalStyles.buttonText}>Cancelar</Text>
               </TouchableOpacity>
             </View>
-          </Animatable.View>
+          </>
         )}
-      </View>
-
+      </Animatable.View>
       <MenuInferior />
       {carregando && <Carregando />}
       <ModalConfirmacao
@@ -748,153 +615,11 @@ export default function Pesquisar() {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  mainContent: {
-    flex: 1,
-    width: "100%",
-    justifyContent: "center",
-    maxWidth: 800,
-    padding: 20,
-    gap: 20,
-  },
-  itensScroll: {
-    flex: 1,
-    borderRadius: 20,
-    borderWidth: 3,
-    alignSelf: "center",
-    width: "100%",
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: "flex-start",
-  },
-  item: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 10,
-    borderWidth: 1,
-    borderRadius: 20,
-    borderColor: "#888",
-    width: "100%",
-    height: 200,
-    gap: 10,
-  },
-  leftSide: {
-    flex: 1,
-    justifyContent: "space-between",
-    height: "100%",
-    paddingVertical: 5,
-    gap: 10,
-  },
-  rightSide: {
-    flex: 1,
-    justifyContent: "space-evenly",
-    height: "100%",
-    paddingVertical: 5,
-    gap: 10,
-  },
-  dadosEpiText: {
-    textAlign: "left",
-    fontSize: 14,
-    color: "black",
-    fontWeight: "500",
-    marginBottom: 10,
-  },
-  mainContentEditar: {
-    flex: 1,
-    width: "100%",
-    maxWidth: 800,
-    padding: 20,
-  },
-  scrollContentEditar: {
-    flex: 1,
-    gap: 20,
-    justifyContent: "center",
-  },
-  labelInputContainer: {
-    gap: 10,
-  },
-  label: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  inputEditar: {
-    height: 50,
-    width: "100%",
-    fontSize: 16,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-  },
   pickerContainer: {
     width: "100%",
     height: 50,
     backgroundColor: "#aaa",
     borderRadius: 10,
     borderWidth: 1,
-  },
-  button: {
-    flex: 1,
-    justifyContent: "center",
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    backgroundColor: "#0033A0",
-  },
-  buttonText: {
-    textAlign: "center",
-    fontSize: 16,
-    fontWeight: 500,
-    color: "white",
-  },
-  input: {
-    flex: 1,
-    height: 50,
-    fontSize: 16,
-  },
-  searchBar: {
-    width: "100%",
-    flexDirection: "row",
-    borderWidth: 2,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buttonEditandoAdicionarFornecedor: {
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    backgroundColor: "#0033A0",
-  },
-  buttonEditando: {
-    flex: 1,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    backgroundColor: "#0033A0",
-    marginTop: 20,
-  },
-  buttonEditandoText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-    paddingHorizontal: 30,
   },
 });

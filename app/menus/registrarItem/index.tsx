@@ -13,7 +13,7 @@ import MenuSuperior from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
 import Carregando from "../../components/Carregando";
 import { useEffect, useState } from "react";
-import { Picker } from "@react-native-picker/picker";
+import Entypo from "@expo/vector-icons/Entypo";
 import { ICriarEpi } from "../../../interfaces/epi";
 import { registrarEpiApi } from "../../../services/epiApi";
 import {
@@ -28,9 +28,13 @@ import {
 import { IFornecedor } from "../../../interfaces/fornecedor";
 import { useAuth } from "../../../context/auth";
 import MaskInput, { Masks } from "react-native-mask-input";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { getGlobalStyles } from "../../../globalStyles";
+import { AntDesign } from "@expo/vector-icons";
 
 export default function RegistrarEpi() {
   const { theme } = useThemeContext();
+  const globalStyles = getGlobalStyles(theme);
   const { usuario } = useAuth();
   const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
@@ -152,403 +156,111 @@ export default function RegistrarEpi() {
   };
 
   return (
-    <View
-      style={[
-        styles.background,
-        theme === "light"
-          ? {
-              backgroundColor: "#f0f3fa",
-            }
-          : { backgroundColor: "#1c1c1c" },
-      ]}
-    >
+    <View style={globalStyles.background}>
       <MenuSuperior />
-      <View style={styles.content}>
-        <Text
-          style={[
-            styles.title,
-            theme === "light" ? { color: "black" } : { color: "white" },
-          ]}
+      <Text style={globalStyles.title}>
+        {usuario.tipoAcesso === "Almoxarifado" ||
+        usuario.tipoAcesso === "AlmoxarifadoAdm"
+          ? "REGISTRAR EPI"
+          : usuario.tipoAcesso === "Compras" ||
+            usuario.tipoAcesso === "ComprasAdm"
+          ? "REGISTRAR ITEM"
+          : " "}
+      </Text>
+      <Animatable.View
+        animation="fadeInUp"
+        duration={1000}
+        style={globalStyles.mainContent}
+      >
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            justifyContent: "space-evenly",
+          }}
         >
-          {usuario.tipoAcesso === "Almoxarifado" ||
-          usuario.tipoAcesso === "AlmoxarifadoAdm"
-            ? "REGISTRAR EPI"
-            : usuario.tipoAcesso === "Compras" ||
-              usuario.tipoAcesso === "ComprasAdm"
-            ? "REGISTRAR ITEM"
-            : " "}
-        </Text>
-        <View style={{ flex: 1, width: "100%", maxWidth: 800 }}>
-          <Animatable.View
-            animation="fadeInUp"
-            duration={1000}
-            style={styles.mainContent}
-          >
-            <ScrollView
-              contentContainerStyle={[
-                styles.scrollContent,
-                height < 973 && { paddingRight: 20 },
-                height < 997 && width < 534 && { paddingRight: 20 },
-              ]}
-              persistentScrollbar={true}
-            >
-              <View style={styles.labelInputContainer}>
-                <Text
-                  style={[
-                    styles.label,
-                    theme === "light" ? { color: "black" } : { color: "white" },
-                  ]}
-                >
-                  NOME: *
-                </Text>
-                <TextInput
-                  style={[
-                    styles.input,
-                    { outline: "none" } as any,
-                    theme === "light"
-                      ? { color: "black", borderColor: "black" }
-                      : { color: "white", borderColor: "white" },
-                  ]}
-                  placeholder="Nome do item"
-                  placeholderTextColor="#888"
-                  value={nome}
-                  onChangeText={(text) => setNome(text.slice(0, 30))}
-                />
-              </View>
+          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
+            console.log("suprimento")
+          }}>
+            <Text style={globalStyles.optionButtonText}>
+              REGISTRAR SUPRIMENTO
+            </Text>
+            <Entypo
+              name="shop"
+              size={28}
+              color={theme === "light" ? "black" : "white"}
+            />
+          </TouchableOpacity>
 
-              <View style={styles.labelInputContainer}>
-                <Text
-                  style={[
-                    styles.label,
-                    theme === "light" ? { color: "black" } : { color: "white" },
-                  ]}
-                >
-                  CERTIFICADO DE APROVAÇÃO:
-                </Text>
-                <TextInput
-                  style={[
-                    styles.input,
-                    { outline: "none" } as any,
-                    theme === "light"
-                      ? { color: "black", borderColor: "black" }
-                      : { color: "white", borderColor: "white" },
-                  ]}
-                  placeholder="C.A. do EPI"
-                  placeholderTextColor="#888"
-                  value={certificadoAprovacao}
-                  onChangeText={(text) =>
-                    setCertificadoAprovacao(text.slice(0, 20))
-                  }
-                />
-              </View>
+          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
+            console.log("epi")
+          }}>
+            <Text style={globalStyles.optionButtonText}>REGISTRAR EPI</Text>
+            <MaterialCommunityIcons
+              name="warehouse"
+              size={28}
+              color={theme === "light" ? "black" : "white"}
+            />
+          </TouchableOpacity>
 
-              <View style={styles.labelInputContainer}>
-                <Text
-                  style={[
-                    styles.label,
-                    theme === "light" ? { color: "black" } : { color: "white" },
-                  ]}
-                >
-                  DESCRIÇÃO:
-                </Text>
-                <TextInput
-                  style={[
-                    styles.input,
-                    { outline: "none" } as any,
-                    theme === "light"
-                      ? { color: "black", borderColor: "black" }
-                      : { color: "white", borderColor: "white" },
-                  ]}
-                  placeholder="Descrição do item"
-                  placeholderTextColor="#888"
-                  value={descricao}
-                  onChangeText={(text) => setDescricao(text)}
-                />
-              </View>
+          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
+            console.log("fornecedor")
+          }}>
+            <Text style={globalStyles.optionButtonText}>
+              REGISTRAR FORNECEDOR
+            </Text>
+            <AntDesign
+              name="contacts"
+              size={28}
+              color={theme === "light" ? "black" : "white"}
+            />
+          </TouchableOpacity>
 
-              <View style={styles.labelInputContainer}>
-                <Text
-                  style={[
-                    styles.label,
-                    { color: theme === "light" ? "black" : "white" },
-                  ]}
-                >
-                  TIPO DE UNIDADE: *
-                </Text>
+          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
+            console.log("tipoUnidade")
+          }}>
+            <Text style={globalStyles.optionButtonText}>
+              REGISTRAR TIPO DE UNIDADE
+            </Text>
+            <AntDesign
+              name="tago"
+              size={28}
+              color={theme === "light" ? "black" : "white"}
+            />
+          </TouchableOpacity>
 
-                <View
-                  style={[
-                    styles.pickerContainer,
-                    {
-                      backgroundColor: theme === "light" ? "#fff" : "#2a2a2a", // fundo claro ou escuro
-                      borderColor: theme === "light" ? "black" : "white",
-                    },
-                  ]}
-                >
-                  <Picker
-                    selectedValue={tipoUnidade}
-                    onValueChange={(tipo) => setTipoUnidade(tipo)}
-                    style={[
-                      styles.input,
-                      { outline: "none" } as any,
-                      {
-                        color:
-                          tipoUnidade === ""
-                            ? "#888"
-                            : theme === "light"
-                            ? "black"
-                            : "white",
-                      },
-                      {
-                        backgroundColor:
-                          theme === "light" ? "#F0F3FA" : "#1C1C1C", // fundo do picker
-                        borderWidth: 0,
-                      },
-                    ]}
-                    mode="dropdown"
-                    dropdownIconColor={theme === "light" ? "black" : "white"} // cor do ícone (Web/Android)
-                  >
-                    <Picker.Item
-                      label="Tipo de unidade"
-                      value=""
-                      color={theme === "light" ? "black" : "#888"} // texto do placeholder
-                    />
-                    {tiposUnidadeDisponiveis.map((tipo) => (
-                      <Picker.Item
-                        key={tipo.value}
-                        label={tipo.label}
-                        value={tipo.value}
-                        color={theme === "light" ? "black" : "white"}
-                      />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
+          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
+            console.log("categoriaFornecedor")
+          }}>
+            <Text style={globalStyles.optionButtonText}>
+              REGISTRAR CATEGORIA FORNECEDOR
+            </Text>
+            <AntDesign
+              name="skin"
+              size={28}
+              color={theme === "light" ? "black" : "white"}
+            />
+          </TouchableOpacity>
 
-              <View style={styles.labelInputContainer}>
-                <Text
-                  style={[
-                    styles.label,
-                    theme === "light" ? { color: "black" } : { color: "white" },
-                  ]}
-                >
-                  FORNECEDORES:
-                </Text>
-
-                {fornecedores.map((forn, index) => {
-                  // Filtra os fornecedores já selecionados, exceto o atual
-                  const usados = fornecedores.filter((_, i) => i !== index);
-                  const opcoesFiltradas = fornecedoresDisponiveis.filter(
-                    (f) => !usados.includes(f.value)
-                  );
-
-                  return (
-                    <View
-                      key={index}
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 10,
-                        marginBottom: 10,
-                      }}
-                    >
-                      <View
-                        style={[
-                          styles.pickerContainer,
-                          {
-                            flex: 1,
-                            backgroundColor:
-                              theme === "light" ? "#fff" : "#2a2a2a",
-                            borderColor: theme === "light" ? "black" : "white",
-                          },
-                        ]}
-                      >
-                        <Picker
-                          selectedValue={fornecedores[index]}
-                          onValueChange={(valor) => setFornecedor(index, valor)}
-                          style={[
-                            styles.input,
-                            { outline: "none" } as any,
-                            {
-                              flex: 1,
-                              color:
-                                fornecedores[index] === ""
-                                  ? "#888"
-                                  : theme === "light"
-                                  ? "black"
-                                  : "white",
-                              backgroundColor:
-                                theme === "light" ? "#F0F3FA" : "#1C1C1C",
-                              borderWidth: 0,
-                            },
-                          ]}
-                          mode="dropdown"
-                          dropdownIconColor={
-                            theme === "light" ? "black" : "white"
-                          }
-                        >
-                          <Picker.Item
-                            label="Selecione o fornecedor"
-                            value=""
-                            color={"#888"}
-                          />
-                          {opcoesFiltradas.map((fornecedor) => (
-                            <Picker.Item
-                              key={fornecedor.value}
-                              label={fornecedor.label}
-                              value={fornecedor.value}
-                              color={theme === "light" ? "black" : "white"}
-                            />
-                          ))}
-                        </Picker>
-                      </View>
-
-                      {index > 0 && (
-                        <TouchableOpacity
-                          onPress={() =>
-                            setFornecedores((prev) =>
-                              prev.filter((_, i) => i !== index)
-                            )
-                          }
-                          style={{
-                            backgroundColor: "#d9534f",
-                            borderRadius: 10,
-                            paddingVertical: 4,
-                            paddingHorizontal: 8,
-                          }}
-                        >
-                          <Text style={{ color: "white", fontWeight: "bold" }}>
-                            X
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  );
-                })}
-
-                {fornecedores.length < 3 &&
-                  fornecedores[fornecedores.length - 1].trim() !== "" && (
-                    <TouchableOpacity
-                      onPress={() => setFornecedores((prev) => [...prev, ""])}
-                      style={[styles.button, { marginTop: 0 }]}
-                    >
-                      <Text style={styles.buttonText}>
-                        Adicionar fornecedor
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "flex-end",
-                  gap: 20,
-                }}
-              >
-                <View style={[styles.labelInputContainer, { flex: 1 }]}>
-                  <Text
-                    style={[
-                      styles.label,
-                      theme === "light"
-                        ? { color: "black" }
-                        : { color: "white" },
-                    ]}
-                  >
-                    QUANTIDADE: *
-                  </Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      { outline: "none" } as any,
-                      theme === "light"
-                        ? { color: "black", borderColor: "black" }
-                        : { color: "white", borderColor: "white" },
-                    ]}
-                    placeholder="Quantidade inicial do item"
-                    placeholderTextColor="#888"
-                    value={quantidade}
-                    onChangeText={(text) => {
-                      const numeric = text.replace(/[^0-9]/g, "");
-                      const valor = parseInt(numeric || "0", 10);
-                      setQuantidade(valor > 999 ? "999" : numeric);
-                    }}
-                  />
-                </View>
-                <View style={[styles.labelInputContainer, { flex: 1 }]}>
-                  <Text
-                    style={[
-                      styles.label,
-                      theme === "light"
-                        ? { color: "black" }
-                        : { color: "white" },
-                    ]}
-                  >
-                    QUANTIDADE PARA AVISO: *
-                  </Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      { outline: "none" } as any,
-                      theme === "light"
-                        ? { color: "black", borderColor: "black" }
-                        : { color: "white", borderColor: "white" },
-                    ]}
-                    placeholder="Quantidade para o item ser exibido no aviso"
-                    placeholderTextColor="#888"
-                    value={quantidadeParaAviso}
-                    onChangeText={(text) => {
-                      const numeric = text.replace(/[^0-9]/g, "");
-                      const valor = parseInt(numeric || "0", 10);
-                      setQuantidadeParaAviso(valor > 999 ? "999" : numeric);
-                    }}
-                  />
-                </View>
-
-                {usuario.tipoAcesso === "Compras" ||
-                  (usuario.tipoAcesso === "ComprasAdm" && (
-                    <View style={[styles.labelInputContainer, { flex: 1 }]}>
-                      <Text
-                        style={[
-                          styles.label,
-                          theme === "light"
-                            ? { color: "black" }
-                            : { color: "white" },
-                        ]}
-                      >
-                        PRECO:
-                      </Text>
-                      <MaskInput
-                        style={[
-                          styles.input,
-                          { outline: "none" } as any,
-                          theme === "light"
-                            ? { color: "black", borderColor: "black" }
-                            : { color: "white", borderColor: "white" },
-                        ]}
-                        placeholder="Preço médio do item"
-                        placeholderTextColor="#888"
-                        value={preco}
-                        onChangeText={(text) => setPreco(text)}
-                        mask={Masks.BRL_CURRENCY}
-                      />
-                    </View>
-                  ))}
-              </View>
-            </ScrollView>
-          </Animatable.View>
-          <Animatable.View
-            animation="fadeInUp"
-            duration={1000}
-            style={{ width: "100%" }}
-          >
-            <TouchableOpacity style={styles.button} onPress={registrarEpi}>
-              <Text style={styles.buttonText}>Salvar</Text>
-            </TouchableOpacity>
-          </Animatable.View>
+          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
+            console.log("endereco")
+          }}>
+            <Text style={globalStyles.optionButtonText}>
+              REGISTRAR ENDERECO
+            </Text>
+            <Entypo
+              name="address"
+              size={28}
+              color={theme === "light" ? "black" : "white"}
+            />
+          </TouchableOpacity>
         </View>
-      </View>
+
+        <TouchableOpacity style={globalStyles.button} onPress={registrarEpi}>
+          <Text style={globalStyles.buttonText}>Salvar</Text>
+        </TouchableOpacity>
+      </Animatable.View>
+
       <MenuInferior />
       {carregando && <Carregando />}
     </View>
@@ -556,27 +268,6 @@ export default function RegistrarEpi() {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: "100%",
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-    padding: 20,
-    paddingTop: 0,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: "700",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  mainContent: {
-    flex: 1,
-    width: "100%",
-    maxWidth: 800,
-  },
   scrollContent: {
     flex: 1,
     gap: 20,
@@ -597,25 +288,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 10,
   },
-  pickerContainer: {
+  optionButtonsRow: {
     width: "100%",
-    height: 50,
-    backgroundColor: "#aaa",
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-  button: {
-    height: 50,
+    flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    backgroundColor: "#0033A0",
-    marginTop: 20,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-    paddingHorizontal: 30,
+    gap: 20,
   },
 });
