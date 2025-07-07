@@ -580,7 +580,7 @@ export default function Pesquisar() {
                 </View>
               </View>
             </ScrollView>
-            <View style={{ flexDirection: "row", gap: 20, width: "100%" }}>
+            <View style={globalStyles.buttonRowContainer}>
               <TouchableOpacity
                 style={[globalStyles.button, { flex: 1 }]}
                 onPress={editar}

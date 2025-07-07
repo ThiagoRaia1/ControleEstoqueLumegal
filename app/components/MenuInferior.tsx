@@ -30,7 +30,7 @@ export default function MenuInferior() {
       label: "ITENS EM FALTA",
     },
     {
-      href: `${nomePaginas.registrarItem}`,
+      href: `${nomePaginas.registrarItem.main}`,
       icon: "package",
       label:
         usuario.tipoAcesso === "Almoxarifado" ||

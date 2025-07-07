@@ -31,6 +31,8 @@ import MaskInput, { Masks } from "react-native-mask-input";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getGlobalStyles } from "../../../globalStyles";
 import { AntDesign } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { nomePaginas } from "../../../utils/nomePaginas";
 
 export default function RegistrarEpi() {
   const { theme } = useThemeContext();
@@ -179,9 +181,12 @@ export default function RegistrarEpi() {
             justifyContent: "space-evenly",
           }}
         >
-          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
-            console.log("suprimento")
-          }}>
+          <TouchableOpacity
+            style={globalStyles.optionButton}
+            onPress={() => {
+              router.push(nomePaginas.registrarItem.registrarSuprimento);
+            }}
+          >
             <Text style={globalStyles.optionButtonText}>
               REGISTRAR SUPRIMENTO
             </Text>
@@ -192,9 +197,12 @@ export default function RegistrarEpi() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
-            console.log("epi")
-          }}>
+          <TouchableOpacity
+            style={globalStyles.optionButton}
+            onPress={() => {
+              router.push(nomePaginas.registrarItem.registrarEpi);
+            }}
+          >
             <Text style={globalStyles.optionButtonText}>REGISTRAR EPI</Text>
             <MaterialCommunityIcons
               name="warehouse"
@@ -203,9 +211,12 @@ export default function RegistrarEpi() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
-            console.log("fornecedor")
-          }}>
+          <TouchableOpacity
+            style={globalStyles.optionButton}
+            onPress={() => {
+              router.push(nomePaginas.registrarItem.registrarFornecedor);
+            }}
+          >
             <Text style={globalStyles.optionButtonText}>
               REGISTRAR FORNECEDOR
             </Text>
@@ -216,9 +227,12 @@ export default function RegistrarEpi() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
-            console.log("tipoUnidade")
-          }}>
+          <TouchableOpacity
+            style={globalStyles.optionButton}
+            onPress={() => {
+              router.push(nomePaginas.registrarItem.registrartipoUnidade);
+            }}
+          >
             <Text style={globalStyles.optionButtonText}>
               REGISTRAR TIPO DE UNIDADE
             </Text>
@@ -229,9 +243,14 @@ export default function RegistrarEpi() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
-            console.log("categoriaFornecedor")
-          }}>
+          <TouchableOpacity
+            style={globalStyles.optionButton}
+            onPress={() => {
+              router.push(
+                nomePaginas.registrarItem.registrarCategoriaFornecedor
+              );
+            }}
+          >
             <Text style={globalStyles.optionButtonText}>
               REGISTRAR CATEGORIA FORNECEDOR
             </Text>
@@ -242,9 +261,12 @@ export default function RegistrarEpi() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={globalStyles.optionButton} onPress={() => {
-            console.log("endereco")
-          }}>
+          <TouchableOpacity
+            style={globalStyles.optionButton}
+            onPress={() => {
+              router.push(nomePaginas.registrarItem.registrarEndereco);
+            }}
+          >
             <Text style={globalStyles.optionButtonText}>
               REGISTRAR ENDERECO
             </Text>

@@ -15,6 +15,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       textAlign: "center",
       color: theme === "light" ? "black" : "white",
       marginBottom: 20,
+      paddingHorizontal: 20,
     },
     mainContent: {
       flex: 1,
@@ -52,6 +53,11 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       fontWeight: 600,
       fontSize: 18,
       paddingHorizontal: 30,
+    },
+    buttonRowContainer: {
+      flexDirection: "row",
+      gap: 20,
+      width: "100%",
     },
     optionButton: {
       flexDirection: "row",
