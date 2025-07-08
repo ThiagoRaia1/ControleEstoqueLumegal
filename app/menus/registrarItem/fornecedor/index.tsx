@@ -7,7 +7,6 @@ import MenuInferior from "../../../components/MenuInferior";
 import Carregando from "../../../components/Carregando";
 import { useState } from "react";
 import { router } from "expo-router";
-import { ITipoUnidade } from "../../../../interfaces/tipoUnidade";
 import { IFornecedor } from "../../../../interfaces/fornecedor";
 
 export default function TipoUnidade() {
@@ -55,10 +54,10 @@ export default function TipoUnidade() {
           </View>
 
           <View style={globalStyles.labelInputContainer}>
-            <Text style={globalStyles.label}>TIPO: *</Text>
+            <Text style={globalStyles.label}>ENDEREÇOS: *</Text>
             <TextInput
               style={globalStyles.inputEditar}
-              placeholder="Tipo"
+              placeholder="Endereços"
               placeholderTextColor="#888"
               value={"Verificar como colocar os 3 fornecedores permitidos"}
               //   onChangeText={(text) =>
@@ -71,10 +70,10 @@ export default function TipoUnidade() {
           </View>
 
           <View style={globalStyles.labelInputContainer}>
-            <Text style={globalStyles.label}>TIPO: *</Text>
+            <Text style={globalStyles.label}>CATEGORIAS DO FORNECEDOR: *</Text>
             <TextInput
               style={globalStyles.inputEditar}
-              placeholder="Tipo"
+              placeholder="Categorias do fornecedor"
               placeholderTextColor="#888"
               value={"Ver como permitir mais de uma categoria"}
               //   onChangeText={(text) =>
