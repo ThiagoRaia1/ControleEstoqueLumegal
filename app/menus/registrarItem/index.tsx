@@ -1,9 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
 import MenuSuperior from "../../components/MenuSuperior";
@@ -34,9 +29,7 @@ export default function RegistrarEpi() {
   return (
     <View style={globalStyles.background}>
       <MenuSuperior />
-      <Text style={globalStyles.title}>
-        REGISTRAR ITEM
-      </Text>
+      <Text style={globalStyles.title}>REGISTRAR ITEM</Text>
       <Animatable.View
         animation="fadeInUp"
         duration={1000}
@@ -82,22 +75,6 @@ export default function RegistrarEpi() {
           <TouchableOpacity
             style={globalStyles.optionButton}
             onPress={() => {
-              router.push(nomePaginas.registrarItem.registrarFornecedor);
-            }}
-          >
-            <Text style={globalStyles.optionButtonText}>
-              REGISTRAR FORNECEDOR
-            </Text>
-            <AntDesign
-              name="contacts"
-              size={28}
-              color={theme === "light" ? "black" : "white"}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={globalStyles.optionButton}
-            onPress={() => {
               router.push(nomePaginas.registrarItem.registrartipoUnidade);
             }}
           >
@@ -106,6 +83,22 @@ export default function RegistrarEpi() {
             </Text>
             <AntDesign
               name="tago"
+              size={28}
+              color={theme === "light" ? "black" : "white"}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={globalStyles.optionButton}
+            onPress={() => {
+              router.push(nomePaginas.registrarItem.registrarFornecedor);
+            }}
+          >
+            <Text style={globalStyles.optionButtonText}>
+              REGISTRAR FORNECEDOR
+            </Text>
+            <AntDesign
+              name="contacts"
               size={28}
               color={theme === "light" ? "black" : "white"}
             />

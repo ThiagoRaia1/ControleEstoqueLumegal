@@ -106,6 +106,13 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       color: theme === "light" ? "black" : "white",
       fontSize: 16,
     },
+    pickerContainer: {
+      width: "100%",
+      height: 50,
+      backgroundColor: "#aaa",
+      borderRadius: 10,
+      borderWidth: 1,
+    },
     // Scroll
     itensScroll: {
       flex: 1,

@@ -11,8 +11,8 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { useAuth } from "../../context/auth";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
-export const acessoComprasAdm = "ComprasAdm"
-export const acessoAlmoxarifadoAdm = "AlmoxarifadoAdm"
+export const acessoComprasAdm = "ComprasAdm";
+export const acessoAlmoxarifadoAdm = "AlmoxarifadoAdm";
 
 export default function MenuSuperior({ style = {} }) {
   const { theme, toggleTheme } = useThemeContext();
@@ -62,12 +62,16 @@ export default function MenuSuperior({ style = {} }) {
                 paddingHorizontal: 10,
               },
             ]}
-            onPress={() => setUsuario({ ...usuario, tipoAcesso: acessoComprasAdm })}
+            onPress={() =>
+              setUsuario({ ...usuario, tipoAcesso: acessoComprasAdm })
+            }
           >
             <Entypo
               name="shop"
               size={30}
-              color={usuario.tipoAcesso === acessoComprasAdm ? "#0033A0" : "white"}
+              color={
+                usuario.tipoAcesso === acessoComprasAdm ? "#0033A0" : "white"
+              }
             />
           </TouchableOpacity>
 
@@ -90,11 +94,7 @@ export default function MenuSuperior({ style = {} }) {
               name="warehouse"
               size={30}
               color={
-                usuario.tipoAcesso === acessoAlmoxarifadoAdm
-                  ? "#0033A0"
-                  : theme === "light"
-                  ? "black"
-                  : "white"
+                usuario.tipoAcesso === acessoAlmoxarifadoAdm ? "#0033A0" : "white"
               }
             />
           </TouchableOpacity>

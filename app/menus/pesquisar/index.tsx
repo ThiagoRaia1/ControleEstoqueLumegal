@@ -377,7 +377,7 @@ export default function Pesquisar() {
 
                 <View
                   style={[
-                    styles.pickerContainer,
+                    globalStyles.pickerContainer,
                     {
                       backgroundColor: theme === "light" ? "#fff" : "#2a2a2a", // fundo claro ou escuro
                       borderColor: theme === "light" ? "black" : "white",
@@ -445,7 +445,7 @@ export default function Pesquisar() {
                     >
                       <View
                         style={[
-                          styles.pickerContainer,
+                          globalStyles.pickerContainer,
                           {
                             flex: 1,
                             backgroundColor:
@@ -613,13 +613,3 @@ export default function Pesquisar() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  pickerContainer: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#aaa",
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-});

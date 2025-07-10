@@ -7,16 +7,34 @@ import MenuInferior from "../../../components/MenuInferior";
 import Carregando from "../../../components/Carregando";
 import { useState } from "react";
 import { router } from "expo-router";
-import { IEndereco } from "../../../../interfaces/endereco";
+import { ICriarEndereco } from "../../../../interfaces/endereco";
+import { registrarEnderecoApi } from "../../../../services/endereco";
+import { nomePaginas } from "../../../../utils/nomePaginas";
 
 export default function Endereco() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
 
-  const [endereco, setEndereco] = useState<Partial<IEndereco>>({
-    cidade: "",
-  });
+  const [cidade, setCidade] = useState("");
+
+  const registrarEndereco = async () => {
+    try {
+      const endereco: ICriarEndereco = {
+        cidade: cidade.trim(),
+      };
+      setCarregando(true);
+      console.log(endereco);
+      const resultado = await registrarEnderecoApi(endereco);
+      console.log(resultado)
+      alert("Endereço registrado com sucesso!");
+      router.push(nomePaginas.registrarItem.main);
+    } catch (erro: any) {
+      alert(erro.message);
+    } finally {
+      setCarregando(false);
+    }
+  };
 
   return (
     <View style={globalStyles.background}>
@@ -34,20 +52,15 @@ export default function Endereco() {
               style={globalStyles.inputEditar}
               placeholder="Cidade"
               placeholderTextColor="#888"
-              value={endereco.cidade}
-              onChangeText={(text) =>
-                setEndereco((prev) => ({
-                  ...prev,
-                  nome: text.slice(0, 30),
-                }))
-              }
+              value={cidade}
+              onChangeText={(text) => setCidade(text)}
             />
           </View>
         </View>
         <View style={globalStyles.buttonRowContainer}>
           <TouchableOpacity
             style={[globalStyles.button, { flex: 1 }]}
-            // onPress={editar}
+            onPress={registrarEndereco}
           >
             <Text style={globalStyles.buttonText}>Salvar</Text>
           </TouchableOpacity>
