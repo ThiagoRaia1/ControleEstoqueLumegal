@@ -7,3 +7,9 @@ export interface IFornecedor {
     endereco: IEndereco[],
     categoriasFornecedor: ICategoriaFornecedor[]
 }
+
+export interface ICriarFornecedor {
+    nome: string,
+    enderecos: number[],
+    categoriasFornecedor: number[]
+}

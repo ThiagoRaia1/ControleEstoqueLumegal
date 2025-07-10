@@ -433,7 +433,7 @@ export default function Relatorios() {
           </View>
         </View>
 
-        <View style={[styles.buttonsView, { alignItems: "flex-start" }]}>
+        <View style={[styles.buttonsView, { flexWrap: "wrap" }]}>
           <View style={styles.alignButtons}>
             <TouchableOpacity
               style={[
@@ -477,7 +477,7 @@ export default function Relatorios() {
 
 const styles = StyleSheet.create({
   alignButtons: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: "center",
     gap: 10,
   },
