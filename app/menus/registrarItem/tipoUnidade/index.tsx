@@ -7,16 +7,35 @@ import MenuInferior from "../../../components/MenuInferior";
 import Carregando from "../../../components/Carregando";
 import { useState } from "react";
 import { router } from "expo-router";
-import { ITipoUnidade } from "../../../../interfaces/tipoUnidade";
+import { registrarTipoUnidadeApi } from "../../../../services/tipoUnidadeApi";
+import { ICriarTipoUnidade } from "../../../../interfaces/tipoUnidade";
 
 export default function TipoUnidade() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
 
-  const [tipoUnidade, setTipoUnidade] = useState<Partial<ITipoUnidade>>({
-    tipo: "",
-  });
+  const [tipo, setTipo] = useState("");
+
+  const registrarTipoUnidade = async () => {
+    try {
+      setCarregando(true);
+      if (!tipo || !tipo.trim()) {
+        alert("Por favor, preencha todos os campos obrigatórios.");
+        return;
+      }
+      const tipoUnidade: ICriarTipoUnidade = {
+        tipo: tipo.trim(),
+      };
+      const retornoDaApi = await registrarTipoUnidadeApi(tipoUnidade);
+      alert("Tipo de unidade registrado com sucesso!");
+      setTipo("");
+    } catch (erro: any) {
+      alert(erro.message);
+    } finally {
+      setCarregando(false);
+    }
+  };
 
   return (
     <View style={globalStyles.background}>
@@ -34,20 +53,15 @@ export default function TipoUnidade() {
               style={globalStyles.inputEditar}
               placeholder="Tipo"
               placeholderTextColor="#888"
-              value={tipoUnidade.tipo}
-              onChangeText={(text) =>
-                setTipoUnidade((prev) => ({
-                  ...prev,
-                  nome: text.slice(0, 30),
-                }))
-              }
+              value={tipo}
+              onChangeText={(text) => setTipo(text)}
             />
           </View>
         </View>
         <View style={globalStyles.buttonRowContainer}>
           <TouchableOpacity
             style={[globalStyles.button, { flex: 1 }]}
-            // onPress={editar}
+            onPress={registrarTipoUnidade}
           >
             <Text style={globalStyles.buttonText}>Salvar</Text>
           </TouchableOpacity>

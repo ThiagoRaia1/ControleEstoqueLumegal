@@ -9,7 +9,10 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
-import MenuSuperior from "../../components/MenuSuperior";
+import MenuSuperior, {
+  acessoCompras,
+  acessoComprasAdm,
+} from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
 import Carregando from "../../components/Carregando";
 import { useEffect, useState } from "react";
@@ -29,16 +32,28 @@ import { IFornecedor } from "../../../interfaces/fornecedor";
 import { ITipoUnidade } from "../../../interfaces/tipoUnidade";
 import { getGlobalStyles } from "../../../globalStyles";
 import SearchBar from "../../components/SearchBar";
+import {
+  editarSuprimentoApi,
+  getSuprimentos,
+} from "../../../services/suprimentoApi";
+import { ISuprimento } from "../../../interfaces/suprimento";
+import { useAuth } from "../../../context/auth";
+import MaskInput, { Masks } from "react-native-mask-input";
 
 export default function Pesquisar() {
+  const { usuario } = useAuth();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
   const [epis, setEpis] = useState<IEpi[]>([]);
+  const [suprimentos, setSuprimentos] = useState<ISuprimento[]>([]);
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [epiSelecionado, setEpiSelecionado] = useState<IEpi | null>(null);
+  type ItemUnificado = (IEpi | ISuprimento) & { tipo: "epi" | "suprimento" };
+  const [itemSelecionado, setItemSelecionado] = useState<ItemUnificado | null>(
+    null
+  );
 
   const [pesquisa, setPesquisa] = useState("");
 
@@ -50,6 +65,7 @@ export default function Pesquisar() {
   const [fornecedores, setFornecedores] = useState<string[]>([""]);
   const [quantidade, setQuantidade] = useState("");
   const [quantidadeParaAviso, setQuantidadeParaAviso] = useState("");
+  const [preco, setPreco] = useState("");
 
   // Estado com lista completa de fornecedores vindos do backend
   const [fornecedoresDisponiveis, setFornecedoresDisponiveis] = useState<
@@ -88,6 +104,46 @@ export default function Pesquisar() {
       return novos;
     });
   };
+  const carregarEpis = async () => {
+    try {
+      setEpis(await getEpis());
+    } catch (erro: any) {
+      alert(erro.message);
+    }
+  };
+
+  const carregarSuprimentos = async () => {
+    try {
+      setSuprimentos(await getSuprimentos());
+    } catch (erro: any) {
+      alert(erro.message);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      setCarregando(true);
+      carregarEpis();
+      if (
+        usuario.tipoAcesso === acessoCompras ||
+        usuario.tipoAcesso === acessoComprasAdm
+      ) {
+        carregarSuprimentos();
+      }
+    } catch (erro: any) {
+      alert(erro.message);
+    } finally {
+      setCarregando(false);
+    }
+  }, []);
+
+  const listaUnificada = [
+    ...epis.map((item) => ({ ...item, tipo: "epi" })),
+    ...(usuario.tipoAcesso === acessoCompras ||
+    usuario.tipoAcesso === acessoComprasAdm
+      ? suprimentos.map((item) => ({ ...item, tipo: "suprimento" }))
+      : []),
+  ];
 
   // Funcao para ignorar acentuacao na pesquisa
   const normalizar = (texto: string) =>
@@ -96,37 +152,47 @@ export default function Pesquisar() {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-  // Funcao para filtrar a lista de epis de acordo com a pesquisa
-  const episFiltrados = epis
-    .slice() // cria uma cópia para não modificar o estado original
+  // Funcao para filtrar a lista de itens de acordo com a pesquisa
+  const itensFiltrados = listaUnificada
+    .slice()
     .sort((a, b) =>
       (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
         sensitivity: "base",
       })
     )
-    .filter((epi) => {
+    .filter((item) => {
       const termo = normalizar(pesquisa);
-      const nome = normalizar(epi.nome || "");
-      const ca = normalizar(epi.certificadoAprovacao || "");
+      const nome = normalizar(item.nome || "");
+      const ca = normalizar(
+        "certificadoAprovacao" in item &&
+          typeof item.certificadoAprovacao === "string"
+          ? item.certificadoAprovacao
+          : ""
+      );
+
       return nome.startsWith(termo) || ca.startsWith(termo);
     });
 
   useEffect(() => {
-    if (epiSelecionado && editando) {
-      setNome(epiSelecionado.nome || "");
-      setDescricao(epiSelecionado.descricao || "");
-      setCertificadoAprovacao(epiSelecionado.certificadoAprovacao || "");
-      setTipoUnidade(epiSelecionado.tipoUnidade?.tipo || "");
-      setQuantidade(String(epiSelecionado.quantidade ?? ""));
-      setQuantidadeParaAviso(String(epiSelecionado.quantidadeParaAviso ?? ""));
-      if (epiSelecionado.fornecedores.length != 0) {
-        setFornecedores(epiSelecionado.fornecedores.map((f) => f.nome));
+    if (itemSelecionado && editando) {
+      setNome(itemSelecionado.nome || "");
+      setDescricao(itemSelecionado.descricao || "");
+      if ("certificadoAprovacao" in itemSelecionado) {
+        setCertificadoAprovacao(itemSelecionado.certificadoAprovacao || "");
       }
+      setTipoUnidade(itemSelecionado.tipoUnidade?.tipo || "");
+      setQuantidade(String(itemSelecionado.quantidade ?? ""));
+      setQuantidadeParaAviso(String(itemSelecionado.quantidadeParaAviso ?? ""));
+      if (itemSelecionado.fornecedores.length != 0) {
+        setFornecedores(itemSelecionado.fornecedores.map((f) => f.nome));
+      }
+      setPreco(itemSelecionado.preco || "");
     }
-  }, [epiSelecionado, editando]);
+  }, [itemSelecionado, editando]);
 
   const editar = async () => {
     if (editando) {
+      // Validações básicas comuns a ambos
       if (
         !nome ||
         !nome.trim() ||
@@ -143,49 +209,91 @@ export default function Pesquisar() {
 
       try {
         setCarregando(true);
-        if (!parseInt(quantidade, 10) || parseInt(quantidade, 10) < 0) {
+
+        const quantidadeNum = parseInt(quantidade, 10);
+        const quantidadeParaAvisoNum = parseInt(quantidadeParaAviso, 10);
+
+        if (!quantidadeNum || quantidadeNum < 0) {
           throw new Error("Quantidade deve ser um número válido.");
         }
-        if (
-          !parseInt(quantidadeParaAviso, 10) ||
-          parseInt(quantidadeParaAviso, 10) < 0
-        ) {
+        if (!quantidadeParaAvisoNum || quantidadeParaAvisoNum < 0) {
           throw new Error("Quantidade para Aviso deve ser um número válido.");
         }
+
         if (!descricao) {
           setDescricao(" ");
         }
 
-        const tipoUnidadeId: ITipoUnidade = await getTipoUnidade(tipoUnidade);
+        const tipoUnidadeObj: ITipoUnidade = await getTipoUnidade(tipoUnidade);
 
         const fornecedoresValidos = fornecedores.filter((f) => f.trim() !== "");
         let fornecedoresIds: number[] = [];
-        for (let i: number = 0; i < fornecedoresValidos.length; i++) {
+        for (let i = 0; i < fornecedoresValidos.length; i++) {
           const fornecedorObj: IFornecedor = await getFornecedorPorNome(
             fornecedoresValidos[i]
           );
           fornecedoresIds.push(fornecedorObj.id);
         }
 
-        const epiEditado: ICriarEpi = {
-          nome,
-          descricao: descricao?.trim() || "",
-          certificadoAprovacao,
-          quantidade: parseInt(quantidade, 10),
-          quantidadeParaAviso: parseInt(quantidadeParaAviso, 10),
-          tipoUnidadeId: tipoUnidadeId.id,
-          fornecedores: fornecedoresIds,
-        };
-        if (epiSelecionado) {
-          const editado = await editarEpiApi(epiSelecionado?.nome, epiEditado);
-          alert("Epi editado com sucesso!");
-          console.log("Editando epi selecionado: ", epiSelecionado?.nome);
-          console.log(editado);
-          await carregarEpis();
-          setEditando(false);
+        if (!itemSelecionado) {
+          alert("Nenhum item selecionado para edição.");
+          return;
         }
+
+        function formatarPrecoParaEnvio(preco: string): string {
+          const soNumeros = preco.replace(/\D/g, ""); // remove tudo que não for número
+          const valor = parseInt(soNumeros || "0", 10);
+          const comDecimal = (valor / 100).toFixed(2); // divide por 100 e fixa 2 casas
+          return comDecimal; // retorna como "12.34"
+        }
+
+        if (itemSelecionado.tipo === "epi") {
+          // Objeto para edição de EPI
+          const epiEditado: ICriarEpi = {
+            nome,
+            descricao: descricao?.trim() || "",
+            certificadoAprovacao,
+            quantidade: quantidadeNum,
+            quantidadeParaAviso: quantidadeParaAvisoNum,
+            tipoUnidadeId: tipoUnidadeObj.id,
+            fornecedores: fornecedoresIds,
+            preco: formatarPrecoParaEnvio(preco),
+          };
+
+          const editado = await editarEpiApi(itemSelecionado.nome, epiEditado);
+          alert("EPI editado com sucesso!");
+          console.log("Editando EPI selecionado: ", itemSelecionado.nome);
+          console.log(editado);
+
+          await carregarEpis();
+        } else if (itemSelecionado.tipo === "suprimento") {
+          // Montar objeto para edição de suprimento
+          const suprimentoEditado = {
+            nome,
+            descricao: descricao?.trim() || "",
+            quantidade: quantidadeNum,
+            quantidadeParaAviso: quantidadeParaAvisoNum,
+            tipoUnidadeId: tipoUnidadeObj.id,
+            fornecedores: fornecedoresIds,
+            preco: formatarPrecoParaEnvio(preco),
+            // Não inclui certificadoAprovacao para suprimento
+          };
+
+          await editarSuprimentoApi(itemSelecionado.nome, suprimentoEditado);
+          alert("Suprimento editado com sucesso!");
+          console.log(
+            "Editando suprimento selecionado: ",
+            itemSelecionado.nome
+          );
+
+          await carregarSuprimentos();
+        } else {
+          alert("Tipo de item desconhecido.");
+        }
+
+        setEditando(false);
       } catch (erro: any) {
-        console.log(erro.message);
+        alert(erro.message);
       } finally {
         setCarregando(false);
       }
@@ -193,58 +301,55 @@ export default function Pesquisar() {
   };
 
   const excluirItem = async () => {
-    if (!epiSelecionado) return;
+    if (!itemSelecionado) return;
     try {
       setCarregando(true);
-      await excluirEpiApi(epiSelecionado.id);
-      alert(`EPI "${epiSelecionado.nome}" excluído com sucesso!`);
+      await excluirEpiApi(itemSelecionado.id);
+      alert(`EPI "${itemSelecionado.nome}" excluído com sucesso!`);
       setModalVisible(false);
-      setEpiSelecionado(null);
+      setItemSelecionado(null);
       await carregarEpis(); // Atualiza a lista
     } catch (erro: any) {
       alert(erro.message);
     }
   };
 
-  const carregarEpis = async () => {
-    try {
-      setCarregando(true);
-      setEpis(await getEpis());
-    } catch (erro: any) {
-      alert(erro.message);
-    } finally {
-      setCarregando(false);
-    }
-  };
+  function RenderForm({
+    item,
+    onEditar,
+  }: {
+    item: ItemUnificado;
+    onEditar?: () => void;
+  }) {
+    const isEpi = item.tipo === "epi";
 
-  useEffect(() => {
-    carregarEpis();
-  }, []);
-
-  function ItemEpi({ epi }: { epi: IEpi }) {
     return (
       <View style={globalStyles.item}>
         <View style={globalStyles.leftSide}>
           <ScrollView
             contentContainerStyle={{ paddingRight: 10, borderRadius: 20 }}
           >
-            <Text style={globalStyles.dadosEpiText}>Nome: {epi.nome}</Text>
+            <Text style={globalStyles.dadosEpiText}>Nome: {item.nome}</Text>
+
+            {isEpi && (
+              <Text style={globalStyles.dadosEpiText}>
+                C.A.: {(item as IEpi).certificadoAprovacao}
+              </Text>
+            )}
+
             <Text style={globalStyles.dadosEpiText}>
-              C.A.: {epi.certificadoAprovacao}
+              Unidade/Par: {item.tipoUnidade.tipo}
             </Text>
             <Text style={globalStyles.dadosEpiText}>
-              Unidade/Par: {epi.tipoUnidade.tipo}
+              Quantidade: {item.quantidade}
             </Text>
             <Text style={globalStyles.dadosEpiText}>
-              Quantidade: {epi.quantidade}
-            </Text>
-            <Text style={globalStyles.dadosEpiText}>
-              Quantidade para aviso: {epi.quantidadeParaAviso}
+              Quantidade para aviso: {item.quantidadeParaAviso}
             </Text>
             <Text style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}>
               Fornecedores:
             </Text>
-            {epi.fornecedores.slice(0, 3).map((fornecedor, index) => (
+            {item.fornecedores.slice(0, 3).map((fornecedor, index) => (
               <Text
                 key={index}
                 style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}
@@ -268,22 +373,31 @@ export default function Pesquisar() {
                 { flex: 1, marginBottom: 0, textAlign: "justify" },
               ]}
             >
-              {epi.descricao}
+              {item.descricao}
             </Text>
           </ScrollView>
           <View style={{ flexDirection: "row", gap: 10 }}>
             <TouchableOpacity
               style={[globalStyles.button, { height: 40 }]}
-              onPress={() => {
-                setEpiSelecionado(epi);
-                setEditando(true);
-              }}
+              onPress={onEditar}
             >
               <Text style={globalStyles.buttonText}>Editar</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
+    );
+  }
+
+  function ItemUnificado({ item }: { item: ItemUnificado }) {
+    return (
+      <RenderForm
+        item={item}
+        onEditar={() => {
+          setItemSelecionado(item);
+          setEditando(true);
+        }}
+      />
     );
   }
 
@@ -311,14 +425,18 @@ export default function Pesquisar() {
               persistentScrollbar={true}
             >
               <View style={{ padding: 20, gap: 20 }}>
-                {episFiltrados.map((epi: IEpi, index: number) => (
+                {itensFiltrados.map((item: any, index: number) => (
                   <Animatable.View
-                    key={epi.id}
+                    key={
+                      "certificadoAprovacao" in item
+                        ? `epi-${item.id}`
+                        : `sup-${item.id}`
+                    }
                     animation="fadeInUp"
                     duration={1000}
                     delay={index * 150}
                   >
-                    <ItemEpi epi={epi} />
+                    <ItemUnificado item={item} />
                   </Animatable.View>
                 ))}
               </View>
@@ -342,24 +460,26 @@ export default function Pesquisar() {
                   placeholder="Nome do EPI"
                   placeholderTextColor="#888"
                   value={nome}
-                  onChangeText={(text) => setNome(text.slice(0, 30))}
+                  onChangeText={(text) => setNome(text.slice(0, 50))}
                 />
               </View>
 
-              <View style={globalStyles.labelInputContainer}>
-                <Text style={globalStyles.label}>
-                  CERTIFICADO DE APROVAÇÃO:
-                </Text>
-                <TextInput
-                  style={globalStyles.inputEditar}
-                  placeholder="C.A. do EPI"
-                  placeholderTextColor="#888"
-                  value={certificadoAprovacao}
-                  onChangeText={(text) =>
-                    setCertificadoAprovacao(text.slice(0, 20))
-                  }
-                />
-              </View>
+              {itemSelecionado?.tipo === "epi" && (
+                <View style={globalStyles.labelInputContainer}>
+                  <Text style={globalStyles.label}>
+                    CERTIFICADO DE APROVAÇÃO:
+                  </Text>
+                  <TextInput
+                    style={globalStyles.inputEditar}
+                    placeholder="C.A. do EPI"
+                    placeholderTextColor="#888"
+                    value={certificadoAprovacao}
+                    onChangeText={(text) =>
+                      setCertificadoAprovacao(text.slice(0, 20))
+                    }
+                  />
+                </View>
+              )}
 
               <View style={globalStyles.labelInputContainer}>
                 <Text style={globalStyles.label}>DESCRIÇÃO:</Text>
@@ -578,6 +698,33 @@ export default function Pesquisar() {
                     }}
                   />
                 </View>
+                {usuario.tipoAcesso === acessoCompras ||
+                  (usuario.tipoAcesso === acessoComprasAdm && (
+                    <View
+                      style={[globalStyles.labelInputContainer, { flex: 1 }]}
+                    >
+                      <Text style={globalStyles.label}>PRECO:</Text>
+                      <MaskInput
+                        style={globalStyles.inputEditar}
+                        placeholder="Preço médio do item"
+                        placeholderTextColor="#888"
+                        value={preco}
+                        onChangeText={(masked, unmasked) => {
+                          // Limpa e converte para centavos
+                          const numeric = parseInt(unmasked || "0", 10);
+
+                          if (numeric > 999999) {
+                            // Se for maior que 999999 centavos (ou R$ 9999,99), ignora a mudança
+                            setPreco("999999");
+                            return;
+                          }
+
+                          setPreco(masked);
+                        }}
+                        mask={Masks.BRL_CURRENCY}
+                      />
+                    </View>
+                  ))}
               </View>
             </ScrollView>
             <View style={globalStyles.buttonRowContainer}>
@@ -607,7 +754,7 @@ export default function Pesquisar() {
         onConfirmar={excluirItem}
         onCancelar={() => setModalVisible(false)}
         mensagem={`Tem certeza que deseja excluir o EPI "${
-          epiSelecionado?.nome || " "
+          itemSelecionado?.nome || " "
         }"?`}
       />
     </View>

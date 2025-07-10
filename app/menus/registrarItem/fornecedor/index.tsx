@@ -254,7 +254,7 @@ export default function Fornecedor() {
           </View>
 
           <View style={globalStyles.labelInputContainer}>
-            <Text style={globalStyles.label}>ENDEREÇOS: ¹*</Text>
+            <Text style={globalStyles.label}>CATEGORIAS DO FORNECEDOR: ¹*</Text>
 
             {categoriasFornecedor.map((categoria, index) => {
               // Filtra os enderecos já selecionados, exceto o atual
@@ -323,7 +323,7 @@ export default function Fornecedor() {
                   {index > 0 && (
                     <TouchableOpacity
                       onPress={() =>
-                        setCategoriasDisponiveis((prev) =>
+                        setCategoriasFornecedor((prev) =>
                           prev.filter((_, i) => i !== index)
                         )
                       }
@@ -353,7 +353,7 @@ export default function Fornecedor() {
                   style={globalStyles.button}
                 >
                   <Text style={globalStyles.buttonText}>
-                    Adicionar fornecedor
+                    Adicionar categoria
                   </Text>
                 </TouchableOpacity>
               )}

@@ -26,7 +26,10 @@ import {
 } from "../../../../services/tipoUnidadeApi";
 import Carregando from "../../../components/Carregando";
 import MenuInferior from "../../../components/MenuInferior";
-import MenuSuperior from "../../../components/MenuSuperior";
+import MenuSuperior, {
+  acessoCompras,
+  acessoComprasAdm,
+} from "../../../components/MenuSuperior";
 import { router } from "expo-router";
 import { useAuth } from "../../../../context/auth";
 import MaskInput, { Masks } from "react-native-mask-input";
@@ -132,8 +135,6 @@ export default function Epi() {
         return comDecimal; // retorna como "12.34"
       }
 
-      // console.log(fornecedoresIds);
-      console.log(preco);
       const epi: ICriarEpi = {
         nome: nome.trim(),
         descricao: descricao.trim(),
@@ -406,8 +407,8 @@ export default function Epi() {
                 }}
               />
             </View>
-            {usuario.tipoAcesso === "Compras" ||
-              (usuario.tipoAcesso === "ComprasAdm" && (
+            {usuario.tipoAcesso === acessoCompras ||
+              (usuario.tipoAcesso === acessoComprasAdm && (
                 <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
                   <Text style={globalStyles.label}>PRECO:</Text>
                   <MaskInput

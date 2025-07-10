@@ -13,6 +13,12 @@ import { Feather } from "@expo/vector-icons";
 import { nomePaginas } from "../../utils/nomePaginas";
 import { useThemeContext } from "../../context/ThemeContext";
 import { useAuth } from "../../context/auth";
+import {
+  acessoAlmoxarifado,
+  acessoAlmoxarifadoAdm,
+  acessoCompras,
+  acessoComprasAdm,
+} from "./MenuSuperior";
 
 let prevIndex = 0;
 
@@ -33,11 +39,11 @@ export default function MenuInferior() {
       href: `${nomePaginas.registrarItem.main}`,
       icon: "package",
       label:
-        usuario.tipoAcesso === "Almoxarifado" ||
-        usuario.tipoAcesso === "AlmoxarifadoAdm"
+        usuario.tipoAcesso === acessoAlmoxarifado ||
+        usuario.tipoAcesso === acessoAlmoxarifadoAdm
           ? "REGISTRAR EPI"
-          : usuario.tipoAcesso === "Compras" ||
-            usuario.tipoAcesso === "ComprasAdm"
+          : usuario.tipoAcesso === acessoCompras ||
+            usuario.tipoAcesso === acessoComprasAdm
           ? "REGISTRAR ITEM"
           : "",
     },

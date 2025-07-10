@@ -6,12 +6,14 @@ import {
   Text,
   useWindowDimensions,
 } from "react-native";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAuth } from "../../context/auth";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
+export const acessoCompras = "Compras";
 export const acessoComprasAdm = "ComprasAdm";
+export const acessoAlmoxarifado = "Almoxarifado";
 export const acessoAlmoxarifadoAdm = "AlmoxarifadoAdm";
 
 export default function MenuSuperior({ style = {} }) {
@@ -94,7 +96,9 @@ export default function MenuSuperior({ style = {} }) {
               name="warehouse"
               size={30}
               color={
-                usuario.tipoAcesso === acessoAlmoxarifadoAdm ? "#0033A0" : "white"
+                usuario.tipoAcesso === acessoAlmoxarifadoAdm
+                  ? "#0033A0"
+                  : "white"
               }
             />
           </TouchableOpacity>
@@ -130,9 +134,12 @@ export default function MenuSuperior({ style = {} }) {
           />
         </TouchableOpacity>
 
-        <Link href="/" style={[{ zIndex: 999 }, style]}>
+        <TouchableOpacity
+          onPress={() => router.push("/")}
+          style={[{ zIndex: 999 }, style]}
+        >
           <Feather name="log-out" size={30} color={"white"} />
-        </Link>
+        </TouchableOpacity>
       </View>
     </View>
   );

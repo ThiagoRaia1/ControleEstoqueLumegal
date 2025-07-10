@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 export const getGlobalStyles = (theme: "light" | "dark") =>
   StyleSheet.create({
@@ -47,6 +47,14 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       borderRadius: 10,
       justifyContent: "center",
       alignItems: "center",
+      elevation: 20,
+
+      // Sombra na Web
+      ...(Platform.OS === "web"
+        ? {
+            boxShadow: "0px 10px 10px rgba(0, 0, 0, 0.6)",
+          }
+        : {}),
     },
     buttonText: {
       color: "white",

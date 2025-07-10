@@ -1,4 +1,8 @@
 export interface ITipoUnidade {
-  id: number
-  tipo: string
+  id: number;
+  tipo: string;
+}
+
+export interface ICriarTipoUnidade {
+  tipo: string;
 }
