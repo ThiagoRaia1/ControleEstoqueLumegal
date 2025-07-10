@@ -1,6 +1,6 @@
 import { IEpi } from "./epi";
 
-export interface IMovimentacaoEpi {
+export interface IMovimentacaoItem {
   id: string;
   quantidade: number;
 }

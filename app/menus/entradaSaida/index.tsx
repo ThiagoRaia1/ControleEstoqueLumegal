@@ -8,29 +8,42 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
-import MenuSuperior from "../../components/MenuSuperior";
+import MenuSuperior, {
+  acessoCompras,
+  acessoComprasAdm,
+} from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
 import { useEffect, useState } from "react";
 import Carregando from "../../components/Carregando";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { entradaSaidaApi } from "../../../services/entradaSaidaApi";
+import {
+  entradaSaidaEpiApi,
+  entradaSaidaSuprimentoApi,
+} from "../../../services/entradaSaidaApi";
 import { IEpi } from "../../../interfaces/epi";
 import { getEpis } from "../../../services/epiApi";
-import { IMovimentacaoEpi } from "../../../interfaces/entradaSaida";
+import { IMovimentacaoItem } from "../../../interfaces/entradaSaida";
 import { getGlobalStyles } from "../../../globalStyles";
 import SearchBar from "../../components/SearchBar";
+import { useAuth } from "../../../context/auth";
+import { getSuprimentos } from "../../../services/suprimentoApi";
+import { ISuprimento } from "../../../interfaces/suprimento";
+
+type ItemUnificado = (IEpi | ISuprimento) & { tipo: "epi" | "suprimento" };
 
 function RenderItem({
   globalStyles,
-  epi,
+  item,
   setQuantidadeItem,
   quantidadeASerMovida,
 }: {
   globalStyles: any;
-  epi: IEpi;
+  item: ItemUnificado;
   setQuantidadeItem: (id: string, novaQuantidade: number) => void;
   quantidadeASerMovida: number;
 }) {
+  const isEpi = item.tipo === "epi";
+
   return (
     <View style={globalStyles.item}>
       <View style={globalStyles.leftSide}>
@@ -41,19 +54,37 @@ function RenderItem({
             paddingRight: 10,
           }}
         >
-          <Text style={globalStyles.dadosEpiText}>Nome: {epi.nome || " "}</Text>
-          <Text style={globalStyles.dadosEpiText}>
-            C.A.: {epi.certificadoAprovacao}
-          </Text>
-          <Text style={globalStyles.dadosEpiText}>
-            Unidade/Par: {epi.tipoUnidade.tipo}
-          </Text>
-          <Text style={globalStyles.dadosEpiText}>
-            Quantidade: {epi.quantidade}
-          </Text>
-          <Text style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}>
-            Quantidade para aviso: {epi.quantidadeParaAviso}
-          </Text>
+          <Text style={globalStyles.dadosEpiText}>Nome: {item.nome}</Text>
+          {isEpi && (
+            <>
+              <Text style={globalStyles.dadosEpiText}>
+                C.A.: {(item as IEpi).certificadoAprovacao}
+              </Text>
+              <Text style={globalStyles.dadosEpiText}>
+                Unidade/Par: {(item as IEpi).tipoUnidade.tipo}
+              </Text>
+              <Text style={globalStyles.dadosEpiText}>
+                Quantidade: {item.quantidade}
+              </Text>
+              <Text style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}>
+                Quantidade para aviso: {(item as IEpi).quantidadeParaAviso}
+              </Text>
+            </>
+          )}
+          {!isEpi && (
+            <>
+              <Text style={globalStyles.dadosEpiText}>
+                Unidade: {(item as ISuprimento).tipoUnidade.tipo}
+              </Text>
+              <Text style={globalStyles.dadosEpiText}>
+                Quantidade: {item.quantidade}
+              </Text>
+              <Text style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}>
+                Quantidade para aviso:{" "}
+                {(item as ISuprimento).quantidadeParaAviso}
+              </Text>
+            </>
+          )}
         </ScrollView>
       </View>
 
@@ -74,19 +105,22 @@ function RenderItem({
         <View style={styles.plusMinusButtonContainer}>
           <TouchableOpacity
             style={[styles.plusMinusButton, { backgroundColor: "green" }]}
-            onPress={() => setQuantidadeItem(epi.id, quantidadeASerMovida + 1)}
+            onPress={() =>
+              setQuantidadeItem(item.id.toString(), quantidadeASerMovida + 1)
+            }
           >
             <AntDesign name="pluscircleo" size={24} color="white" />
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.plusMinusButton, { backgroundColor: "#b30f02" }]}
-            onPress={() => setQuantidadeItem(epi.id, quantidadeASerMovida - 1)}
+            onPress={() =>
+              setQuantidadeItem(item.id.toString(), quantidadeASerMovida - 1)
+            }
           >
             <AntDesign name="minuscircleo" size={24} color="white" />
           </TouchableOpacity>
         </View>
 
-        {/* texto "Quantidade a ser movida:" + input*/}
         <View
           style={{
             flex: 1,
@@ -95,12 +129,7 @@ function RenderItem({
             gap: 5,
           }}
         >
-          <Text
-            style={[
-              globalStyles.dadosEpiText,
-              { textAlign: "center", marginBottom: 0 },
-            ]}
-          >
+          <Text style={[globalStyles.dadosEpiText, { textAlign: "center" }]}>
             Quantidade a ser movida:
           </Text>
           <TextInput
@@ -108,23 +137,20 @@ function RenderItem({
             keyboardType="numeric"
             value={quantidadeASerMovida.toString()}
             onChangeText={(text: string) => {
-              // Permite apenas "-" no início e números
               const numericValue = text.replace(/(?!^-)-|[^0-9-]/g, "");
-
-              // Trata campo vazio ou apenas "-"
               if (numericValue === "" || numericValue === "-") {
-                setQuantidadeItem(epi.id, numericValue === "-" ? -0 : 0);
+                setQuantidadeItem(
+                  item.id.toString(),
+                  numericValue === "-" ? -0 : 0
+                );
                 return;
               }
-
               let valor = parseInt(numericValue, 10);
-
-              // Se for negativo e o valor absoluto for maior que a quantidade, limita
-              if (valor < 0 && Math.abs(valor) > (epi.quantidade ?? 0)) {
-                valor = -(epi.quantidade ?? 0);
+              const max = item.quantidade ?? 0;
+              if (valor < 0 && Math.abs(valor) > max) {
+                valor = -max;
               }
-
-              setQuantidadeItem(epi.id, valor);
+              setQuantidadeItem(item.id.toString(), valor);
             }}
           />
         </View>
@@ -134,10 +160,12 @@ function RenderItem({
 }
 
 export default function EntradaSaida() {
+  const { usuario } = useAuth();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
   const [epis, setEpis] = useState<IEpi[]>([]);
+  const [suprimentos, setSuprimentos] = useState<ISuprimento[]>([]);
   const [quantidadeASerMovida, setQuantidadeASerMovida] = useState<{
     [key: string]: number;
   }>({});
@@ -151,62 +179,120 @@ export default function EntradaSaida() {
 
   const carregarEpis = async () => {
     try {
-      setCarregando(true);
       setEpis(await getEpis());
+    } catch (erro: any) {
+      alert(erro.message);
+    }
+  };
+
+  const carregarSuprimentos = async () => {
+    try {
+      setSuprimentos(await getSuprimentos());
+    } catch (erro: any) {
+      alert(erro.message);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      setCarregando(true);
+      carregarEpis();
+      if (
+        usuario.tipoAcesso === acessoCompras ||
+        usuario.tipoAcesso === acessoComprasAdm
+      ) {
+        carregarSuprimentos();
+      }
     } catch (erro: any) {
       alert(erro.message);
     } finally {
       setCarregando(false);
     }
-  };
+  }, []);
 
-  const setQuantidadeItem = (id: string, novaQuantidade: number) => {
+  const listaUnificada: ItemUnificado[] = [
+    ...epis.map((item) => ({ ...item, tipo: "epi" as const })),
+    ...(usuario.tipoAcesso === acessoCompras ||
+    usuario.tipoAcesso === acessoComprasAdm
+      ? suprimentos.map((item) => ({ ...item, tipo: "suprimento" as const }))
+      : []),
+  ];
+
+  const setQuantidadeItem = (
+    id: string,
+    tipo: "epi" | "suprimento",
+    novaQuantidade: number
+  ) => {
+    const chave = `${tipo}-${id}`;
     setQuantidadeASerMovida((prev) => ({
       ...prev,
-      [id]: novaQuantidade,
+      [chave]: novaQuantidade,
     }));
   };
 
   const handleConfirmarMovimentacoes = async () => {
-    const mov = Object.entries(quantidadeASerMovida)
-      .filter(([_, quantidade]) => quantidade !== 0)
-      .map(([id, quantidade]) => {
-        const epi = epis.find((e) => String(e.id) === String(id));
-        return {
-          id,
-          nome: epi?.nome ?? "[EPI não encontrado]",
-          quantidade,
-        };
+    const movimentacoesEpi: IMovimentacaoItem[] = [];
+    const movimentacoesSuprimento: IMovimentacaoItem[] = [];
+
+    const resumoMovimentacoes: { nome: string; quantidade: number }[] = [];
+
+    for (const [chave, quantidade] of Object.entries(quantidadeASerMovida)) {
+      if (quantidade === 0) continue;
+
+      const [tipo, id] = chave.split("-");
+      const item = listaUnificada.find(
+        (i) => String(i.id) === id && i.tipo === tipo
+      );
+
+      if (!item) continue;
+
+      resumoMovimentacoes.push({
+        nome: item.nome,
+        quantidade,
       });
 
-    if (mov.length === 0) {
+      const movimentacao: IMovimentacaoItem = {
+        id,
+        quantidade,
+      };
+
+      if (tipo === "epi") {
+        movimentacoesEpi.push(movimentacao);
+      } else if (tipo === "suprimento") {
+        movimentacoesSuprimento.push(movimentacao);
+      }
+    }
+
+    if (resumoMovimentacoes.length === 0) {
       alert("Nenhuma movimentação selecionada.");
       return;
     }
 
-    const movimentacoes: IMovimentacaoEpi[] = Object.entries(
-      quantidadeASerMovida
-    )
-      .filter(([_, quantidade]) => quantidade !== 0)
-      .map(([id, quantidade]) => ({
-        id: id,
-        quantidade,
-      }));
-
     try {
       setCarregando(true);
-      await entradaSaidaApi(movimentacoes);
+
+      // Envia separadamente para o backend
+      if (movimentacoesEpi.length > 0) {
+        await entradaSaidaEpiApi(movimentacoesEpi);
+      }
+
+      if (movimentacoesSuprimento.length > 0) {
+        await entradaSaidaSuprimentoApi(movimentacoesSuprimento);
+      }
+
       alert(
         "Movimentações confirmadas:\n" +
-          mov
+          resumoMovimentacoes
             .sort((a, b) =>
               a.nome.localeCompare(b.nome, "pt", { sensitivity: "base" })
             )
             .map((m) => `${m.nome}: ${m.quantidade}`)
             .join("\n")
       );
-      setQuantidadeASerMovida({}); // limpa estado
-      await carregarEpis(); // atualiza a lista com dados atualizados
+
+      setQuantidadeASerMovida({});
+      await carregarEpis();
+      await carregarSuprimentos();
     } catch (erro: any) {
       alert(erro.message);
     } finally {
@@ -239,32 +325,42 @@ export default function EntradaSaida() {
           persistentScrollbar={true}
         >
           <View style={{ padding: 20, gap: 20 }}>
-            {epis
+            {listaUnificada
               .slice()
               .sort((a, b) =>
                 (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
                   sensitivity: "base",
                 })
               )
-              .filter((epi) => {
+              .filter((item) => {
                 const termo = normalizar(pesquisa);
-                const nome = normalizar(epi.nome || "");
-                const ca = normalizar(epi.certificadoAprovacao || "");
+                const nome = normalizar(item.nome || "");
+                const ca = normalizar(
+                  "certificadoAprovacao" in item &&
+                    typeof item.certificadoAprovacao === "string"
+                    ? item.certificadoAprovacao
+                    : ""
+                );
+
                 return nome.startsWith(termo) || ca.startsWith(termo);
               })
-              .map((epi: IEpi, index: number) => (
+              .map((item: ItemUnificado, index: number) => (
                 <Animatable.View
-                  key={epi.id}
+                  key={item.id}
                   animation="fadeInUp"
                   duration={1000}
                   delay={index * 150}
                 >
-                  <View key={epi.id}>
+                  <View key={item.id}>
                     <RenderItem
                       globalStyles={globalStyles}
-                      epi={epi}
-                      setQuantidadeItem={setQuantidadeItem}
-                      quantidadeASerMovida={quantidadeASerMovida[epi.id] || 0}
+                      item={item}
+                      setQuantidadeItem={(id, novaQuantidade) =>
+                        setQuantidadeItem(id, item.tipo, novaQuantidade)
+                      }
+                      quantidadeASerMovida={
+                        quantidadeASerMovida[`${item.tipo}-${item.id}`] || 0
+                      }
                     />
                   </View>
                 </Animatable.View>

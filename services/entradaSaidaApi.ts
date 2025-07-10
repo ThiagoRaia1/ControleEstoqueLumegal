@@ -1,5 +1,5 @@
 import { httpClient } from "../adapters/httpClient";
-import { IMovimentacaoEpi } from "../interfaces/entradaSaida";
+import { IMovimentacaoItem } from "../interfaces/entradaSaida";
 
 export async function getEntradasSaidas(
   dataInicial: string,
@@ -10,7 +10,7 @@ export async function getEntradasSaidas(
   });
 }
 
-export async function entradaSaidaApi(movimentacoes: IMovimentacaoEpi[]) {
+export async function entradaSaidaEpiApi(movimentacoes: IMovimentacaoItem[]) {
   const registroEntradaSaida = movimentacoes.map(({ id, quantidade }) => ({
     idEpi: id,
     quantidade,
@@ -21,7 +21,7 @@ export async function entradaSaidaApi(movimentacoes: IMovimentacaoEpi[]) {
       method: "PATCH",
       body: JSON.stringify(movimentacoes),
     }),
-    httpClient("/entrada-saida", {
+    httpClient("/entrada-saida-epi", {
       method: "POST",
       body: JSON.stringify(registroEntradaSaida),
     }),
@@ -29,6 +29,31 @@ export async function entradaSaidaApi(movimentacoes: IMovimentacaoEpi[]) {
 
   return {
     epi: resEpi,
+    entradaSaida: resEntradaSaida,
+  };
+}
+
+export async function entradaSaidaSuprimentoApi(
+  movimentacoes: IMovimentacaoItem[]
+) {
+  const registroEntradaSaida = movimentacoes.map(({ id, quantidade }) => ({
+    idSuprimento: id,
+    quantidade,
+  }));
+
+  const [resSuprimento, resEntradaSaida] = await Promise.all([
+    httpClient("/suprimento/entradaSaida", {
+      method: "PATCH",
+      body: JSON.stringify(movimentacoes),
+    }),
+    httpClient("/entrada-saida-suprimento", {
+      method: "POST",
+      body: JSON.stringify(registroEntradaSaida),
+    }),
+  ]);
+
+  return {
+    epi: resSuprimento,
     entradaSaida: resEntradaSaida,
   };
 }
