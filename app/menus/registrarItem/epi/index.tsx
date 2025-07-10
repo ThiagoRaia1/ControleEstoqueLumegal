@@ -16,14 +16,13 @@ import { IEpi, ICriarEpi } from "../../../../interfaces/epi";
 import { IFornecedor } from "../../../../interfaces/fornecedor";
 import { ITipoUnidade } from "../../../../interfaces/tipoUnidade";
 import {
-  editarEpiApi,
   excluirEpiApi,
-  getEpis,
+  registrarEpiApi,
 } from "../../../../services/epiApi";
 import {
   getFornecedores,
   getFornecedorPorNome,
-} from "../../../../services/fornecedor";
+} from "../../../../services/fornecedorApi";
 import {
   getTiposUnidade,
   getTipoUnidade,
@@ -35,14 +34,13 @@ import { router } from "expo-router";
 import { useAuth } from "../../../../context/auth";
 import MaskInput, { Masks } from "react-native-mask-input";
 
-export default function Pesquisar() {
+export default function Epi() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const { usuario } = useAuth();
   const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
 
-  const [editando, setEditando] = useState(false);
   const [nome, setNome] = useState("");
   const [certificadoAprovacao, setCertificadoAprovacao] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -62,6 +60,25 @@ export default function Pesquisar() {
     { label: string; value: string }[]
   >([]);
 
+  useEffect(() => {
+    async function carregarDados() {
+      const listaTiposUnidadeDisponiveis = await getTiposUnidade();
+      const itensTiposUnidade = listaTiposUnidadeDisponiveis.map((f: any) => ({
+        label: f.tipo,
+        value: f.tipo, // use f.id se quiser o ID como value
+      }));
+      setTiposUnidadeDisponiveis(itensTiposUnidade);
+
+      const listaFornecedores = await getFornecedores();
+      const itensFornecedores = listaFornecedores.map((f: any) => ({
+        label: f.nome,
+        value: f.nome, // use f.id se quiser o ID como value
+      }));
+      setFornecedoresDisponiveis(itensFornecedores);
+    }
+    carregarDados();
+  }, []);
+
   // Função para setar fornecedor selecionado no índice
   const setFornecedor = (index: number, valor: string) => {
     setFornecedores((prev) => {
@@ -71,70 +88,82 @@ export default function Pesquisar() {
     });
   };
 
-  const editar = async () => {
-    if (editando) {
+  const registrarEpi = async () => {
+    // Validação dos fornecedores: só passa os não vazios
+    const fornecedoresValidos = fornecedores.filter((f) => f.trim() !== "");
+
+    if (
+      !nome ||
+      !nome.trim() ||
+      !tipoUnidade ||
+      !tipoUnidade.trim() ||
+      !quantidade ||
+      !quantidade.trim() ||
+      !quantidadeParaAviso ||
+      !quantidadeParaAviso.trim()
+    ) {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    try {
+      setCarregando(true);
+      if (!parseInt(quantidade, 10) || parseInt(quantidade, 10) < 0) {
+        throw new Error("Quantidade deve ser um número válido.");
+      }
       if (
-        !nome ||
-        !nome.trim() ||
-        !tipoUnidade ||
-        !tipoUnidade.trim() ||
-        !quantidade ||
-        !quantidade.trim() ||
-        !quantidadeParaAviso ||
-        !quantidadeParaAviso.trim()
+        !parseInt(quantidadeParaAviso, 10) ||
+        parseInt(quantidadeParaAviso, 10) < 0
       ) {
-        alert("Por favor, preencha todos os campos obrigatórios.");
-        return;
+        throw new Error("Quantidade para Aviso deve ser um número válido.");
       }
 
-      try {
-        setCarregando(true);
-        if (!parseInt(quantidade, 10) || parseInt(quantidade, 10) < 0) {
-          throw new Error("Quantidade deve ser um número válido.");
-        }
-        if (
-          !parseInt(quantidadeParaAviso, 10) ||
-          parseInt(quantidadeParaAviso, 10) < 0
-        ) {
-          throw new Error("Quantidade para Aviso deve ser um número válido.");
-        }
-        if (!descricao) {
-          setDescricao(" ");
-        }
+      const tipoUnidadeId: ITipoUnidade = await getTipoUnidade(tipoUnidade);
 
-        const tipoUnidadeId: ITipoUnidade = await getTipoUnidade(tipoUnidade);
-
-        const fornecedoresValidos = fornecedores.filter((f) => f.trim() !== "");
-        let fornecedoresIds: number[] = [];
-        for (let i: number = 0; i < fornecedoresValidos.length; i++) {
-          const fornecedorObj: IFornecedor = await getFornecedorPorNome(
-            fornecedoresValidos[i]
-          );
-          fornecedoresIds.push(fornecedorObj.id);
-        }
-
-        const epiEditado: ICriarEpi = {
-          nome,
-          descricao: descricao?.trim() || "",
-          certificadoAprovacao,
-          quantidade: parseInt(quantidade, 10),
-          quantidadeParaAviso: parseInt(quantidadeParaAviso, 10),
-          tipoUnidadeId: tipoUnidadeId.id,
-          fornecedores: fornecedoresIds,
-        };
-        // if (epiSelecionado) {
-        //   const editado = await editarEpiApi(epiSelecionado?.nome, epiEditado);
-        //   alert("Epi editado com sucesso!");
-        //   console.log("Editando epi selecionado: ", epiSelecionado?.nome);
-        //   console.log(editado);
-
-        //   setEditando(false);
-        // }
-      } catch (erro: any) {
-        console.log(erro.message);
-      } finally {
-        setCarregando(false);
+      let fornecedoresIds: number[] = [];
+      for (let i: number = 0; i < fornecedoresValidos.length; i++) {
+        const fornecedorObj: IFornecedor = await getFornecedorPorNome(
+          fornecedoresValidos[i]
+        );
+        fornecedoresIds.push(fornecedorObj.id);
       }
+
+      function formatarPrecoParaEnvio(preco: string): string {
+        const soNumeros = preco.replace(/\D/g, ""); // remove tudo que não for número
+        const valor = parseInt(soNumeros || "0", 10);
+        const comDecimal = (valor / 100).toFixed(2); // divide por 100 e fixa 2 casas
+        return comDecimal; // retorna como "12.34"
+      }
+
+      // console.log(fornecedoresIds);
+      console.log(preco);
+      const epi: ICriarEpi = {
+        nome: nome.trim(),
+        descricao: descricao.trim(),
+        certificadoAprovacao: certificadoAprovacao.trim(),
+        quantidade: parseInt(quantidade.trim(), 10),
+        quantidadeParaAviso: parseInt(quantidadeParaAviso.trim(), 10),
+        tipoUnidadeId: tipoUnidadeId.id,
+        fornecedores: fornecedoresIds,
+        preco: formatarPrecoParaEnvio(preco),
+      };
+
+      const retornoDaApi = await registrarEpiApi(epi);
+
+      alert("EPI registrado com sucesso!");
+      // Limpa os campos após o registro
+      setNome("");
+      setCertificadoAprovacao("");
+      setDescricao("");
+      setTipoUnidade("");
+      setFornecedores([""]);
+      setQuantidade("");
+      setQuantidadeParaAviso("");
+      setPreco("");
+    } catch (erro: any) {
+      alert(erro.message);
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -395,7 +424,7 @@ export default function Pesquisar() {
 
                       if (numeric > 999999) {
                         // Se for maior que 999999 centavos (ou R$ 9999,99), ignora a mudança
-                        setPreco("999999")
+                        setPreco("999999");
                         return;
                       }
 
@@ -410,7 +439,7 @@ export default function Pesquisar() {
         <View style={globalStyles.buttonRowContainer}>
           <TouchableOpacity
             style={[globalStyles.button, { flex: 1 }]}
-            onPress={editar}
+            onPress={registrarEpi}
           >
             <Text style={globalStyles.buttonText}>Salvar</Text>
           </TouchableOpacity>
