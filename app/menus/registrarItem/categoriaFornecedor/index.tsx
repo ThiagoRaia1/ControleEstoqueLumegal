@@ -7,18 +7,35 @@ import MenuInferior from "../../../components/MenuInferior";
 import Carregando from "../../../components/Carregando";
 import { useState } from "react";
 import { router } from "expo-router";
-import { ICategoriaFornecedor } from "../../../../interfaces/categoriaFornecedor";
+import { nomePaginas } from "../../../../utils/nomePaginas";
+import { ICriarCategoriaFornecedor } from "../../../../interfaces/categoriaFornecedor";
+import { registrarCategoriaFornecedorApi } from "../../../../services/categoriaFornecedor";
 
 export default function CategoriaFornecedor() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
 
-  const [categoriaFornecedor, setCategoriaFornecedor] = useState<
-    Partial<ICategoriaFornecedor>
-  >({
-    tipo: "",
-  });
+  const [categoria, setCategoria] = useState("");
+
+  const registrarCategoria = async () => {
+    try {
+      const categoriaFornecedor: ICriarCategoriaFornecedor = {
+        categoria: categoria.trim(),
+      };
+      setCarregando(true);
+      const resultado = await registrarCategoriaFornecedorApi(
+        categoriaFornecedor
+      );
+      console.log(resultado);
+      alert("Categoria registrada com sucesso!");
+      router.push(nomePaginas.registrarItem.main);
+    } catch (erro: any) {
+      alert(erro.message);
+    } finally {
+      setCarregando(false);
+    }
+  };
 
   return (
     <View style={globalStyles.background}>
@@ -36,20 +53,15 @@ export default function CategoriaFornecedor() {
               style={globalStyles.inputEditar}
               placeholder="Categoria do fornecedor"
               placeholderTextColor="#888"
-              value={categoriaFornecedor.tipo}
-              onChangeText={(text) =>
-                setCategoriaFornecedor((prev) => ({
-                  ...prev,
-                  nome: text.slice(0, 30),
-                }))
-              }
+              value={categoria}
+              onChangeText={(text) => setCategoria(text)}
             />
           </View>
         </View>
         <View style={globalStyles.buttonRowContainer}>
           <TouchableOpacity
             style={[globalStyles.button, { flex: 1 }]}
-            // onPress={editar}
+            onPress={registrarCategoria}
           >
             <Text style={globalStyles.buttonText}>Salvar</Text>
           </TouchableOpacity>

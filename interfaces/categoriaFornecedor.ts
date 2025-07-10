@@ -1,4 +1,8 @@
 export interface ICategoriaFornecedor {
     id: number,
-    tipo: string
+    categoria: string
+}
+
+export interface ICriarCategoriaFornecedor {
+    categoria: string
 }
