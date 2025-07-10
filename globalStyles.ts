@@ -1,5 +1,16 @@
 import { Platform, StyleSheet } from "react-native";
 
+export const getBoxShadow = (theme: "light" | "dark") => {
+  if (Platform.OS !== "web") return {};
+
+  return {
+    boxShadow:
+      theme === "light"
+        ? "0px 5px 10px rgba(0, 0, 0, 0.8)"
+        : "0px 5px 10px rgba(140, 140, 140, 0.8)",
+  };
+};
+
 export const getGlobalStyles = (theme: "light" | "dark") =>
   StyleSheet.create({
     // Base
@@ -8,6 +19,20 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       width: "100%",
       height: "100%",
       backgroundColor: theme === "light" ? "#f0f3fa" : "#1c1c1c",
+    },
+    loginInputContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: "white",
+      elevation: 20,
+      paddingHorizontal: 15,
+      marginBottom: 20,
+      width: "100%",
+      borderWidth: 1,
+      borderColor: "#0033A0",
+      borderRadius: 10,
+      justifyContent: "space-between",
+      ...getBoxShadow(theme),
     },
     title: {
       fontSize: 30,
@@ -20,13 +45,13 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
     mainContent: {
       flex: 1,
       width: "100%",
-      maxWidth: 800,
+      maxWidth: 1100,
       alignSelf: "center",
       alignItems: "center",
       justifyContent: "center",
       gap: 20,
-      paddingHorizontal: 20,
-      marginBottom: 20,
+      marginBottom: 30,
+      paddingHorizontal: 100,
     },
     // Pesquisa
     searchBar: {
@@ -38,6 +63,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       paddingHorizontal: 10,
       borderColor: "#888",
       backgroundColor: theme === "light" ? "white" : "#1C1C1C",
+      ...getBoxShadow(theme),
     },
     //Botoes
     button: {
@@ -48,13 +74,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       justifyContent: "center",
       alignItems: "center",
       elevation: 20,
-
-      // Sombra na Web
-      ...(Platform.OS === "web"
-        ? {
-            boxShadow: "0px 10px 10px rgba(0, 0, 0, 0.6)",
-          }
-        : {}),
+      boxShadow: "0px 5px 20px rgb(0, 69, 218)",
     },
     buttonText: {
       color: "white",
@@ -66,6 +86,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       flexDirection: "row",
       gap: 20,
       width: "100%",
+      paddingHorizontal: 10,
     },
     optionButton: {
       flexDirection: "row",
@@ -79,6 +100,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       borderWidth: 2,
       borderRadius: 100,
       borderColor: theme === "light" ? "black" : "white",
+      ...getBoxShadow(theme),
     },
     optionButtonText: {
       fontSize: 20,
@@ -104,6 +126,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       color: theme === "light" ? "black" : "white",
       borderColor: theme === "light" ? "black" : "white",
       outlineStyle: "none" as any,
+      ...getBoxShadow(theme),
     },
     dataPicker: {
       padding: 10,
@@ -113,6 +136,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       backgroundColor: theme === "light" ? "#fff" : "#2a2a2a",
       color: theme === "light" ? "black" : "white",
       fontSize: 16,
+      ...getBoxShadow(theme),
     },
     pickerContainer: {
       width: "100%",
@@ -129,6 +153,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       borderColor: "#888",
       alignSelf: "center",
       width: "100%",
+      ...getBoxShadow(theme),
     },
     scrollContent: {
       flexGrow: 1,
@@ -138,6 +163,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
     scrollContentForm: {
       flex: 1,
       gap: 20,
+      paddingHorizontal: 10,
       justifyContent: "center",
     },
     // Exibição

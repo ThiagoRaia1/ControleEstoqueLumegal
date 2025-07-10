@@ -80,14 +80,16 @@ export default function Pesquisar() {
   useEffect(() => {
     async function carregarDados() {
       const listaTiposUnidadeDisponiveis = await getTiposUnidade();
-      const itensTiposUnidade = listaTiposUnidadeDisponiveis.map((f: any) => ({
-        label: f.tipo,
-        value: f.tipo, // use f.id se quiser o ID como value
-      }));
+      const itensTiposUnidade = listaTiposUnidadeDisponiveis.map(
+        (f: ITipoUnidade) => ({
+          label: f.tipo,
+          value: f.tipo, // use f.id se quiser o ID como value
+        })
+      );
       setTiposUnidadeDisponiveis(itensTiposUnidade);
 
       const listaFornecedores = await getFornecedores();
-      const itensFornecedores = listaFornecedores.map((f: any) => ({
+      const itensFornecedores = listaFornecedores.map((f: IFornecedor) => ({
         label: f.nome,
         value: f.nome, // use f.id se quiser o ID como value
       }));
@@ -104,6 +106,7 @@ export default function Pesquisar() {
       return novos;
     });
   };
+
   const carregarEpis = async () => {
     try {
       setEpis(await getEpis());

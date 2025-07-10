@@ -207,7 +207,7 @@ export default function Relatorios() {
         const blob = new Blob([buffer], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
-        saveAs(blob, "relatorio_epi.xlsx");
+        saveAs(blob, "relatorio.xlsx");
       }
 
       if (tipoRelatorio === "PDF") {
@@ -276,7 +276,7 @@ export default function Relatorios() {
           headStyles: { fillColor: "#46c8f2", textColor: "#ffffff" },
         });
 
-        doc.save("relatorio_epi.pdf");
+        doc.save("relatorio.pdf");
       }
     } catch (erro: any) {
       switch (erro.message) {

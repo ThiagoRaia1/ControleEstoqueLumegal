@@ -185,7 +185,7 @@ export default function Suprimento() {
               placeholder="Nome do suprimento"
               placeholderTextColor="#888"
               value={nome}
-              onChangeText={(text) => setNome(text.slice(0, 30))}
+              onChangeText={(text) => setNome(text.slice(0, 50))}
             />
           </View>
 

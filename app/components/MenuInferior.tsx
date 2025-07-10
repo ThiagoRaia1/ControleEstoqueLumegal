@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
     height: 70,
     flexDirection: "row",
     alignItems: "center",
+    boxShadow: "0px -5px 5px rgba(0, 0, 0, 0.8)"
   },
   text: {
     color: "white",

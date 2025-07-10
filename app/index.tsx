@@ -48,7 +48,7 @@ export default function TelaLogin() {
         >
           Controle de estoque Lumegal
         </Text>
-        <View style={styles.inputContainer}>
+        <View style={globalStyles.loginInputContainer}>
           <Feather name="mail" size={20} color="#0033A0" style={styles.icon} />
           <TextInput
             style={styles.input}
@@ -59,7 +59,7 @@ export default function TelaLogin() {
           />
         </View>
 
-        <View style={styles.inputContainer}>
+        <View style={globalStyles.loginInputContainer}>
           <Feather name="lock" size={20} color="#0033A0" style={styles.icon} />
           <TextInput
             style={styles.input}
@@ -91,25 +91,6 @@ export default function TelaLogin() {
 }
 
 const styles = StyleSheet.create({
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "white",
-    elevation: 20,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#0033A0",
-    borderRadius: 10,
-    justifyContent: "space-between",
-    // Sombra na Web
-    ...(Platform.OS === "web"
-      ? {
-          boxShadow: "0px 10px 10px rgba(0, 0, 0, 0.6)",
-        }
-      : {}),
-  },
   icon: {
     marginRight: 10,
   },
