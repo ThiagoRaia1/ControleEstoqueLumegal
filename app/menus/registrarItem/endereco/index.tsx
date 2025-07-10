@@ -8,7 +8,7 @@ import Carregando from "../../../components/Carregando";
 import { useState } from "react";
 import { router } from "expo-router";
 import { ICriarEndereco } from "../../../../interfaces/endereco";
-import { registrarEnderecoApi } from "../../../../services/endereco";
+import { registrarEnderecoApi } from "../../../../services/enderecoApi";
 import { nomePaginas } from "../../../../utils/nomePaginas";
 
 export default function Endereco() {

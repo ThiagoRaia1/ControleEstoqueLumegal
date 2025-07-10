@@ -9,7 +9,7 @@ import { useState } from "react";
 import { router } from "expo-router";
 import { nomePaginas } from "../../../../utils/nomePaginas";
 import { ICriarCategoriaFornecedor } from "../../../../interfaces/categoriaFornecedor";
-import { registrarCategoriaFornecedorApi } from "../../../../services/categoriaFornecedor";
+import { registrarCategoriaFornecedorApi } from "../../../../services/categoriaFornecedorApi";
 
 export default function CategoriaFornecedor() {
   const { theme } = useThemeContext();

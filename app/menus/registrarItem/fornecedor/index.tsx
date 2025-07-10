@@ -11,16 +11,15 @@ import { Picker } from "@react-native-picker/picker";
 import {
   getEnderecoPorCidade,
   getEnderecos,
-} from "../../../../services/endereco";
+} from "../../../../services/enderecoApi";
 import { IEndereco } from "../../../../interfaces/endereco";
 import { ICriarFornecedor } from "../../../../interfaces/fornecedor";
 import {
   getCategoriasFornecedor,
   getCategoriasFornecedorPorCategoria,
-  registrarCategoriaFornecedorApi,
-} from "../../../../services/categoriaFornecedor";
+} from "../../../../services/categoriaFornecedorApi";
 import { nomePaginas } from "../../../../utils/nomePaginas";
-import { registrarFornecedorApi } from "../../../../services/fornecedor";
+import { registrarFornecedorApi } from "../../../../services/fornecedorApi";
 import { ICategoriaFornecedor } from "../../../../interfaces/categoriaFornecedor";
 
 export default function Fornecedor() {

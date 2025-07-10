@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -15,14 +14,9 @@ import { getGlobalStyles } from "../../../../globalStyles";
 import { IFornecedor } from "../../../../interfaces/fornecedor";
 import { ITipoUnidade } from "../../../../interfaces/tipoUnidade";
 import {
-  editarEpiApi,
-  excluirEpiApi,
-  getEpis,
-} from "../../../../services/epiApi";
-import {
   getFornecedores,
   getFornecedorPorNome,
-} from "../../../../services/fornecedor";
+} from "../../../../services/fornecedorApi";
 import {
   getTiposUnidade,
   getTipoUnidade,
@@ -33,15 +27,16 @@ import MenuSuperior from "../../../components/MenuSuperior";
 import { router } from "expo-router";
 import { useAuth } from "../../../../context/auth";
 import MaskInput, { Masks } from "react-native-mask-input";
+import { ICriarSuprimento } from "../../../../interfaces/suprimento";
+import { registrarSuprimentoApi } from "../../../../services/suprimentoApi";
 
-export default function Pesquisar() {
+export default function Suprimento() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const { usuario } = useAuth();
   const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
 
-  const [editando, setEditando] = useState(false);
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
   const [tipoUnidade, setTipoUnidade] = useState("");
@@ -60,6 +55,25 @@ export default function Pesquisar() {
     { label: string; value: string }[]
   >([]);
 
+  useEffect(() => {
+    async function carregarDados() {
+      const listaTiposUnidadeDisponiveis = await getTiposUnidade();
+      const itensTiposUnidade = listaTiposUnidadeDisponiveis.map((f: any) => ({
+        label: f.tipo,
+        value: f.tipo, // use f.id se quiser o ID como value
+      }));
+      setTiposUnidadeDisponiveis(itensTiposUnidade);
+
+      const listaFornecedores = await getFornecedores();
+      const itensFornecedores = listaFornecedores.map((f: any) => ({
+        label: f.nome,
+        value: f.nome, // use f.id se quiser o ID como value
+      }));
+      setFornecedoresDisponiveis(itensFornecedores);
+    }
+    carregarDados();
+  }, []);
+
   // Função para setar fornecedor selecionado no índice
   const setFornecedor = (index: number, valor: string) => {
     setFornecedores((prev) => {
@@ -69,70 +83,80 @@ export default function Pesquisar() {
     });
   };
 
-  const editar = async () => {
-    if (editando) {
+  const registrarSuprimento = async () => {
+    // Validação dos fornecedores: só passa os não vazios
+    const fornecedoresValidos = fornecedores.filter((f) => f.trim() !== "");
+
+    if (
+      !nome ||
+      !nome.trim() ||
+      !tipoUnidade ||
+      !tipoUnidade.trim() ||
+      !quantidade ||
+      !quantidade.trim() ||
+      !quantidadeParaAviso ||
+      !quantidadeParaAviso.trim()
+    ) {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    try {
+      setCarregando(true);
+      if (!parseInt(quantidade, 10) || parseInt(quantidade, 10) < 0) {
+        throw new Error("Quantidade deve ser um número válido.");
+      }
       if (
-        !nome ||
-        !nome.trim() ||
-        !tipoUnidade ||
-        !tipoUnidade.trim() ||
-        !quantidade ||
-        !quantidade.trim() ||
-        !quantidadeParaAviso ||
-        !quantidadeParaAviso.trim()
+        !parseInt(quantidadeParaAviso, 10) ||
+        parseInt(quantidadeParaAviso, 10) < 0
       ) {
-        alert("Por favor, preencha todos os campos obrigatórios.");
-        return;
+        throw new Error("Quantidade para Aviso deve ser um número válido.");
       }
 
-      try {
-        setCarregando(true);
-        if (!parseInt(quantidade, 10) || parseInt(quantidade, 10) < 0) {
-          throw new Error("Quantidade deve ser um número válido.");
-        }
-        if (
-          !parseInt(quantidadeParaAviso, 10) ||
-          parseInt(quantidadeParaAviso, 10) < 0
-        ) {
-          throw new Error("Quantidade para Aviso deve ser um número válido.");
-        }
-        if (!descricao) {
-          setDescricao(" ");
-        }
+      const tipoUnidadeId: ITipoUnidade = await getTipoUnidade(tipoUnidade);
 
-        const tipoUnidadeId: ITipoUnidade = await getTipoUnidade(tipoUnidade);
-
-        const fornecedoresValidos = fornecedores.filter((f) => f.trim() !== "");
-        let fornecedoresIds: number[] = [];
-        for (let i: number = 0; i < fornecedoresValidos.length; i++) {
-          const fornecedorObj: IFornecedor = await getFornecedorPorNome(
-            fornecedoresValidos[i]
-          );
-          fornecedoresIds.push(fornecedorObj.id);
-        }
-
-        // const epiEditado: ICriarEpi = {
-        //   nome,
-        //   descricao: descricao?.trim() || "",
-        //   certificadoAprovacao,
-        //   quantidade: parseInt(quantidade, 10),
-        //   quantidadeParaAviso: parseInt(quantidadeParaAviso, 10),
-        //   tipoUnidadeId: tipoUnidadeId.id,
-        //   fornecedores: fornecedoresIds,
-        // };
-        // if (epiSelecionado) {
-        //   const editado = await editarEpiApi(epiSelecionado?.nome, epiEditado);
-        //   alert("Epi editado com sucesso!");
-        //   console.log("Editando epi selecionado: ", epiSelecionado?.nome);
-        //   console.log(editado);
-
-        //   setEditando(false);
-        // }
-      } catch (erro: any) {
-        console.log(erro.message);
-      } finally {
-        setCarregando(false);
+      let fornecedoresIds: number[] = [];
+      for (let i: number = 0; i < fornecedoresValidos.length; i++) {
+        const fornecedorObj: IFornecedor = await getFornecedorPorNome(
+          fornecedoresValidos[i]
+        );
+        fornecedoresIds.push(fornecedorObj.id);
       }
+
+      function formatarPrecoParaEnvio(preco: string): string {
+        const soNumeros = preco.replace(/\D/g, ""); // remove tudo que não for número
+        const valor = parseInt(soNumeros || "0", 10);
+        const comDecimal = (valor / 100).toFixed(2); // divide por 100 e fixa 2 casas
+        return comDecimal; // retorna como "12.34"
+      }
+
+      // console.log(fornecedoresIds);
+      // console.log(preco);
+      const suprimento: ICriarSuprimento = {
+        nome: nome.trim(),
+        descricao: descricao.trim(),
+        quantidade: parseInt(quantidade.trim(), 10),
+        quantidadeParaAviso: parseInt(quantidadeParaAviso.trim(), 10),
+        tipoUnidadeId: tipoUnidadeId.id,
+        fornecedores: fornecedoresIds,
+        preco: formatarPrecoParaEnvio(preco),
+      };
+
+      const retornoDaApi = await registrarSuprimentoApi(suprimento);
+
+      alert("Suprimento registrado com sucesso!");
+      // Limpa os campos após o registro
+      setNome("");
+      setDescricao("");
+      setTipoUnidade("");
+      setFornecedores([""]);
+      setQuantidade("");
+      setQuantidadeParaAviso("");
+      setPreco("");
+    } catch (erro: any) {
+      alert(erro.message);
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -181,7 +205,7 @@ export default function Pesquisar() {
 
             <View
               style={[
-                styles.pickerContainer,
+                globalStyles.pickerContainer,
                 {
                   backgroundColor: theme === "light" ? "#fff" : "#2a2a2a", // fundo claro ou escuro
                   borderColor: theme === "light" ? "black" : "white",
@@ -248,7 +272,7 @@ export default function Pesquisar() {
                 >
                   <View
                     style={[
-                      styles.pickerContainer,
+                      globalStyles.pickerContainer,
                       {
                         flex: 1,
                         backgroundColor: theme === "light" ? "#fff" : "#2a2a2a",
@@ -365,52 +389,46 @@ export default function Pesquisar() {
                 }}
               />
             </View>
-            {usuario.tipoAcesso === "Compras" ||
-              (usuario.tipoAcesso === "ComprasAdm" && (
-                <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
-                  <Text style={globalStyles.label}>PRECO:</Text>
-                  <MaskInput
-                    style={globalStyles.inputEditar}
-                    placeholder="Preço médio do item"
-                    placeholderTextColor="#888"
-                    value={preco}
-                    onChangeText={(masked, unmasked) => {
-                      // Limpa e converte para centavos
-                      const numeric = parseInt(unmasked || "0", 10);
+            <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
+              <Text style={globalStyles.label}>PRECO:</Text>
+              <MaskInput
+                style={globalStyles.inputEditar}
+                placeholder="Preço médio do item"
+                placeholderTextColor="#888"
+                value={preco}
+                onChangeText={(masked, unmasked) => {
+                  // Limpa e converte para centavos
+                  const numeric = parseInt(unmasked || "0", 10);
 
-                      if (numeric > 999999) {
-                        // Se for maior que 999999 centavos (ou R$ 9999,99), ignora a mudança
-                        setPreco("999999");
-                        return;
-                      }
+                  if (numeric > 999999) {
+                    // Se for maior que 999999 centavos (ou R$ 9999,99), ignora a mudança
+                    setPreco("999999");
+                    return;
+                  }
 
-                      setPreco(masked);
-                    }}
-                    mask={Masks.BRL_CURRENCY}
-                  />
-                </View>
-              ))}
+                  setPreco(masked);
+                }}
+                mask={Masks.BRL_CURRENCY}
+              />
+            </View>
           </View>
         </ScrollView>
         <View style={globalStyles.buttonRowContainer}>
           <TouchableOpacity
             style={[globalStyles.button, { flex: 1 }]}
-            onPress={editar}
+            onPress={registrarSuprimento}
           >
             <Text style={globalStyles.buttonText}>Salvar</Text>
           </TouchableOpacity>
-          {usuario.tipoAcesso != "Almoxarifado" &&
-            usuario.tipoAcesso != "AlmoxarifadoAdm" && (
-              <TouchableOpacity
-                style={[
-                  globalStyles.button,
-                  { flex: 1, backgroundColor: "#B30F03" },
-                ]}
-                onPress={() => router.back()}
-              >
-                <Text style={globalStyles.buttonText}>Cancelar</Text>
-              </TouchableOpacity>
-            )}
+          <TouchableOpacity
+            style={[
+              globalStyles.button,
+              { flex: 1, backgroundColor: "#B30F03" },
+            ]}
+            onPress={() => router.back()}
+          >
+            <Text style={globalStyles.buttonText}>Cancelar</Text>
+          </TouchableOpacity>
         </View>
       </Animatable.View>
       <MenuInferior />
@@ -418,13 +436,3 @@ export default function Pesquisar() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  pickerContainer: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#aaa",
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-});

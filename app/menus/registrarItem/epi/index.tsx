@@ -15,10 +15,7 @@ import { getGlobalStyles } from "../../../../globalStyles";
 import { IEpi, ICriarEpi } from "../../../../interfaces/epi";
 import { IFornecedor } from "../../../../interfaces/fornecedor";
 import { ITipoUnidade } from "../../../../interfaces/tipoUnidade";
-import {
-  excluirEpiApi,
-  registrarEpiApi,
-} from "../../../../services/epiApi";
+import { excluirEpiApi, registrarEpiApi } from "../../../../services/epiApi";
 import {
   getFornecedores,
   getFornecedorPorNome,
@@ -225,7 +222,7 @@ export default function Epi() {
 
             <View
               style={[
-                styles.pickerContainer,
+                globalStyles.pickerContainer,
                 {
                   backgroundColor: theme === "light" ? "#fff" : "#2a2a2a", // fundo claro ou escuro
                   borderColor: theme === "light" ? "black" : "white",
@@ -292,7 +289,7 @@ export default function Epi() {
                 >
                   <View
                     style={[
-                      styles.pickerContainer,
+                      globalStyles.pickerContainer,
                       {
                         flex: 1,
                         backgroundColor: theme === "light" ? "#fff" : "#2a2a2a",
@@ -462,13 +459,3 @@ export default function Epi() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  pickerContainer: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#aaa",
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-});

@@ -20,7 +20,7 @@ import { Picker } from "@react-native-picker/picker";
 import {
   getFornecedores,
   getFornecedorPorNome,
-} from "../../../services/fornecedor";
+} from "../../../services/fornecedorApi";
 import {
   getTiposUnidade,
   getTipoUnidade,
