@@ -1,4 +1,10 @@
-import { View, StyleSheet, Text, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import * as Animatable from "react-native-animatable";
 import MenuSuperior from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
@@ -8,6 +14,8 @@ import { useEffect, useState } from "react";
 import { getEpisEmFalta } from "../../../services/epiApi";
 import { IEpi } from "../../../interfaces/epi";
 import { getGlobalStyles } from "../../../globalStyles";
+import { useAuth } from "../../../context/auth";
+import { router } from "expo-router";
 
 function RenderItemEmFalta({
   epi,
@@ -71,68 +79,95 @@ function RenderItemEmFalta({
 
 export default function itensEmFalta() {
   const { theme } = useThemeContext();
+  const { isAuthenticated } = useAuth();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
   const [episEmFalta, setEpisEmFalta] = useState([]);
 
   useEffect(() => {
-    const carregarEpisEmFalta = async () => {
-      try {
-        setCarregando(true);
-        setEpisEmFalta(await getEpisEmFalta());
-      } catch (erro: any) {
-        alert(erro.message);
-      } finally {
-        setCarregando(false);
-      }
-    };
+    if (isAuthenticated) {
+      const carregarEpisEmFalta = async () => {
+        try {
+          setCarregando(true);
+          setEpisEmFalta(await getEpisEmFalta());
+        } catch (erro: any) {
+          alert(erro.message);
+        } finally {
+          setCarregando(false);
+        }
+      };
 
-    carregarEpisEmFalta();
+      carregarEpisEmFalta();
+    }
   }, []);
 
   return (
     <View style={globalStyles.background}>
       <MenuSuperior />
-      <Text style={globalStyles.title}>ITENS EM FALTA</Text>
-      <Animatable.View
-        animation="fadeInUp"
-        duration={1000}
-        style={globalStyles.mainContent}
-      >
-        <ScrollView
-          style={globalStyles.itensScroll}
-          contentContainerStyle={globalStyles.scrollContent}
-          persistentScrollbar={true}
+      {!isAuthenticated ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignSelf: "center",
+            gap: 20,
+          }}
         >
-          <View style={{ padding: 20, gap: 20 }}>
-            {episEmFalta.map((epi: IEpi, index: number) => (
-              <Animatable.View
-                key={epi.id}
-                animation="fadeInUp"
-                duration={1000}
-                delay={index * 150}
-              >
-                <View key={epi.id}>
-                  <RenderItemEmFalta epi={epi} globalStyles={globalStyles} />
-                </View>
-              </Animatable.View>
-            ))}
-          </View>
-        </ScrollView>
-      </Animatable.View>
+          <Text
+            style={{
+              color: theme === "light" ? "black" : "white",
+              fontSize: 20,
+              fontWeight: 500,
+            }}
+          >
+            Realize o login para acessar o site
+          </Text>
+          <TouchableOpacity
+            style={globalStyles.button}
+            onPress={() => router.push("/")}
+          >
+            <Text style={globalStyles.buttonText}>
+              Ir para a página de login
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <>
+          <Text style={globalStyles.title}>ITENS EM FALTA</Text>
+          <Animatable.View
+            animation="fadeInUp"
+            duration={1000}
+            style={globalStyles.mainContent}
+          >
+            <ScrollView
+              style={globalStyles.itensScroll}
+              contentContainerStyle={globalStyles.scrollContent}
+              persistentScrollbar={true}
+            >
+              <View style={{ padding: 20, gap: 20 }}>
+                {episEmFalta.map((epi: IEpi, index: number) => (
+                  <Animatable.View
+                    key={epi.id}
+                    animation="fadeInUp"
+                    duration={1000}
+                    delay={index * 150}
+                  >
+                    <View key={epi.id}>
+                      <RenderItemEmFalta
+                        epi={epi}
+                        globalStyles={globalStyles}
+                      />
+                    </View>
+                  </Animatable.View>
+                ))}
+              </View>
+            </ScrollView>
+          </Animatable.View>
 
-      <MenuInferior />
-      {carregando && <Carregando />}
+          <MenuInferior />
+          {carregando && <Carregando />}
+        </>
+      )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  dadosEpiText: {
-    textAlign: "left",
-    fontSize: 14,
-    color: "black",
-    fontWeight: "500",
-    marginBottom: 10,
-  },
-});

@@ -8,10 +8,6 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
-import MenuSuperior, {
-  acessoCompras,
-  acessoComprasAdm,
-} from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
 import { useEffect, useState } from "react";
 import Carregando from "../../components/Carregando";
@@ -25,9 +21,14 @@ import { getEpis } from "../../../services/epiApi";
 import { IMovimentacaoItem } from "../../../interfaces/entradaSaida";
 import { getGlobalStyles } from "../../../globalStyles";
 import SearchBar from "../../components/SearchBar";
-import { useAuth } from "../../../context/auth";
 import { getSuprimentos } from "../../../services/suprimentoApi";
 import { ISuprimento } from "../../../interfaces/suprimento";
+import {
+  acessoCompras,
+  acessoComprasAdm,
+  useTipoAcessoContext,
+} from "../../../context/tipoAcessoContext";
+import MenuSuperior from "../../components/MenuSuperior";
 
 type ItemUnificado = (IEpi | ISuprimento) & { tipo: "epi" | "suprimento" };
 
@@ -171,7 +172,7 @@ function RenderItem({
 }
 
 export default function EntradaSaida() {
-  const { usuario } = useAuth();
+  const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
@@ -208,10 +209,7 @@ export default function EntradaSaida() {
     try {
       setCarregando(true);
       carregarEpis();
-      if (
-        usuario.tipoAcesso === acessoCompras ||
-        usuario.tipoAcesso === acessoComprasAdm
-      ) {
+      if ([acessoCompras, acessoComprasAdm].includes(tipoAcesso)) {
         carregarSuprimentos();
       }
     } catch (erro: any) {
@@ -223,8 +221,7 @@ export default function EntradaSaida() {
 
   const listaUnificada: ItemUnificado[] = [
     ...epis.map((item) => ({ ...item, tipo: "epi" as const })),
-    ...(usuario.tipoAcesso === acessoCompras ||
-    usuario.tipoAcesso === acessoComprasAdm
+    ...([acessoCompras, acessoComprasAdm].includes(tipoAcesso)
       ? suprimentos.map((item) => ({ ...item, tipo: "suprimento" as const }))
       : []),
   ];

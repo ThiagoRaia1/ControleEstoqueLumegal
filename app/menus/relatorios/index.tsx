@@ -7,16 +7,11 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import MenuSuperior, {
-  acessoAlmoxarifadoAdm,
-  acessoCompras,
-  acessoComprasAdm,
-} from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
 import { useThemeContext } from "../../../context/ThemeContext";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Carregando from "../../components/Carregando";
 import {
   getEntradasSaidasEpi,
@@ -31,10 +26,15 @@ import { saveAs } from "file-saver"; // apenas se for no frontend
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getGlobalStyles } from "../../../globalStyles";
-import { useAuth } from "../../../context/auth";
+import {
+  acessoCompras,
+  acessoComprasAdm,
+  useTipoAcessoContext,
+} from "../../../context/tipoAcessoContext";
+import MenuSuperior from "../../components/MenuSuperior";
 
 export default function Relatorios() {
-  const { usuario } = useAuth();
+  const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
 
@@ -221,10 +221,7 @@ export default function Relatorios() {
           linhaEpi++;
         });
 
-        if (
-          usuario.tipoAcesso === acessoCompras ||
-          usuario.tipoAcesso === acessoComprasAdm
-        ) {
+        if ([acessoCompras, acessoComprasAdm].includes(tipoAcesso)) {
           const worksheetSuprimento = workbook.addWorksheet(
             "Relatório_Suprimento"
           );
@@ -434,10 +431,7 @@ export default function Relatorios() {
           headStyles: { fillColor: "#46c8f2", textColor: "#ffffff" },
         });
 
-        if (
-          usuario.tipoAcesso === acessoComprasAdm ||
-          usuario.tipoAcesso === acessoCompras
-        ) {
+        if ([acessoCompras, acessoComprasAdm].includes(tipoAcesso)) {
           // --- Tabela 1 Suprimento: Detalhada ---
           const columnsSuprimento = [
             { header: "idEntradaSaida", dataKey: "id" },

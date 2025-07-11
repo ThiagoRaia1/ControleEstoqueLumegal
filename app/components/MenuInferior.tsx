@@ -12,19 +12,19 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { nomePaginas } from "../../utils/nomePaginas";
 import { useThemeContext } from "../../context/ThemeContext";
-import { useAuth } from "../../context/auth";
 import {
   acessoAlmoxarifado,
   acessoAlmoxarifadoAdm,
   acessoCompras,
   acessoComprasAdm,
-} from "./MenuSuperior";
+  useTipoAcessoContext,
+} from "../../context/tipoAcessoContext";
 
 let prevIndex = 0;
 
 export default function MenuInferior() {
+  const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
-  const { usuario } = useAuth();
   const iconSize = 30;
   const pathname = usePathname();
 
@@ -39,11 +39,10 @@ export default function MenuInferior() {
       href: `${nomePaginas.registrarItem.main}`,
       icon: "package",
       label:
-        usuario.tipoAcesso === acessoAlmoxarifado ||
-        usuario.tipoAcesso === acessoAlmoxarifadoAdm
+        tipoAcesso === acessoAlmoxarifado ||
+        tipoAcesso === acessoAlmoxarifadoAdm
           ? "REGISTRAR EPI"
-          : usuario.tipoAcesso === acessoCompras ||
-            usuario.tipoAcesso === acessoComprasAdm
+          : tipoAcesso === acessoCompras || tipoAcesso === acessoComprasAdm
           ? "REGISTRAR ITEM"
           : "",
     },
@@ -155,7 +154,7 @@ const styles = StyleSheet.create({
     height: 70,
     flexDirection: "row",
     alignItems: "center",
-    boxShadow: "0px -5px 5px rgba(0, 0, 0, 0.8)"
+    boxShadow: "0px -5px 5px rgba(0, 0, 0, 0.8)",
   },
   text: {
     color: "white",

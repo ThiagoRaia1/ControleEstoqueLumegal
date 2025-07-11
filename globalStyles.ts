@@ -73,7 +73,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       alignItems: "center",
       elevation: 20,
       backgroundColor: "#0033a0",
-      boxShadow: "0px 5px 20px rgb(0, 69, 218)",
+      boxShadow: "0px 5px 5px #000c27ff",
     },
     buttonCancelar: {
       width: "100%",
@@ -83,7 +83,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       alignItems: "center",
       elevation: 20,
       backgroundColor: "#B30F03",
-      boxShadow: "0px 5px 20px #B30F03",
+      boxShadow: "0px 5px 5px #290300ff",
     },
     buttonText: {
       color: "white",

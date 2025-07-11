@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
 import { useEffect } from "react";
 import { ThemeProvider } from "../context/ThemeContext";
+import { TipoAcessoProvider } from "../context/tipoAcessoContext";
 
 export default function Layout() {
   useEffect(() => {
@@ -14,8 +15,10 @@ export default function Layout() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <StatusBar hidden />
-        <Slot />
+        <TipoAcessoProvider>
+          <StatusBar hidden />
+          <Slot />
+        </TipoAcessoProvider>
       </ThemeProvider>
     </AuthProvider>
   );

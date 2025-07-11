@@ -25,7 +25,6 @@ import Carregando from "../../../components/Carregando";
 import MenuInferior from "../../../components/MenuInferior";
 import MenuSuperior from "../../../components/MenuSuperior";
 import { router } from "expo-router";
-import { useAuth } from "../../../../context/auth";
 import MaskInput, { Masks } from "react-native-mask-input";
 import { ICriarSuprimento } from "../../../../interfaces/suprimento";
 import { registrarSuprimentoApi } from "../../../../services/suprimentoApi";
@@ -33,7 +32,6 @@ import { registrarSuprimentoApi } from "../../../../services/suprimentoApi";
 export default function Suprimento() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
-  const { usuario } = useAuth();
   const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
 

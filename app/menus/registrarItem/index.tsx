@@ -5,23 +5,24 @@ import MenuSuperior from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
 import { useEffect } from "react";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useAuth } from "../../../context/auth";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getGlobalStyles } from "../../../globalStyles";
 import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { nomePaginas } from "../../../utils/nomePaginas";
+import {
+  acessoAlmoxarifado,
+  acessoAlmoxarifadoAdm,
+  useTipoAcessoContext,
+} from "../../../context/tipoAcessoContext";
 
 export default function RegistrarEpi() {
+  const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
-  const { usuario } = useAuth();
 
   useEffect(() => {
-    if (
-      usuario.tipoAcesso === "Almoxarifado" ||
-      usuario.tipoAcesso === "AlmoxarifadoAdm"
-    ) {
+    if ([acessoAlmoxarifado, acessoAlmoxarifadoAdm].includes(tipoAcesso)) {
       router.push(nomePaginas.registrarItem.registrarEpi);
     }
   }, []);

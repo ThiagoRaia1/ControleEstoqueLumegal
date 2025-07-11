@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -9,10 +8,6 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
-import MenuSuperior, {
-  acessoCompras,
-  acessoComprasAdm,
-} from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
 import Carregando from "../../components/Carregando";
 import { useEffect, useState } from "react";
@@ -39,9 +34,15 @@ import {
 import { ISuprimento } from "../../../interfaces/suprimento";
 import { useAuth } from "../../../context/auth";
 import MaskInput, { Masks } from "react-native-mask-input";
+import {
+  acessoCompras,
+  acessoComprasAdm,
+  useTipoAcessoContext,
+} from "../../../context/tipoAcessoContext";
+import MenuSuperior from "../../components/MenuSuperior";
 
 export default function Pesquisar() {
-  const { usuario } = useAuth();
+  const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const { width, height } = useWindowDimensions();
@@ -127,10 +128,7 @@ export default function Pesquisar() {
     try {
       setCarregando(true);
       carregarEpis();
-      if (
-        usuario.tipoAcesso === acessoCompras ||
-        usuario.tipoAcesso === acessoComprasAdm
-      ) {
+      if ([acessoCompras, acessoComprasAdm].includes(tipoAcesso)) {
         carregarSuprimentos();
       }
     } catch (erro: any) {
@@ -142,9 +140,8 @@ export default function Pesquisar() {
 
   const listaUnificada = [
     ...epis.map((item) => ({ ...item, tipo: "epi" })),
-    ...(usuario.tipoAcesso === acessoCompras ||
-    usuario.tipoAcesso === acessoComprasAdm
-      ? suprimentos.map((item) => ({ ...item, tipo: "suprimento" }))
+    ...([acessoCompras, acessoComprasAdm].includes(tipoAcesso)
+      ? suprimentos.map((item) => ({ ...item, tipo: "suprimento" as const }))
       : []),
   ];
 
@@ -701,33 +698,30 @@ export default function Pesquisar() {
                     }}
                   />
                 </View>
-                {usuario.tipoAcesso === acessoCompras ||
-                  (usuario.tipoAcesso === acessoComprasAdm && (
-                    <View
-                      style={[globalStyles.labelInputContainer, { flex: 1 }]}
-                    >
-                      <Text style={globalStyles.label}>PRECO:</Text>
-                      <MaskInput
-                        style={globalStyles.inputEditar}
-                        placeholder="Preço médio do item"
-                        placeholderTextColor="#888"
-                        value={preco}
-                        onChangeText={(masked, unmasked) => {
-                          // Limpa e converte para centavos
-                          const numeric = parseInt(unmasked || "0", 10);
+                {[acessoCompras, acessoComprasAdm].includes(tipoAcesso) && (
+                  <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
+                    <Text style={globalStyles.label}>PRECO:</Text>
+                    <MaskInput
+                      style={globalStyles.inputEditar}
+                      placeholder="Preço médio do item"
+                      placeholderTextColor="#888"
+                      value={preco}
+                      onChangeText={(masked, unmasked) => {
+                        // Limpa e converte para centavos
+                        const numeric = parseInt(unmasked || "0", 10);
 
-                          if (numeric > 999999) {
-                            // Se for maior que 999999 centavos (ou R$ 9999,99), ignora a mudança
-                            setPreco("999999");
-                            return;
-                          }
+                        if (numeric > 999999) {
+                          // Se for maior que 999999 centavos (ou R$ 9999,99), ignora a mudança
+                          setPreco("999999");
+                          return;
+                        }
 
-                          setPreco(masked);
-                        }}
-                        mask={Masks.BRL_CURRENCY}
-                      />
-                    </View>
-                  ))}
+                        setPreco(masked);
+                      }}
+                      mask={Masks.BRL_CURRENCY}
+                    />
+                  </View>
+                )}
               </View>
             </ScrollView>
             <View style={globalStyles.buttonRowContainer}>

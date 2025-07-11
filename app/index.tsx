@@ -1,31 +1,49 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Platform,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "../context/auth";
 import Carregando from "./components/Carregando";
 import { useThemeContext } from "../context/ThemeContext";
 import { getGlobalStyles } from "../globalStyles";
-import MenuSuperior from "./components/MenuSuperior";
+import { login as loginApi } from "../services/AuthService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { nomePaginas } from "../utils/nomePaginas";
+import { router } from "expo-router";
+import {
+  TipoAcessoType,
+  useTipoAcessoContext,
+} from "../context/tipoAcessoContext";
 
 export default function TelaLogin() {
+  const { setTipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
-  const { usuario, handleLogin, setUsuario } = useAuth();
+  const { login, logout } = useAuth();
+  const [loginInput, setLoginInput] = useState("");
   const [senha, setSenha] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [carregando, setCarregando] = useState(false);
 
-  const login = async () => {
-    setCarregando(true);
+  const handleLogin = async () => {
     try {
-      await handleLogin(senha);
+      setCarregando(true);
+      const { token, tipoAcesso } = await loginApi({
+        login: loginInput,
+        senha,
+      });
+      if (!token) {
+        throw new Error("Token não encontrado");
+      }
+      await AsyncStorage.setItem("token", token);
+
+      setTipoAcesso(tipoAcesso as TipoAcessoType);
+      login();
     } catch (erro: any) {
       alert(erro.message);
     } finally {
@@ -33,9 +51,12 @@ export default function TelaLogin() {
     }
   };
 
+  useEffect(() => {
+    logout();
+  }, []);
+
   return (
     <View style={globalStyles.background}>
-      <MenuSuperior />
       <View style={globalStyles.mainContent}>
         <Text
           style={{
@@ -54,7 +75,7 @@ export default function TelaLogin() {
             style={styles.input}
             placeholder="Email"
             placeholderTextColor="#ccc"
-            onChangeText={(text) => setUsuario({ ...usuario, login: text })}
+            onChangeText={(text) => setLoginInput(text)}
             onSubmitEditing={login}
           />
         </View>
@@ -80,7 +101,7 @@ export default function TelaLogin() {
 
         <TouchableOpacity
           style={[globalStyles.button, { maxWidth: 300 }]}
-          onPress={login}
+          onPress={handleLogin}
         >
           <Text style={globalStyles.buttonText}>Login</Text>
         </TouchableOpacity>

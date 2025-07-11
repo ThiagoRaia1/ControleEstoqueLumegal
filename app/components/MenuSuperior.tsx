@@ -6,20 +6,23 @@ import {
   Text,
   useWindowDimensions,
 } from "react-native";
-import { router } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useAuth } from "../../context/auth";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-
-export const acessoCompras = "Compras";
-export const acessoComprasAdm = "ComprasAdm";
-export const acessoAlmoxarifado = "Almoxarifado";
-export const acessoAlmoxarifadoAdm = "AlmoxarifadoAdm";
+import {
+  acessoAlmoxarifadoAdm,
+  acessoComprasAdm,
+  useTipoAcessoContext,
+} from "../../context/tipoAcessoContext";
+import { useAuth } from "../../context/auth";
+import { router } from "expo-router";
 
 export default function MenuSuperior({ style = {} }) {
+  const { logout } = useAuth();
+  const { tipoAcesso, setTipoAcesso } = useTipoAcessoContext();
   const { theme, toggleTheme } = useThemeContext();
-  const { usuario, setUsuario } = useAuth();
   const { width } = useWindowDimensions();
+
+  console.log("Tipo de acesso no MenuSuperior: " + tipoAcesso);
 
   return (
     <View
@@ -34,17 +37,17 @@ export default function MenuSuperior({ style = {} }) {
           backgroundColor: "black",
           boxShadow: "0px 5px 5px rgba(0, 0, 0, 0.8)",
         },
-        (usuario.tipoAcesso !== acessoComprasAdm ||
-          usuario.login !== acessoAlmoxarifadoAdm) && {
-          justifyContent: "flex-end",
-        },
+        tipoAcesso !== acessoComprasAdm &&
+          tipoAcesso !== acessoAlmoxarifadoAdm && {
+            justifyContent: "flex-end",
+          },
         theme === "light"
           ? { backgroundColor: "#0033A0" }
           : { backgroundColor: "black" },
       ]}
     >
-      {(usuario.tipoAcesso === acessoAlmoxarifadoAdm ||
-        usuario.tipoAcesso === acessoComprasAdm) && (
+      {(tipoAcesso === acessoAlmoxarifadoAdm ||
+        tipoAcesso === acessoComprasAdm) && (
         <View
           style={{
             flex: 1,
@@ -56,7 +59,7 @@ export default function MenuSuperior({ style = {} }) {
         >
           <TouchableOpacity
             style={[
-              usuario.tipoAcesso === acessoComprasAdm && {
+              tipoAcesso === acessoComprasAdm && {
                 backgroundColor: "white",
               },
               {
@@ -65,22 +68,18 @@ export default function MenuSuperior({ style = {} }) {
                 paddingHorizontal: 10,
               },
             ]}
-            onPress={() =>
-              setUsuario({ ...usuario, tipoAcesso: acessoComprasAdm })
-            }
+            onPress={() => setTipoAcesso(acessoComprasAdm)}
           >
             <Entypo
               name="shop"
               size={30}
-              color={
-                usuario.tipoAcesso === acessoComprasAdm ? "#0033A0" : "white"
-              }
+              color={tipoAcesso === acessoComprasAdm ? "#0033A0" : "white"}
             />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
-              usuario.tipoAcesso === acessoAlmoxarifadoAdm && {
+              tipoAcesso === acessoAlmoxarifadoAdm && {
                 backgroundColor: "white",
               },
               {
@@ -89,18 +88,12 @@ export default function MenuSuperior({ style = {} }) {
                 paddingHorizontal: 10,
               },
             ]}
-            onPress={() =>
-              setUsuario({ ...usuario, tipoAcesso: acessoAlmoxarifadoAdm })
-            }
+            onPress={() => setTipoAcesso(acessoAlmoxarifadoAdm)}
           >
             <MaterialCommunityIcons
               name="warehouse"
               size={30}
-              color={
-                usuario.tipoAcesso === acessoAlmoxarifadoAdm
-                  ? "#0033A0"
-                  : "white"
-              }
+              color={tipoAcesso === acessoAlmoxarifadoAdm ? "#0033A0" : "white"}
             />
           </TouchableOpacity>
           <Text
@@ -113,7 +106,7 @@ export default function MenuSuperior({ style = {} }) {
                 : { fontSize: 16 },
             ]}
           >
-            {"Tipo de acesso: " + usuario.tipoAcesso}
+            {"Tipo de acesso: " + tipoAcesso}
           </Text>
         </View>
       )}
@@ -136,8 +129,10 @@ export default function MenuSuperior({ style = {} }) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => router.push("/")}
-          style={[{ zIndex: 999 }, style]}
+          onPress={() => {
+            logout();
+            router.push("/");
+          }}
         >
           <Feather name="log-out" size={30} color={"white"} />
         </TouchableOpacity>

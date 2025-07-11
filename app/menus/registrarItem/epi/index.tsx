@@ -26,18 +26,21 @@ import {
 } from "../../../../services/tipoUnidadeApi";
 import Carregando from "../../../components/Carregando";
 import MenuInferior from "../../../components/MenuInferior";
-import MenuSuperior, {
+import { router } from "expo-router";
+import MaskInput, { Masks } from "react-native-mask-input";
+import {
+  acessoAlmoxarifado,
+  acessoAlmoxarifadoAdm,
   acessoCompras,
   acessoComprasAdm,
-} from "../../../components/MenuSuperior";
-import { router } from "expo-router";
-import { useAuth } from "../../../../context/auth";
-import MaskInput, { Masks } from "react-native-mask-input";
+  useTipoAcessoContext,
+} from "../../../../context/tipoAcessoContext";
+import MenuSuperior from "../../../components/MenuSuperior";
 
 export default function Epi() {
+  const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
-  const { usuario } = useAuth();
   const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
 
@@ -407,31 +410,30 @@ export default function Epi() {
                 }}
               />
             </View>
-            {usuario.tipoAcesso === acessoCompras ||
-              (usuario.tipoAcesso === acessoComprasAdm && (
-                <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
-                  <Text style={globalStyles.label}>PRECO:</Text>
-                  <MaskInput
-                    style={globalStyles.inputEditar}
-                    placeholder="Preço médio do item"
-                    placeholderTextColor="#888"
-                    value={preco}
-                    onChangeText={(masked, unmasked) => {
-                      // Limpa e converte para centavos
-                      const numeric = parseInt(unmasked || "0", 10);
+            {[acessoCompras, acessoComprasAdm].includes(tipoAcesso) && (
+              <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
+                <Text style={globalStyles.label}>PRECO:</Text>
+                <MaskInput
+                  style={globalStyles.inputEditar}
+                  placeholder="Preço médio do item"
+                  placeholderTextColor="#888"
+                  value={preco}
+                  onChangeText={(masked, unmasked) => {
+                    // Limpa e converte para centavos
+                    const numeric = parseInt(unmasked || "0", 10);
 
-                      if (numeric > 999999) {
-                        // Se for maior que 999999 centavos (ou R$ 9999,99), ignora a mudança
-                        setPreco("999999");
-                        return;
-                      }
+                    if (numeric > 999999) {
+                      // Se for maior que 999999 centavos (ou R$ 9999,99), ignora a mudança
+                      setPreco("999999");
+                      return;
+                    }
 
-                      setPreco(masked);
-                    }}
-                    mask={Masks.BRL_CURRENCY}
-                  />
-                </View>
-              ))}
+                    setPreco(masked);
+                  }}
+                  mask={Masks.BRL_CURRENCY}
+                />
+              </View>
+            )}
           </View>
         </ScrollView>
         <View style={globalStyles.buttonRowContainer}>
@@ -441,15 +443,14 @@ export default function Epi() {
           >
             <Text style={globalStyles.buttonText}>Salvar</Text>
           </TouchableOpacity>
-          {usuario.tipoAcesso != "Almoxarifado" &&
-            usuario.tipoAcesso != "AlmoxarifadoAdm" && (
-              <TouchableOpacity
-                style={[globalStyles.buttonCancelar, { flex: 1 }]}
-                onPress={() => router.back()}
-              >
-                <Text style={globalStyles.buttonText}>Cancelar</Text>
-              </TouchableOpacity>
-            )}
+          {[acessoCompras, acessoComprasAdm].includes(tipoAcesso) && (
+            <TouchableOpacity
+              style={[globalStyles.buttonCancelar, { flex: 1 }]}
+              onPress={() => router.back()}
+            >
+              <Text style={globalStyles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </Animatable.View>
       <MenuInferior />

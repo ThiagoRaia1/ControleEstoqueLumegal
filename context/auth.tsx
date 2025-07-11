@@ -1,58 +1,41 @@
-// context/auth.tsx
-import React, { createContext, useContext, useState } from "react";
-import AuthService from "../services/AuthService";
-
-export interface IUsuario {
-  login: string;
-  senha: string;
-  tipoAcesso: string;
-}
+import { router } from "expo-router";
+import { createContext, useContext, ReactNode, useState } from "react";
+import { nomePaginas } from "../utils/nomePaginas";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTipoAcessoContext } from "./tipoAcessoContext";
 
 interface IAuthContext {
-  usuario: IUsuario;
-  setUsuario: (usuario: IUsuario) => void;
-  handleLogin: (senha: string) => Promise<void>;
+  isAuthenticated: boolean;
+  login: () => void;
+  logout: () => void;
 }
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
+const AuthContext = createContext<IAuthContext>({
+  isAuthenticated: false,
+  login: () => {},
+  logout: () => {},
+});
 
-const AuthContext = createContext<IAuthContext>({} as IAuthContext);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { tipoAcesso, setTipoAcesso } = useTipoAcessoContext();
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [usuario, setUsuario] = useState<IUsuario>({
-    login: "",
-    senha: "",
-    tipoAcesso: "",
-  });
+  const login = () => {
+    setIsAuthenticated(true);
+    router.push(nomePaginas.itensEmFalta);
+  };
 
-  async function handleLogin(senha: string) {
-    try {
-      const user = await AuthService.login(usuario.login, senha);
-      if (user) {
-        setUsuario(user);
-      }
-    } catch (erro: any) {
-      const mensagem = erro.message || "";
-
-      if (mensagem === "Erro ao autenticar usuario") {
-        alert("Login ou senha inválidos");
-      } else if (mensagem === "Erro ao buscar dados do usuario") {
-        alert("Erro ao buscar dados do usuario");
-      } else {
-        alert("Erro inesperado ao fazer login" + mensagem);
-      }
-    }
-  }
+  const logout = async () => {
+    setIsAuthenticated(false);
+    await AsyncStorage.removeItem("token");
+    setTipoAcesso("");
+  };
 
   return (
-    <AuthContext.Provider value={{ usuario, handleLogin, setUsuario }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);
