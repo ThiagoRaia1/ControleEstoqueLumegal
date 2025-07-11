@@ -44,14 +44,13 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
     },
     mainContent: {
       flex: 1,
-      width: "100%",
-      maxWidth: 1100,
+      width: "90%",
+      maxWidth: 1000,
       alignSelf: "center",
       alignItems: "center",
       justifyContent: "center",
       gap: 20,
       marginBottom: 30,
-      paddingHorizontal: 100,
     },
     // Pesquisa
     searchBar: {

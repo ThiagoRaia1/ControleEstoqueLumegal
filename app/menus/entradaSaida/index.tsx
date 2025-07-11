@@ -355,27 +355,30 @@ export default function EntradaSaida() {
 
                 return nome.startsWith(termo) || ca.startsWith(termo);
               })
-              .map((item: ItemUnificado, index: number) => (
-                <Animatable.View
-                  key={item.id}
-                  animation="fadeInUp"
-                  duration={1000}
-                  delay={index * 150}
-                >
-                  <View key={item.id}>
-                    <RenderItem
-                      globalStyles={globalStyles}
-                      item={item}
-                      setQuantidadeItem={(id, novaQuantidade) =>
-                        setQuantidadeItem(id, item.tipo, novaQuantidade)
-                      }
-                      quantidadeASerMovida={
-                        quantidadeASerMovida[`${item.tipo}-${item.id}`] || 0
-                      }
-                    />
-                  </View>
-                </Animatable.View>
-              ))}
+              .map((item: ItemUnificado, index: number) => {
+                const uniqueKey = `${item.tipo}-${item.id}`;
+                return (
+                  <Animatable.View
+                    key={uniqueKey}
+                    animation="fadeInUp"
+                    duration={1000}
+                    delay={index * 150}
+                  >
+                    <View key={uniqueKey}>
+                      <RenderItem
+                        globalStyles={globalStyles}
+                        item={item}
+                        setQuantidadeItem={(id, novaQuantidade) =>
+                          setQuantidadeItem(id, item.tipo, novaQuantidade)
+                        }
+                        quantidadeASerMovida={
+                          quantidadeASerMovida[`${item.tipo}-${item.id}`] || 0
+                        }
+                      />
+                    </View>
+                  </Animatable.View>
+                );
+              })}
           </View>
         </ScrollView>
         <TouchableOpacity
