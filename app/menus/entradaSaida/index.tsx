@@ -105,17 +105,26 @@ function RenderItem({
         <View style={styles.plusMinusButtonContainer}>
           <TouchableOpacity
             style={[styles.plusMinusButton, { backgroundColor: "green" }]}
-            onPress={() =>
-              setQuantidadeItem(item.id.toString(), quantidadeASerMovida + 1)
-            }
+            onPress={() => {
+              setQuantidadeItem(item.id.toString(), quantidadeASerMovida + 1);
+            }}
           >
             <AntDesign name="pluscircleo" size={24} color="white" />
           </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.plusMinusButton, { backgroundColor: "#b30f02" }]}
-            onPress={() =>
-              setQuantidadeItem(item.id.toString(), quantidadeASerMovida - 1)
-            }
+            onPress={() => {
+              const novaQuantidade = quantidadeASerMovida - 1;
+              const max = item.quantidade ?? 0;
+
+              // Impede ultrapassar o limite de entrega
+              if (novaQuantidade < 0 && Math.abs(novaQuantidade) > max) {
+                setQuantidadeItem(item.id.toString(), -max);
+              } else {
+                setQuantidadeItem(item.id.toString(), novaQuantidade);
+              }
+            }}
           >
             <AntDesign name="minuscircleo" size={24} color="white" />
           </TouchableOpacity>
@@ -138,19 +147,21 @@ function RenderItem({
             value={quantidadeASerMovida.toString()}
             onChangeText={(text: string) => {
               const numericValue = text.replace(/(?!^-)-|[^0-9-]/g, "");
+              const id = item.id.toString();
+
               if (numericValue === "" || numericValue === "-") {
-                setQuantidadeItem(
-                  item.id.toString(),
-                  numericValue === "-" ? -0 : 0
-                );
+                setQuantidadeItem(id, numericValue === "-" ? -0 : 0);
                 return;
               }
+
               let valor = parseInt(numericValue, 10);
               const max = item.quantidade ?? 0;
+
               if (valor < 0 && Math.abs(valor) > max) {
                 valor = -max;
               }
-              setQuantidadeItem(item.id.toString(), valor);
+
+              setQuantidadeItem(id, valor);
             }}
           />
         </View>
