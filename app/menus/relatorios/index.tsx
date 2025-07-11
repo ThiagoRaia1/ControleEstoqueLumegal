@@ -7,22 +7,34 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import MenuSuperior from "../../components/MenuSuperior";
+import MenuSuperior, {
+  acessoAlmoxarifadoAdm,
+  acessoCompras,
+  acessoComprasAdm,
+} from "../../components/MenuSuperior";
 import MenuInferior from "../../components/MenuInferior";
 import { useThemeContext } from "../../../context/ThemeContext";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
 import Carregando from "../../components/Carregando";
-import { getEntradasSaidas } from "../../../services/entradaSaidaApi";
-import { IEntradaSaida } from "../../../interfaces/entradaSaida";
+import {
+  getEntradasSaidasEpi,
+  getEntradasSaidasSuprimento,
+} from "../../../services/entradaSaidaApi";
+import {
+  IEntradaSaidaEpi,
+  IEntradaSaidaSuprimento,
+} from "../../../interfaces/entradaSaida";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver"; // apenas se for no frontend
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getGlobalStyles } from "../../../globalStyles";
+import { useAuth } from "../../../context/auth";
 
 export default function Relatorios() {
+  const { usuario } = useAuth();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
 
@@ -43,14 +55,9 @@ export default function Relatorios() {
   async function gerarRelatorio(tipoRelatorio: string) {
     try {
       setCarregando(true);
-      // console.log("dataInicial: " + dataInicial.toISOString());
 
       const dataFinalSelecionada = new Date(dataFinal);
       dataFinalSelecionada.setUTCHours(23, 59, 59, 0);
-
-      // console.log(
-      //   "dataFinalSelecionada: " + dataFinalSelecionada.toISOString()
-      // );
 
       if (dataInicial > hojeComecoDoDia)
         throw new Error("dataInicial > hojeComecoDoDia");
@@ -59,25 +66,36 @@ export default function Relatorios() {
       if (dataFinalSelecionada > hojeFinalDoDia)
         throw new Error("dataFinalSelecionada > hojeFinalDoDia");
 
-      const entradasSaidas: IEntradaSaida[] = await getEntradasSaidas(
+      const entradasSaidasEpi: IEntradaSaidaEpi[] = await getEntradasSaidasEpi(
         dataInicial.toISOString(),
         dataFinalSelecionada.toISOString()
       );
-      // console.log(entradasSaidas);
+
+      const entradasSaidasSuprimento: IEntradaSaidaSuprimento[] =
+        await getEntradasSaidasSuprimento(
+          dataInicial.toISOString(),
+          dataFinalSelecionada.toISOString()
+        );
 
       if (tipoRelatorio === "XLSX") {
         const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet("Relatório");
+        const worksheetEpi = workbook.addWorksheet("Relatório_Epi");
 
         const alturaPx = 30;
         const alturaPts = alturaPx / 1.33;
+        const columnsWidth = 59.29;
 
+        // ==== Primeira tabela: Entradas e Saídas EPI ====
         // Define colunas da primeira tabela
-        worksheet.columns = [
-          { header: "idEntradaSaida", key: "idEntradaSaida", width: 30 },
-          { header: "EPI", key: "epi", width: 30 },
-          { header: "Quantidade", key: "quantidade", width: 30 },
-          { header: "Data", key: "data", width: 30 },
+        worksheetEpi.columns = [
+          {
+            header: "idEntradaSaida",
+            key: "idEntradaSaida",
+            width: columnsWidth,
+          },
+          { header: "EPI", key: "epi", width: columnsWidth },
+          { header: "Quantidade", key: "quantidade", width: columnsWidth },
+          { header: "Data", key: "data", width: columnsWidth },
         ];
 
         // Estilos globais
@@ -100,8 +118,8 @@ export default function Relatorios() {
         };
 
         // Preenche os dados da primeira tabela
-        entradasSaidas.forEach((entradaSaida, index) => {
-          const row = worksheet.addRow({
+        entradasSaidasEpi.forEach((entradaSaida, index) => {
+          const row = worksheetEpi.addRow({
             idEntradaSaida: entradaSaida.id,
             epi: entradaSaida.epi.nome,
             quantidade: entradaSaida.quantidade,
@@ -120,7 +138,7 @@ export default function Relatorios() {
         });
 
         // Aplica estilo à primeira tabela
-        worksheet.eachRow((row, rowNumber) => {
+        worksheetEpi.eachRow((row, rowNumber) => {
           row.height = alturaPts;
           row.eachCell((cell) => {
             cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -142,7 +160,7 @@ export default function Relatorios() {
         const saidasPorEpi: Record<string, number> = {};
         const entradasPorEpi: Record<string, number> = {};
 
-        for (const entrada of entradasSaidas) {
+        for (const entrada of entradasSaidasEpi) {
           const nome = entrada.epi.nome;
           if (entrada.quantidade > 0) {
             entradasPorEpi[nome] =
@@ -152,22 +170,23 @@ export default function Relatorios() {
           }
         }
 
-        const startResumoRow = entradasSaidas.length + 4;
+        const startResumoRowEpi = entradasSaidasEpi.length + 4;
 
         // Cabeçalho da tabela
-        worksheet.getCell(`A${startResumoRow}`).value = "EPI";
-        worksheet.getCell(`B${startResumoRow}`).value = "Total de Entradas";
-        worksheet.getCell(`C${startResumoRow}`).value = "Total de Saídas";
+        worksheetEpi.getCell(`A${startResumoRowEpi}`).value = "EPI";
+        worksheetEpi.getCell(`B${startResumoRowEpi}`).value =
+          "Total de Entradas";
+        worksheetEpi.getCell(`C${startResumoRowEpi}`).value = "Total de Saídas";
 
         ["A", "B", "C"].forEach((col) => {
-          const cell = worksheet.getCell(`${col}${startResumoRow}`);
+          const cell = worksheetEpi.getCell(`${col}${startResumoRowEpi}`);
           cell.fill = azulClaro;
           cell.font = { bold: true, size: 12, color: { argb: "FFFFFFFF" } };
           cell.alignment = { vertical: "middle", horizontal: "center" };
-          worksheet.getColumn(col).width = 30;
+          worksheetEpi.getColumn(col).width = columnsWidth;
         });
 
-        worksheet.getRow(startResumoRow).height = alturaPts;
+        worksheetEpi.getRow(startResumoRowEpi).height = alturaPts;
 
         // Unifica os nomes de EPIs
         const nomesEpi = new Set([
@@ -176,18 +195,18 @@ export default function Relatorios() {
         ]);
 
         // Corpo da tabela
-        let linha = startResumoRow + 1;
+        let linhaEpi = startResumoRowEpi + 1;
         Array.from(nomesEpi).forEach((nome, index) => {
           const entradaTotal = entradasPorEpi[nome] || 0;
           const saidaTotal = saidasPorEpi[nome] || 0;
 
-          worksheet.getCell(`A${linha}`).value = nome;
-          worksheet.getCell(`B${linha}`).value = entradaTotal;
-          worksheet.getCell(`C${linha}`).value = saidaTotal;
+          worksheetEpi.getCell(`A${linhaEpi}`).value = nome;
+          worksheetEpi.getCell(`B${linhaEpi}`).value = entradaTotal;
+          worksheetEpi.getCell(`C${linhaEpi}`).value = saidaTotal;
 
           const isPar = index % 2 === 0;
           ["A", "B", "C"].forEach((col) => {
-            const cell = worksheet.getCell(`${col}${linha}`);
+            const cell = worksheetEpi.getCell(`${col}${linhaEpi}`);
             cell.alignment = { vertical: "middle", horizontal: "center" };
             cell.fill = isPar
               ? cinzaClaro
@@ -198,9 +217,148 @@ export default function Relatorios() {
                 };
           });
 
-          worksheet.getRow(linha).height = alturaPts;
-          linha++;
+          worksheetEpi.getRow(linhaEpi).height = alturaPts;
+          linhaEpi++;
         });
+
+        if (
+          usuario.tipoAcesso === acessoCompras ||
+          usuario.tipoAcesso === acessoComprasAdm
+        ) {
+          const worksheetSuprimento = workbook.addWorksheet(
+            "Relatório_Suprimento"
+          );
+          // ==== Primeira tabela: Entradas e Saídas Suprimento ====
+          // Define colunas da primeira tabela
+          worksheetSuprimento.columns = [
+            {
+              header: "idEntradaSaida",
+              key: "idEntradaSaida",
+              width: columnsWidth,
+            },
+            { header: "Suprimento", key: "suprimento", width: columnsWidth },
+            { header: "Quantidade", key: "quantidade", width: columnsWidth },
+            { header: "Data", key: "data", width: columnsWidth },
+          ];
+
+          // Preenche os dados da primeira tabela
+          entradasSaidasSuprimento.forEach((entradaSaida, index) => {
+            const row = worksheetSuprimento.addRow({
+              idEntradaSaida: entradaSaida.id,
+              suprimento: entradaSaida.suprimento.nome,
+              quantidade: entradaSaida.quantidade,
+              data: new Date(entradaSaida.data).toLocaleString("pt-BR"),
+            });
+
+            const isPar = index % 2 === 0;
+            const fill = isPar ? cinzaClaro : branco;
+
+            row.eachCell((cell) => {
+              cell.alignment = { vertical: "middle", horizontal: "center" };
+              cell.fill = fill;
+            });
+
+            row.height = alturaPts;
+          });
+
+          // Aplica estilo à primeira tabela
+          worksheetSuprimento.eachRow((row, rowNumber) => {
+            row.height = alturaPts;
+            row.eachCell((cell) => {
+              cell.alignment = { vertical: "middle", horizontal: "center" };
+            });
+
+            if (rowNumber === 1) {
+              row.eachCell((cell) => {
+                cell.fill = azulClaro;
+                cell.font = {
+                  bold: true,
+                  size: 12,
+                  color: { argb: "FFFFFFFF" },
+                };
+              });
+            } else if (rowNumber % 2 === 0) {
+              row.eachCell((cell) => {
+                cell.fill = cinzaClaro;
+              });
+            }
+          });
+
+          // ==== Segunda tabela: Entradas e Saídas por suprimento ====
+          const saidasPorSuprimento: Record<string, number> = {};
+          const entradasPorSuprimento: Record<string, number> = {};
+
+          for (const entrada of entradasSaidasSuprimento) {
+            const nome = entrada.suprimento.nome;
+            if (entrada.quantidade > 0) {
+              entradasPorSuprimento[nome] =
+                (entradasPorSuprimento[nome] || 0) + entrada.quantidade;
+            } else if (entrada.quantidade < 0) {
+              saidasPorSuprimento[nome] =
+                (saidasPorSuprimento[nome] || 0) + entrada.quantidade;
+            }
+          }
+
+          const startResumoRowSuprimento = entradasSaidasSuprimento.length + 4;
+
+          // Cabeçalho da tabela
+          worksheetSuprimento.getCell(`A${startResumoRowSuprimento}`).value =
+            "Suprimento";
+          worksheetSuprimento.getCell(`B${startResumoRowSuprimento}`).value =
+            "Total de Entradas";
+          worksheetSuprimento.getCell(`C${startResumoRowSuprimento}`).value =
+            "Total de Saídas";
+
+          ["A", "B", "C"].forEach((col) => {
+            const cell = worksheetSuprimento.getCell(
+              `${col}${startResumoRowSuprimento}`
+            );
+            cell.fill = azulClaro;
+            cell.font = { bold: true, size: 12, color: { argb: "FFFFFFFF" } };
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+            worksheetSuprimento.getColumn(col).width = columnsWidth;
+          });
+
+          worksheetSuprimento.getRow(startResumoRowSuprimento).height =
+            alturaPts;
+
+          // Unifica os nomes de Suprimentos
+          const nomesSuprimento = new Set([
+            ...Object.keys(entradasPorSuprimento),
+            ...Object.keys(saidasPorSuprimento),
+          ]);
+
+          // Corpo da tabela
+          let linhaSuprimento = startResumoRowSuprimento + 1;
+          Array.from(nomesSuprimento).forEach((nome, index) => {
+            const entradaTotal = entradasPorSuprimento[nome] || 0;
+            const saidaTotal = saidasPorSuprimento[nome] || 0;
+
+            worksheetSuprimento.getCell(`A${linhaSuprimento}`).value = nome;
+            worksheetSuprimento.getCell(`B${linhaSuprimento}`).value =
+              entradaTotal;
+            worksheetSuprimento.getCell(`C${linhaSuprimento}`).value =
+              saidaTotal;
+
+            const isPar = index % 2 === 0;
+            ["A", "B", "C"].forEach((col) => {
+              const cell = worksheetSuprimento.getCell(
+                `${col}${linhaSuprimento}`
+              );
+              cell.alignment = { vertical: "middle", horizontal: "center" };
+              cell.fill = isPar
+                ? cinzaClaro
+                : {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "FFFFFFFF" },
+                  };
+            });
+
+            worksheetSuprimento.getRow(linhaSuprimento).height = alturaPts;
+            linhaSuprimento++;
+          });
+        }
 
         // Gera e salva o arquivo
         const buffer = await workbook.xlsx.writeBuffer();
@@ -213,15 +371,15 @@ export default function Relatorios() {
       if (tipoRelatorio === "PDF") {
         const doc = new jsPDF();
 
-        // --- Tabela 1: Detalhada ---
-        const columns = [
+        // --- Tabela 1 Epi: Detalhada ---
+        const columnsEpi = [
           { header: "idEntradaSaida", dataKey: "id" },
           { header: "EPI", dataKey: "epi" },
           { header: "Quantidade", dataKey: "quantidade" },
           { header: "Data", dataKey: "data" },
         ];
 
-        const rows = entradasSaidas.map((entrada) => ({
+        const rowsEpi = entradasSaidasEpi.map((entrada) => ({
           id: entrada.id,
           epi: entrada.epi.nome,
           quantidade: entrada.quantidade,
@@ -229,8 +387,8 @@ export default function Relatorios() {
         }));
 
         autoTable(doc, {
-          columns,
-          body: rows,
+          columns: columnsEpi,
+          body: rowsEpi,
           styles: { halign: "center", valign: "middle" },
           headStyles: { fillColor: "#46c8f2" },
           margin: { top: 20 },
@@ -240,7 +398,7 @@ export default function Relatorios() {
         const entradasPorEpi: Record<string, number> = {};
         const saidasPorEpi: Record<string, number> = {};
 
-        for (const entrada of entradasSaidas) {
+        for (const entrada of entradasSaidasEpi) {
           const nome = entrada.epi.nome;
           if (entrada.quantidade > 0) {
             entradasPorEpi[nome] =
@@ -251,19 +409,19 @@ export default function Relatorios() {
         }
 
         // Unifica todos os nomes de EPI
-        const nomesUnicos = new Set([
+        const nomesUnicosEpi = new Set([
           ...Object.keys(entradasPorEpi),
           ...Object.keys(saidasPorEpi),
         ]);
 
         // Monta o corpo da tabela
-        const resumoBody = Array.from(nomesUnicos).map((nome) => ({
+        const resumoBodyEpi = Array.from(nomesUnicosEpi).map((nome) => ({
           epi: nome,
           entradas: entradasPorEpi[nome] || 0,
           saidas: saidasPorEpi[nome] || 0,
         }));
 
-        // --- Tabela 2: Resumo de Entradas e Saídas ---
+        // --- Tabela 2 Epi: Resumo de Entradas e Saídas ---
         autoTable(doc, {
           startY: (doc as any).lastAutoTable.finalY + 10,
           columns: [
@@ -271,10 +429,81 @@ export default function Relatorios() {
             { header: "Total de Entradas", dataKey: "entradas" },
             { header: "Total de Saídas", dataKey: "saidas" },
           ],
-          body: resumoBody,
+          body: resumoBodyEpi,
           styles: { halign: "center", valign: "middle" },
           headStyles: { fillColor: "#46c8f2", textColor: "#ffffff" },
         });
+
+        if (
+          usuario.tipoAcesso === acessoComprasAdm ||
+          usuario.tipoAcesso === acessoCompras
+        ) {
+          // --- Tabela 1 Suprimento: Detalhada ---
+          const columnsSuprimento = [
+            { header: "idEntradaSaida", dataKey: "id" },
+            { header: "Suprimento", dataKey: "suprimento" },
+            { header: "Quantidade", dataKey: "quantidade" },
+            { header: "Data", dataKey: "data" },
+          ];
+
+          const rowsSuprimento = entradasSaidasSuprimento.map((entrada) => ({
+            id: entrada.id,
+            suprimento: entrada.suprimento.nome,
+            quantidade: entrada.quantidade,
+            data: new Date(entrada.data).toLocaleString("pt-BR"),
+          }));
+
+          autoTable(doc, {
+            columns: columnsSuprimento,
+            body: rowsSuprimento,
+            styles: { halign: "center", valign: "middle" },
+            headStyles: { fillColor: "#46c8f2" },
+            margin: { top: 20 },
+          });
+
+          // --- Agrupamento por suprimento: Entradas e Saídas ---
+          const entradasPorSuprimento: Record<string, number> = {};
+          const saidasPorSuprimento: Record<string, number> = {};
+
+          for (const entrada of entradasSaidasSuprimento) {
+            const nome = entrada.suprimento.nome;
+            if (entrada.quantidade > 0) {
+              entradasPorSuprimento[nome] =
+                (entradasPorSuprimento[nome] || 0) + entrada.quantidade;
+            } else if (entrada.quantidade < 0) {
+              saidasPorSuprimento[nome] =
+                (saidasPorSuprimento[nome] || 0) + entrada.quantidade;
+            }
+          }
+
+          // Unifica todos os nomes de suprimento
+          const nomesUnicosSuprimento = new Set([
+            ...Object.keys(entradasPorSuprimento),
+            ...Object.keys(saidasPorSuprimento),
+          ]);
+
+          // Monta o corpo da tabela
+          const resumoBodySuprimento = Array.from(nomesUnicosSuprimento).map(
+            (nome) => ({
+              suprimento: nome,
+              entradas: entradasPorSuprimento[nome] || 0,
+              saidas: saidasPorSuprimento[nome] || 0,
+            })
+          );
+
+          // --- Tabela 2 Suprimento: Resumo de Entradas e Saídas ---
+          autoTable(doc, {
+            startY: (doc as any).lastAutoTable.finalY + 10,
+            columns: [
+              { header: "Suprimento", dataKey: "suprimento" },
+              { header: "Total de Entradas", dataKey: "entradas" },
+              { header: "Total de Saídas", dataKey: "saidas" },
+            ],
+            body: resumoBodySuprimento,
+            styles: { halign: "center", valign: "middle" },
+            headStyles: { fillColor: "#46c8f2", textColor: "#ffffff" },
+          });
+        }
 
         doc.save("relatorio.pdf");
       }

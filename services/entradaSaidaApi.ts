@@ -1,13 +1,25 @@
 import { httpClient } from "../adapters/httpClient";
 import { IMovimentacaoItem } from "../interfaces/entradaSaida";
 
-export async function getEntradasSaidas(
+export async function getEntradasSaidasEpi(
   dataInicial: string,
   dataFinal: string
 ) {
-  return await httpClient(`/entrada-saida/${dataInicial}/${dataFinal}`, {
+  return await httpClient(`/entrada-saida-epi/${dataInicial}/${dataFinal}`, {
     method: "GET",
   });
+}
+
+export async function getEntradasSaidasSuprimento(
+  dataInicial: string,
+  dataFinal: string
+) {
+  return await httpClient(
+    `/entrada-saida-suprimento/${dataInicial}/${dataFinal}`,
+    {
+      method: "GET",
+    }
+  );
 }
 
 export async function entradaSaidaEpiApi(movimentacoes: IMovimentacaoItem[]) {
