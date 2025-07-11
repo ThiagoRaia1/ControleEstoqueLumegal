@@ -661,7 +661,7 @@ export default function Pesquisar() {
                 }}
               >
                 <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
-                  <Text style={globalStyles.label}>QUANTIDADE:</Text>
+                  <Text style={globalStyles.label}>QUANTIDADE: *</Text>
                   <TextInput
                     style={[
                       globalStyles.inputEditar,
@@ -738,10 +738,7 @@ export default function Pesquisar() {
                 <Text style={globalStyles.buttonText}>Salvar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[
-                  globalStyles.button,
-                  { flex: 1, backgroundColor: "#B30F03" },
-                ]}
+                style={[globalStyles.buttonCancelar, { flex: 1 }]}
                 onPress={() => setEditando(false)}
               >
                 <Text style={globalStyles.buttonText}>Cancelar</Text>

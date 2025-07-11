@@ -66,10 +66,7 @@ export default function TipoUnidade() {
             <Text style={globalStyles.buttonText}>Salvar</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              globalStyles.button,
-              { flex: 1, backgroundColor: "#B30F03" },
-            ]}
+            style={[globalStyles.buttonCancelar, { flex: 1 }]}
             onPress={() => router.back()}
           >
             <Text style={globalStyles.buttonText}>Cancelar</Text>

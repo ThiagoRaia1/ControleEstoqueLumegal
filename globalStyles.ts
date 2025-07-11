@@ -69,12 +69,22 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
     button: {
       width: "100%",
       height: 50,
-      backgroundColor: "#0033a0",
       borderRadius: 10,
       justifyContent: "center",
       alignItems: "center",
       elevation: 20,
+      backgroundColor: "#0033a0",
       boxShadow: "0px 5px 20px rgb(0, 69, 218)",
+    },
+    buttonCancelar: {
+      width: "100%",
+      height: 50,
+      borderRadius: 10,
+      justifyContent: "center",
+      alignItems: "center",
+      elevation: 20,
+      backgroundColor: "#B30F03",
+      boxShadow: "0px 5px 20px #B30F03",
     },
     buttonText: {
       color: "white",

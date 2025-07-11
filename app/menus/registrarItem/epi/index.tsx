@@ -380,7 +380,7 @@ export default function Epi() {
             }}
           >
             <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
-              <Text style={globalStyles.label}>QUANTIDADE:</Text>
+              <Text style={globalStyles.label}>QUANTIDADE: *</Text>
               <TextInput
                 style={globalStyles.inputEditar}
                 placeholder="Quantidade inicial do EPI"
@@ -444,10 +444,7 @@ export default function Epi() {
           {usuario.tipoAcesso != "Almoxarifado" &&
             usuario.tipoAcesso != "AlmoxarifadoAdm" && (
               <TouchableOpacity
-                style={[
-                  globalStyles.button,
-                  { flex: 1, backgroundColor: "#B30F03" },
-                ]}
+                style={[globalStyles.buttonCancelar, { flex: 1 }]}
                 onPress={() => router.back()}
               >
                 <Text style={globalStyles.buttonText}>Cancelar</Text>

@@ -66,8 +66,8 @@ export default function Endereco() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[
-              globalStyles.button,
-              { flex: 1, backgroundColor: "#B30F03" },
+              globalStyles.buttonCancelar,
+              { flex: 1 },
             ]}
             onPress={() => router.back()}
           >
