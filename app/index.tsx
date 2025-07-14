@@ -13,18 +13,16 @@ import { useThemeContext } from "../context/ThemeContext";
 import { getGlobalStyles } from "../globalStyles";
 import { login as loginApi } from "../services/AuthService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { nomePaginas } from "../utils/nomePaginas";
-import { router } from "expo-router";
 import {
   TipoAcessoType,
   useTipoAcessoContext,
 } from "../context/tipoAcessoContext";
 
 export default function TelaLogin() {
+  const { login, logout } = useAuth();
   const { setTipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
-  const { login, logout } = useAuth();
   const [loginInput, setLoginInput] = useState("");
   const [senha, setSenha] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
@@ -70,7 +68,12 @@ export default function TelaLogin() {
           Controle de estoque Lumegal
         </Text>
         <View style={globalStyles.loginInputContainer}>
-          <Feather name="mail" size={20} color="#0033A0" style={styles.icon} />
+          <Feather
+            name="mail"
+            size={20}
+            color="#0033A0"
+            style={styles.iconSpace}
+          />
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -78,10 +81,11 @@ export default function TelaLogin() {
             onChangeText={(text) => setLoginInput(text)}
             onSubmitEditing={login}
           />
+          <View style={styles.iconSpace}></View>
         </View>
 
         <View style={globalStyles.loginInputContainer}>
-          <Feather name="lock" size={20} color="#0033A0" style={styles.icon} />
+          <Feather name="lock" size={20} color="#0033A0" />
           <TextInput
             style={styles.input}
             placeholder="Senha"
@@ -90,7 +94,10 @@ export default function TelaLogin() {
             onChangeText={(text) => setSenha(text)}
             onSubmitEditing={login}
           />
-          <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
+          <TouchableOpacity
+            onPress={() => setMostrarSenha(!mostrarSenha)}
+            style={[styles.iconSpace, { alignItems: "flex-end" }]}
+          >
             <Feather
               name={mostrarSenha ? "eye-off" : "eye"}
               size={20}
@@ -112,8 +119,8 @@ export default function TelaLogin() {
 }
 
 const styles = StyleSheet.create({
-  icon: {
-    marginRight: 10,
+  iconSpace: {
+    width: 20,
   },
   input: {
     flex: 1,

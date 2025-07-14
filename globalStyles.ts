@@ -26,6 +26,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       backgroundColor: "white",
       elevation: 20,
       paddingHorizontal: 15,
+      gap: 15,
       marginBottom: 20,
       width: "100%",
       borderWidth: 1,
