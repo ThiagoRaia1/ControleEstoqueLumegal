@@ -14,9 +14,17 @@ import { getGlobalStyles } from "../globalStyles";
 import { login as loginApi } from "../services/AuthService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
+  acessoAlmoxarifado,
+  acessoAlmoxarifadoAdm,
+  acessoCompras,
+  acessoComprasAdm,
   TipoAcessoType,
+  TokenPayload,
   useTipoAcessoContext,
 } from "../context/tipoAcessoContext";
+import { router } from "expo-router";
+import { nomePaginas } from "../utils/nomePaginas";
+import { jwtDecode } from "jwt-decode";
 
 export default function TelaLogin() {
   const { login, logout } = useAuth();
@@ -39,9 +47,25 @@ export default function TelaLogin() {
         throw new Error("Token não encontrado");
       }
       await AsyncStorage.setItem("token", token);
-
-      setTipoAcesso(tipoAcesso as TipoAcessoType);
       login();
+      if (token) {
+        const decoded = jwtDecode<TokenPayload>(token);
+        setTipoAcesso(decoded.tipoAcesso);
+        // Redirecionamento direto para a rota correta
+        if (
+          decoded.tipoAcesso === acessoCompras ||
+          decoded.tipoAcesso === acessoComprasAdm
+        ) {
+          router.push(nomePaginas.itensEmFalta.compras);
+        } else if (
+          decoded.tipoAcesso === acessoAlmoxarifado ||
+          decoded.tipoAcesso === acessoAlmoxarifadoAdm
+        ) {
+          router.push(nomePaginas.itensEmFalta.almoxarifado);
+        } else {
+          alert("Tipo de acesso inválido");
+        }
+      }
     } catch (erro: any) {
       alert(erro.message);
     } finally {

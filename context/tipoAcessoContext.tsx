@@ -17,7 +17,7 @@ export type TipoAcessoType =
   | "AlmoxarifadoAdm";
 
 // Interface do payload do token
-interface TokenPayload {
+export interface TokenPayload {
   id: number;
   login: string;
   tipoAcesso: TipoAcessoType;
@@ -51,8 +51,8 @@ export const TipoAcessoProvider = ({
           const decoded = jwtDecode<TokenPayload>(token);
           setTipoAcesso(decoded.tipoAcesso);
         }
-      } catch (error) {
-        console.warn("Erro ao decodificar token:", error);
+      } catch (erro) {
+        console.warn("Erro ao decodificar token:", erro);
         setTipoAcesso(""); // Evita valor incorreto
       }
     };

@@ -31,7 +31,7 @@ export default function MenuInferior() {
   type FeatherIconName = keyof typeof Feather.glyphMap;
   const menuItems: { href: string; icon: FeatherIconName; label: string }[] = [
     {
-      href: `${nomePaginas.itensEmFalta}`,
+      href: `${nomePaginas.itensEmFalta.main}`,
       icon: "archive",
       label: "ITENS EM FALTA",
     },
@@ -47,7 +47,7 @@ export default function MenuInferior() {
           : "",
     },
     {
-      href: `${nomePaginas.entradaSaida}`,
+      href: `${nomePaginas.entradaSaida.main}`,
       icon: "edit",
       label: "ENTRADA/SAÍDA",
     },

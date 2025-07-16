@@ -23,7 +23,9 @@ export default function RegistrarEpi() {
 
   useEffect(() => {
     if ([acessoAlmoxarifado, acessoAlmoxarifadoAdm].includes(tipoAcesso)) {
-      router.push(nomePaginas.registrarItem.registrarEpi);
+      router.push(
+        nomePaginas.registrarItem.almoxarifado.registrarAlmoxarifadoEpi
+      );
     }
   }, []);
 
@@ -46,7 +48,9 @@ export default function RegistrarEpi() {
           <TouchableOpacity
             style={globalStyles.optionButton}
             onPress={() => {
-              router.push(nomePaginas.registrarItem.registrarSuprimento);
+              router.push(
+                nomePaginas.registrarItem.compras.registrarComprasSuprimento
+              );
             }}
           >
             <Text style={globalStyles.optionButtonText}>
@@ -62,7 +66,9 @@ export default function RegistrarEpi() {
           <TouchableOpacity
             style={globalStyles.optionButton}
             onPress={() => {
-              router.push(nomePaginas.registrarItem.registrarEpi);
+              router.push(
+                nomePaginas.registrarItem.compras.registrarComprasEpi
+              );
             }}
           >
             <Text style={globalStyles.optionButtonText}>REGISTRAR EPI</Text>
@@ -76,7 +82,9 @@ export default function RegistrarEpi() {
           <TouchableOpacity
             style={globalStyles.optionButton}
             onPress={() => {
-              router.push(nomePaginas.registrarItem.registrartipoUnidade);
+              router.push(
+                nomePaginas.registrarItem.compras.registrarComprastipoUnidade
+              );
             }}
           >
             <Text style={globalStyles.optionButtonText}>
@@ -92,7 +100,9 @@ export default function RegistrarEpi() {
           <TouchableOpacity
             style={globalStyles.optionButton}
             onPress={() => {
-              router.push(nomePaginas.registrarItem.registrarFornecedor);
+              router.push(
+                nomePaginas.registrarItem.compras.registrarComprasFornecedor
+              );
             }}
           >
             <Text style={globalStyles.optionButtonText}>
@@ -109,7 +119,8 @@ export default function RegistrarEpi() {
             style={globalStyles.optionButton}
             onPress={() => {
               router.push(
-                nomePaginas.registrarItem.registrarCategoriaFornecedor
+                nomePaginas.registrarItem.compras
+                  .registrarComprasCategoriaFornecedor
               );
             }}
           >
@@ -126,7 +137,9 @@ export default function RegistrarEpi() {
           <TouchableOpacity
             style={globalStyles.optionButton}
             onPress={() => {
-              router.push(nomePaginas.registrarItem.registrarEndereco);
+              router.push(
+                nomePaginas.registrarItem.compras.registrarComprasEndereco
+              );
             }}
           >
             <Text style={globalStyles.optionButtonText}>

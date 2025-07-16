@@ -18,11 +18,10 @@ const AuthContext = createContext<IAuthContext>({
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { tipoAcesso, setTipoAcesso } = useTipoAcessoContext();
+  const { setTipoAcesso } = useTipoAcessoContext();
 
   const login = () => {
     setIsAuthenticated(true);
-    router.push(nomePaginas.itensEmFalta);
   };
 
   const logout = async () => {

@@ -22,8 +22,6 @@ export default function MenuSuperior({ style = {} }) {
   const { theme, toggleTheme } = useThemeContext();
   const { width } = useWindowDimensions();
 
-  console.log("Tipo de acesso no MenuSuperior: " + tipoAcesso);
-
   return (
     <View
       style={[

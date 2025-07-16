@@ -40,6 +40,7 @@ import {
   useTipoAcessoContext,
 } from "../../../context/tipoAcessoContext";
 import MenuSuperior from "../../components/MenuSuperior";
+import FiltroTipoItem from "../../components/FiltroTipoItem";
 
 export default function Pesquisar() {
   const { tipoAcesso } = useTipoAcessoContext();
@@ -49,6 +50,7 @@ export default function Pesquisar() {
   const [carregando, setCarregando] = useState(false);
   const [epis, setEpis] = useState<IEpi[]>([]);
   const [suprimentos, setSuprimentos] = useState<ISuprimento[]>([]);
+  const [filtro, setFiltro] = useState<"todos" | "epi" | "suprimento">("todos");
 
   const [modalVisible, setModalVisible] = useState(false);
   type ItemUnificado = (IEpi | ISuprimento) & { tipo: "epi" | "suprimento" };
@@ -154,13 +156,14 @@ export default function Pesquisar() {
 
   // Funcao para filtrar a lista de itens de acordo com a pesquisa
   const itensFiltrados = listaUnificada
-    .slice()
-    .sort((a, b) =>
-      (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
-        sensitivity: "base",
-      })
-    )
     .filter((item) => {
+      // Aplica o filtro de tipo
+      if (filtro === "epi" && item.tipo !== "epi") return false;
+      if (filtro === "suprimento" && item.tipo !== "suprimento") return false;
+      return true;
+    })
+    .filter((item) => {
+      // Aplica o filtro de pesquisa
       const termo = normalizar(pesquisa);
       const nome = normalizar(item.nome || "");
       const ca = normalizar(
@@ -169,9 +172,13 @@ export default function Pesquisar() {
           ? item.certificadoAprovacao
           : ""
       );
-
       return nome.startsWith(termo) || ca.startsWith(termo);
-    });
+    })
+    .sort((a, b) =>
+      (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+        sensitivity: "base",
+      })
+    );
 
   useEffect(() => {
     if (itemSelecionado && editando) {
@@ -213,10 +220,10 @@ export default function Pesquisar() {
         const quantidadeNum = parseInt(quantidade, 10);
         const quantidadeParaAvisoNum = parseInt(quantidadeParaAviso, 10);
 
-        if (!quantidadeNum || quantidadeNum < 0) {
+        if (isNaN(quantidadeNum) || quantidadeNum < 0) {
           throw new Error("Quantidade deve ser um número válido.");
         }
-        if (!quantidadeParaAvisoNum || quantidadeParaAvisoNum < 0) {
+        if (isNaN(quantidadeParaAvisoNum) || quantidadeParaAvisoNum < 0) {
           throw new Error("Quantidade para Aviso deve ser um número válido.");
         }
 
@@ -418,6 +425,11 @@ export default function Pesquisar() {
               value={pesquisa}
               onChangeText={setPesquisa}
               placeholder="Pesquisar por nome ou C.A."
+            />
+
+            <FiltroTipoItem
+              valorSelecionado={filtro}
+              onSelecionar={setFiltro}
             />
             <ScrollView
               style={globalStyles.itensScroll}
@@ -675,11 +687,6 @@ export default function Pesquisar() {
                     placeholderTextColor="#888"
                     value={quantidade}
                     editable={false}
-                    onChangeText={(text) => {
-                      const numeric = text.replace(/[^0-9]/g, "");
-                      const valor = parseInt(numeric || "0", 10);
-                      setQuantidade(valor > 999 ? "999" : numeric);
-                    }}
                   />
                 </View>
                 <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>

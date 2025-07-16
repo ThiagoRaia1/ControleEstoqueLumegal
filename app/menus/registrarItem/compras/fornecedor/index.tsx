@@ -1,26 +1,26 @@
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import * as Animatable from "react-native-animatable";
-import MenuSuperior from "../../../components/MenuSuperior";
-import { useThemeContext } from "../../../../context/ThemeContext";
-import { getGlobalStyles } from "../../../../globalStyles";
-import MenuInferior from "../../../components/MenuInferior";
-import Carregando from "../../../components/Carregando";
+import MenuSuperior from "../../../../components/MenuSuperior";
+import { useThemeContext } from "../../../../../context/ThemeContext";
+import { getGlobalStyles } from "../../../../../globalStyles";
+import MenuInferior from "../../../../components/MenuInferior";
+import Carregando from "../../../../components/Carregando";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 import {
   getEnderecoPorCidade,
   getEnderecos,
-} from "../../../../services/enderecoApi";
-import { IEndereco } from "../../../../interfaces/endereco";
-import { ICriarFornecedor } from "../../../../interfaces/fornecedor";
+} from "../../../../../services/enderecoApi";
+import { IEndereco } from "../../../../../interfaces/endereco";
+import { ICriarFornecedor } from "../../../../../interfaces/fornecedor";
 import {
   getCategoriasFornecedor,
   getCategoriasFornecedorPorCategoria,
-} from "../../../../services/categoriaFornecedorApi";
-import { nomePaginas } from "../../../../utils/nomePaginas";
-import { registrarFornecedorApi } from "../../../../services/fornecedorApi";
-import { ICategoriaFornecedor } from "../../../../interfaces/categoriaFornecedor";
+} from "../../../../../services/categoriaFornecedorApi";
+import { nomePaginas } from "../../../../../utils/nomePaginas";
+import { registrarFornecedorApi } from "../../../../../services/fornecedorApi";
+import { ICategoriaFornecedor } from "../../../../../interfaces/categoriaFornecedor";
 
 export default function Fornecedor() {
   const { theme } = useThemeContext();

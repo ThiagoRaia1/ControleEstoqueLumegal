@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -10,32 +9,30 @@ import {
 import * as Animatable from "react-native-animatable";
 import { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
-import { useThemeContext } from "../../../../context/ThemeContext";
-import { getGlobalStyles } from "../../../../globalStyles";
-import { IEpi, ICriarEpi } from "../../../../interfaces/epi";
-import { IFornecedor } from "../../../../interfaces/fornecedor";
-import { ITipoUnidade } from "../../../../interfaces/tipoUnidade";
-import { excluirEpiApi, registrarEpiApi } from "../../../../services/epiApi";
+import { useThemeContext } from "../../../../../context/ThemeContext";
+import { getGlobalStyles } from "../../../../../globalStyles";
+import { ICriarEpi } from "../../../../../interfaces/epi";
+import { IFornecedor } from "../../../../../interfaces/fornecedor";
+import { ITipoUnidade } from "../../../../../interfaces/tipoUnidade";
+import { registrarEpiApi } from "../../../../../services/epiApi";
 import {
   getFornecedores,
   getFornecedorPorNome,
-} from "../../../../services/fornecedorApi";
+} from "../../../../../services/fornecedorApi";
 import {
   getTiposUnidade,
   getTipoUnidade,
-} from "../../../../services/tipoUnidadeApi";
-import Carregando from "../../../components/Carregando";
-import MenuInferior from "../../../components/MenuInferior";
+} from "../../../../../services/tipoUnidadeApi";
+import Carregando from "../../../../components/Carregando";
+import MenuInferior from "../../../../components/MenuInferior";
 import { router } from "expo-router";
 import MaskInput, { Masks } from "react-native-mask-input";
 import {
-  acessoAlmoxarifado,
-  acessoAlmoxarifadoAdm,
   acessoCompras,
   acessoComprasAdm,
   useTipoAcessoContext,
-} from "../../../../context/tipoAcessoContext";
-import MenuSuperior from "../../../components/MenuSuperior";
+} from "../../../../../context/tipoAcessoContext";
+import MenuSuperior from "../../../../components/MenuSuperior";
 
 export default function Epi() {
   const { tipoAcesso } = useTipoAcessoContext();

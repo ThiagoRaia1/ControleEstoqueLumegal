@@ -1,35 +1,34 @@
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import * as Animatable from "react-native-animatable";
-import MenuSuperior from "../../../components/MenuSuperior";
-import { useThemeContext } from "../../../../context/ThemeContext";
-import { getGlobalStyles } from "../../../../globalStyles";
-import MenuInferior from "../../../components/MenuInferior";
-import Carregando from "../../../components/Carregando";
+import MenuSuperior from "../../../../components/MenuSuperior";
+import { useThemeContext } from "../../../../../context/ThemeContext";
+import { getGlobalStyles } from "../../../../../globalStyles";
+import MenuInferior from "../../../../components/MenuInferior";
+import Carregando from "../../../../components/Carregando";
 import { useState } from "react";
 import { router } from "expo-router";
-import { registrarTipoUnidadeApi } from "../../../../services/tipoUnidadeApi";
-import { ICriarTipoUnidade } from "../../../../interfaces/tipoUnidade";
+import { ICriarEndereco } from "../../../../../interfaces/endereco";
+import { registrarEnderecoApi } from "../../../../../services/enderecoApi";
+import { nomePaginas } from "../../../../../utils/nomePaginas";
 
-export default function TipoUnidade() {
+export default function Endereco() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
 
-  const [tipo, setTipo] = useState("");
+  const [cidade, setCidade] = useState("");
 
-  const registrarTipoUnidade = async () => {
+  const registrarEndereco = async () => {
     try {
-      setCarregando(true);
-      if (!tipo || !tipo.trim()) {
-        alert("Por favor, preencha todos os campos obrigatórios.");
-        return;
-      }
-      const tipoUnidade: ICriarTipoUnidade = {
-        tipo: tipo.trim(),
+      const endereco: ICriarEndereco = {
+        cidade: cidade.trim(),
       };
-      const retornoDaApi = await registrarTipoUnidadeApi(tipoUnidade);
-      alert("Tipo de unidade registrado com sucesso!");
-      setTipo("");
+      setCarregando(true);
+      console.log(endereco);
+      const resultado = await registrarEnderecoApi(endereco);
+      console.log(resultado)
+      alert("Endereço registrado com sucesso!");
+      router.push(nomePaginas.registrarItem.main);
     } catch (erro: any) {
       alert(erro.message);
     } finally {
@@ -40,7 +39,7 @@ export default function TipoUnidade() {
   return (
     <View style={globalStyles.background}>
       <MenuSuperior />
-      <Text style={globalStyles.title}>REGISTRAR TIPO DE UNIDADE</Text>
+      <Text style={globalStyles.title}>REGISTRAR ENDERECO</Text>
       <Animatable.View
         animation="fadeInUp"
         duration={1000}
@@ -48,25 +47,28 @@ export default function TipoUnidade() {
       >
         <View style={{ flex: 1, width: "100%", justifyContent: "center" }}>
           <View style={globalStyles.labelInputContainer}>
-            <Text style={globalStyles.label}>TIPO: *</Text>
+            <Text style={globalStyles.label}>CIDADE: *</Text>
             <TextInput
               style={globalStyles.inputEditar}
-              placeholder="Tipo"
+              placeholder="Cidade"
               placeholderTextColor="#888"
-              value={tipo}
-              onChangeText={(text) => setTipo(text)}
+              value={cidade}
+              onChangeText={(text) => setCidade(text)}
             />
           </View>
         </View>
         <View style={globalStyles.buttonRowContainer}>
           <TouchableOpacity
             style={[globalStyles.button, { flex: 1 }]}
-            onPress={registrarTipoUnidade}
+            onPress={registrarEndereco}
           >
             <Text style={globalStyles.buttonText}>Salvar</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[globalStyles.buttonCancelar, { flex: 1 }]}
+            style={[
+              globalStyles.buttonCancelar,
+              { flex: 1 },
+            ]}
             onPress={() => router.back()}
           >
             <Text style={globalStyles.buttonText}>Cancelar</Text>
