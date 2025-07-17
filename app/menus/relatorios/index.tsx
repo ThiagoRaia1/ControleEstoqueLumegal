@@ -707,7 +707,7 @@ const styles = StyleSheet.create({
   buttonsView: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     width: "100%",
     gap: 20,
   },

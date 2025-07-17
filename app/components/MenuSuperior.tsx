@@ -33,7 +33,6 @@ export default function MenuSuperior({ style = {} }) {
           paddingHorizontal: 10,
           marginBottom: 20,
           backgroundColor: "black",
-          boxShadow: "0px 5px 5px rgba(0, 0, 0, 0.8)",
         },
         tipoAcesso !== acessoComprasAdm &&
           tipoAcesso !== acessoAlmoxarifadoAdm && {

@@ -9,6 +9,7 @@ import { useState } from "react";
 import { router } from "expo-router";
 import { registrarTipoUnidadeApi } from "../../../../../services/tipoUnidadeApi";
 import { ICriarTipoUnidade } from "../../../../../interfaces/tipoUnidade";
+import normalizeInsert from "../../../../../utils/normalizeInsert";
 
 export default function TipoUnidade() {
   const { theme } = useThemeContext();
@@ -54,7 +55,7 @@ export default function TipoUnidade() {
               placeholder="Tipo"
               placeholderTextColor="#888"
               value={tipo}
-              onChangeText={(text) => setTipo(text)}
+              onChangeText={(text) => setTipo(normalizeInsert(text))}
             />
           </View>
         </View>

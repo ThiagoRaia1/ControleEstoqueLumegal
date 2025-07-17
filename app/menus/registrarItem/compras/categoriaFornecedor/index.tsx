@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import { nomePaginas } from "../../../../../utils/nomePaginas";
 import { ICriarCategoriaFornecedor } from "../../../../../interfaces/categoriaFornecedor";
 import { registrarCategoriaFornecedorApi } from "../../../../../services/categoriaFornecedorApi";
+import normalizeInsert from "../../../../../utils/normalizeInsert";
 
 export default function CategoriaFornecedor() {
   const { theme } = useThemeContext();
@@ -54,7 +55,7 @@ export default function CategoriaFornecedor() {
               placeholder="Categoria do fornecedor"
               placeholderTextColor="#888"
               value={categoria}
-              onChangeText={(text) => setCategoria(text)}
+              onChangeText={(text) => setCategoria(normalizeInsert(text))}
             />
           </View>
         </View>
@@ -66,10 +67,7 @@ export default function CategoriaFornecedor() {
             <Text style={globalStyles.buttonText}>Salvar</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              globalStyles.buttonCancelar,
-              { flex: 1 },
-            ]}
+            style={[globalStyles.buttonCancelar, { flex: 1 }]}
             onPress={() => router.back()}
           >
             <Text style={globalStyles.buttonText}>Cancelar</Text>

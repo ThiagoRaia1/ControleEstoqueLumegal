@@ -171,10 +171,11 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       backgroundColor: theme === "light" ? "white" : "#5e5e5e",
     },
     scrollContentForm: {
-      flex: 1,
+      flexGrow: 1,
       gap: 20,
       paddingHorizontal: 10,
       justifyContent: "center",
+      marginBottom: 20
     },
     // Exibição
     item: {

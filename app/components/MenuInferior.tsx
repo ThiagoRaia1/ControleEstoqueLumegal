@@ -81,7 +81,9 @@ export default function MenuInferior() {
   const translateX = useRef(new Animated.Value(prevIndex * itemWidth)).current;
 
   useEffect(() => {
-    const activeIndex = menuItems.findIndex((item) => item.href === pathname);
+    const activeIndex = menuItems.findIndex((item) =>
+      pathname.startsWith(item.href)
+    );
     Animated.timing(translateX, {
       toValue: activeIndex * itemWidth,
       duration: 250,
@@ -91,7 +93,7 @@ export default function MenuInferior() {
     prevIndex = activeIndex;
   }, [pathname, itemWidth]);
 
-  const isActive = (route: string) => pathname === route;
+  const isActive = (route: string) => pathname.startsWith(route);
 
   return (
     <View
@@ -114,7 +116,7 @@ export default function MenuInferior() {
       {menuItems.map(({ href, icon, label }) => {
         const active = isActive(href);
         return (
-          <Link key={href} href={href} asChild>
+          <Link key={href} href={href} asChild style={{ zIndex: 999 }}>
             <TouchableOpacity
               style={{
                 justifyContent: "center",
@@ -154,7 +156,6 @@ const styles = StyleSheet.create({
     height: 70,
     flexDirection: "row",
     alignItems: "center",
-    boxShadow: "0px -5px 5px rgba(0, 0, 0, 0.8)",
   },
   text: {
     color: "white",

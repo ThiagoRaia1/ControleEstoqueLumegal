@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import { ICriarEndereco } from "../../../../../interfaces/endereco";
 import { registrarEnderecoApi } from "../../../../../services/enderecoApi";
 import { nomePaginas } from "../../../../../utils/nomePaginas";
+import normalizeInsert from "../../../../../utils/normalizeInsert";
 
 export default function Endereco() {
   const { theme } = useThemeContext();
@@ -24,9 +25,7 @@ export default function Endereco() {
         cidade: cidade.trim(),
       };
       setCarregando(true);
-      console.log(endereco);
       const resultado = await registrarEnderecoApi(endereco);
-      console.log(resultado)
       alert("Endereço registrado com sucesso!");
       router.push(nomePaginas.registrarItem.main);
     } catch (erro: any) {
@@ -53,7 +52,7 @@ export default function Endereco() {
               placeholder="Cidade"
               placeholderTextColor="#888"
               value={cidade}
-              onChangeText={(text) => setCidade(text)}
+              onChangeText={(text) => setCidade(normalizeInsert(text))}
             />
           </View>
         </View>
@@ -65,10 +64,7 @@ export default function Endereco() {
             <Text style={globalStyles.buttonText}>Salvar</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              globalStyles.buttonCancelar,
-              { flex: 1 },
-            ]}
+            style={[globalStyles.buttonCancelar, { flex: 1 }]}
             onPress={() => router.back()}
           >
             <Text style={globalStyles.buttonText}>Cancelar</Text>

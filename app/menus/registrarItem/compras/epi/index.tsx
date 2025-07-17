@@ -34,6 +34,7 @@ import {
   useTipoAcessoContext,
 } from "../../../../../context/tipoAcessoContext";
 import MenuSuperior from "../../../../components/MenuSuperior";
+import normalizeInsert from "../../../../../utils/normalizeInsert";
 
 export default function Epi() {
   const { tipoAcesso } = useTipoAcessoContext();
@@ -50,6 +51,7 @@ export default function Epi() {
   const [quantidade, setQuantidade] = useState("");
   const [quantidadeParaAviso, setQuantidadeParaAviso] = useState("");
   const [preco, setPreco] = useState("");
+  const [ipi, setIpi] = useState("");
 
   // Estado com lista completa de fornecedores vindos do backend
   const [fornecedoresDisponiveis, setFornecedoresDisponiveis] = useState<
@@ -145,6 +147,7 @@ export default function Epi() {
         tipoUnidadeId: tipoUnidadeId.id,
         fornecedores: fornecedoresIds,
         preco: formatarPrecoParaEnvio(preco),
+        ipi: ipi !== "" ? parseFloat(ipi) : undefined,
       };
 
       const retornoDaApi = await registrarEpiApi(epi);
@@ -159,6 +162,7 @@ export default function Epi() {
       setQuantidade("");
       setQuantidadeParaAviso("");
       setPreco("");
+      setIpi("")
     } catch (erro: any) {
       alert(erro.message);
     } finally {
@@ -191,7 +195,9 @@ export default function Epi() {
               placeholder="Nome do EPI"
               placeholderTextColor="#888"
               value={nome}
-              onChangeText={(text) => setNome(text.slice(0, 30))}
+              onChangeText={(text) =>
+                setNome(normalizeInsert(text.slice(0, 30)))
+              }
             />
           </View>
 
@@ -203,7 +209,7 @@ export default function Epi() {
               placeholderTextColor="#888"
               value={certificadoAprovacao}
               onChangeText={(text) =>
-                setCertificadoAprovacao(text.slice(0, 20))
+                setCertificadoAprovacao(normalizeInsert(text.slice(0, 20)))
               }
             />
           </View>
@@ -215,7 +221,7 @@ export default function Epi() {
               placeholder="Descrição do EPI"
               placeholderTextColor="#888"
               value={descricao}
-              onChangeText={(text) => setDescricao(text)}
+              onChangeText={(text) => setDescricao(normalizeInsert(text))}
             />
           </View>
 
@@ -408,30 +414,74 @@ export default function Epi() {
                 }}
               />
             </View>
-            {[acessoCompras, acessoComprasAdm].includes(tipoAcesso) && (
-              <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
-                <Text style={globalStyles.label}>PRECO:</Text>
-                <MaskInput
-                  style={globalStyles.inputEditar}
-                  placeholder="Preço médio do item"
-                  placeholderTextColor="#888"
-                  value={preco}
-                  onChangeText={(masked, unmasked) => {
-                    // Limpa e converte para centavos
-                    const numeric = parseInt(unmasked || "0", 10);
+            <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
+              <Text style={globalStyles.label}>PRECO:</Text>
+              <MaskInput
+                style={globalStyles.inputEditar}
+                placeholder="Preço médio do item"
+                placeholderTextColor="#888"
+                value={preco}
+                onChangeText={(masked, unmasked) => {
+                  const centavos = parseInt(unmasked || "0", 10);
 
-                    if (numeric > 999999) {
-                      // Se for maior que 999999 centavos (ou R$ 9999,99), ignora a mudança
-                      setPreco("999999");
-                      return;
-                    }
+                  // Limite de R$ 9999,99 (999999 centavos)
+                  if (centavos > 999999) return;
 
-                    setPreco(masked);
+                  const reais = (centavos / 100).toFixed(2); // ex: 1 => "0.01", 10 => "0.10", 100 => "1.00"
+                  setPreco(reais);
+                }}
+                mask={Masks.BRL_CURRENCY}
+              />
+            </View>
+            <View style={[globalStyles.labelInputContainer, { flex: 1 }]}>
+              <Text style={globalStyles.label}>IPI:</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  height: 50,
+                  width: "100%",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  borderColor: theme === "light" ? "black" : "white",
+                  boxShadow:
+                    theme === "light"
+                      ? "0px 5px 10px rgba(0, 0, 0, 0.8)"
+                      : "0px 5px 10px rgba(140, 140, 140, 0.8)",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <TextInput
+                  style={{
+                    width: "80%",
+                    height: "100%",
+                    outlineStyle: "none" as any,
+                    fontSize: 16,
                   }}
-                  mask={Masks.BRL_CURRENCY}
+                  placeholder="IPI do item"
+                  placeholderTextColor="#888"
+                  value={ipi}
+                  onChangeText={(text) => {
+                    // Permite números e vírgula/ponto (substitui vírgula por ponto)
+                    const sanitized = text
+                      .replace(/[^0-9.,]/g, "") // mantém números, vírgula e ponto
+                      .replace(",", "."); // padroniza como ponto
+
+                    // Verifica se é um número válido
+                    const parsed = parseFloat(sanitized);
+
+                    // Atualiza apenas se for um número válido ou vazio
+                    if (!isNaN(parsed)) {
+                      setIpi(sanitized);
+                    } else if (sanitized === "") {
+                      setIpi("");
+                    }
+                  }}
+                  keyboardType="decimal-pad"
                 />
+                <Text style={{}}>%</Text>
               </View>
-            )}
+            </View>
           </View>
         </ScrollView>
         <View style={globalStyles.buttonRowContainer}>

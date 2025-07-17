@@ -33,6 +33,7 @@ import {
   useTipoAcessoContext,
 } from "../../../../../context/tipoAcessoContext";
 import MenuSuperior from "../../../../components/MenuSuperior";
+import normalizeInsert from "../../../../../utils/normalizeInsert";
 
 export default function Epi() {
   const { tipoAcesso } = useTipoAcessoContext();
@@ -190,7 +191,9 @@ export default function Epi() {
               placeholder="Nome do EPI"
               placeholderTextColor="#888"
               value={nome}
-              onChangeText={(text) => setNome(text.slice(0, 30))}
+              onChangeText={(text) =>
+                setNome(normalizeInsert(text.slice(0, 30)))
+              }
             />
           </View>
 
@@ -202,7 +205,7 @@ export default function Epi() {
               placeholderTextColor="#888"
               value={certificadoAprovacao}
               onChangeText={(text) =>
-                setCertificadoAprovacao(text.slice(0, 20))
+                setCertificadoAprovacao(normalizeInsert(text.slice(0, 20)))
               }
             />
           </View>
@@ -214,7 +217,7 @@ export default function Epi() {
               placeholder="Descrição do EPI"
               placeholderTextColor="#888"
               value={descricao}
-              onChangeText={(text) => setDescricao(text)}
+              onChangeText={(text) => setDescricao(normalizeInsert(text))}
             />
           </View>
 

@@ -10,6 +10,7 @@ export interface ISuprimento {
   tipoUnidade: ITipoUnidade;
   fornecedores: IFornecedor[];
   preco?: string;
+  ipi?: number;
 }
 
 export interface ICriarSuprimento {
@@ -20,4 +21,5 @@ export interface ICriarSuprimento {
   tipoUnidadeId: number;
   fornecedores?: number[];
   preco?: string;
+  ipi?: number;
 }

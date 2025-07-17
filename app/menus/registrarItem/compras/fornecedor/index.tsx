@@ -21,6 +21,7 @@ import {
 import { nomePaginas } from "../../../../../utils/nomePaginas";
 import { registrarFornecedorApi } from "../../../../../services/fornecedorApi";
 import { ICategoriaFornecedor } from "../../../../../interfaces/categoriaFornecedor";
+import normalizeInsert from "../../../../../utils/normalizeInsert";
 
 export default function Fornecedor() {
   const { theme } = useThemeContext();
@@ -146,7 +147,7 @@ export default function Fornecedor() {
               placeholder="Nome"
               placeholderTextColor="#888"
               value={nome}
-              onChangeText={(text) => setNome(text)}
+              onChangeText={(text) => setNome(normalizeInsert(text))}
             />
           </View>
 

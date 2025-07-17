@@ -10,7 +10,8 @@ export interface IEpi {
   quantidadeParaAviso: number;
   tipoUnidade: ITipoUnidade;
   fornecedores: IFornecedor[];
-  preco?: string
+  preco?: string;
+  ipi?: number;
 }
 
 export interface ICriarEpi {
@@ -21,5 +22,6 @@ export interface ICriarEpi {
   quantidadeParaAviso: number;
   tipoUnidadeId: number;
   fornecedores?: number[];
-  preco?: string
+  preco?: string;
+  ipi?: number;
 }
