@@ -18,7 +18,6 @@ import {
   acessoAlmoxarifadoAdm,
   acessoCompras,
   acessoComprasAdm,
-  TipoAcessoType,
   TokenPayload,
   useTipoAcessoContext,
 } from "../context/tipoAcessoContext";

@@ -10,7 +10,6 @@ import * as Animatable from "react-native-animatable";
 import { useEffect, useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useThemeContext } from "../../../../context/ThemeContext";
-import { useTipoAcessoContext } from "../../../../context/tipoAcessoContext";
 import { getGlobalStyles } from "../../../../globalStyles";
 import { IMovimentacaoItem } from "../../../../interfaces/entradaSaida";
 import { IEpi } from "../../../../interfaces/epi";
@@ -140,7 +139,6 @@ function RenderItem({
 }
 
 export default function EntradaSaida() {
-  const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);

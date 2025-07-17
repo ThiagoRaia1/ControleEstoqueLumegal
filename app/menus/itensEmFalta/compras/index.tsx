@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../../context/auth";

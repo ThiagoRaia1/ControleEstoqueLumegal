@@ -11,7 +11,7 @@ import MenuInferior from "../../components/MenuInferior";
 import { useThemeContext } from "../../../context/ThemeContext";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Carregando from "../../components/Carregando";
 import {
   getEntradasSaidasEpi,

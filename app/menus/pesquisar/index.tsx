@@ -32,7 +32,6 @@ import {
   getSuprimentos,
 } from "../../../services/suprimentoApi";
 import { ISuprimento } from "../../../interfaces/suprimento";
-import { useAuth } from "../../../context/auth";
 import MaskInput, { Masks } from "react-native-mask-input";
 import {
   acessoCompras,
@@ -84,22 +83,30 @@ export default function Pesquisar() {
 
   useEffect(() => {
     async function carregarDados() {
-      const listaTiposUnidadeDisponiveis = await getTiposUnidade();
-      const itensTiposUnidade = listaTiposUnidadeDisponiveis.map(
-        (f: ITipoUnidade) => ({
-          label: f.tipo,
-          value: f.tipo, // use f.id se quiser o ID como value
-        })
-      );
-      setTiposUnidadeDisponiveis(itensTiposUnidade);
+      try {
+        setCarregando(true);
+        const listaTiposUnidadeDisponiveis = await getTiposUnidade();
+        const itensTiposUnidade = listaTiposUnidadeDisponiveis.map(
+          (f: ITipoUnidade) => ({
+            label: f.tipo,
+            value: f.tipo, // use f.id se quiser o ID como value
+          })
+        );
+        setTiposUnidadeDisponiveis(itensTiposUnidade);
 
-      const listaFornecedores = await getFornecedores();
-      const itensFornecedores = listaFornecedores.map((f: IFornecedor) => ({
-        label: f.nome,
-        value: f.nome, // use f.id se quiser o ID como value
-      }));
-      setFornecedoresDisponiveis(itensFornecedores);
+        const listaFornecedores = await getFornecedores();
+        const itensFornecedores = listaFornecedores.map((f: IFornecedor) => ({
+          label: f.nome,
+          value: f.nome, // use f.id se quiser o ID como value
+        }));
+        setFornecedoresDisponiveis(itensFornecedores);
+      } catch (erro: any) {
+        alert(erro.message);
+      } finally {
+        setCarregando(false);
+      }
     }
+
     carregarDados();
   }, []);
 

@@ -1,6 +1,4 @@
-import { router } from "expo-router";
 import { createContext, useContext, ReactNode, useState } from "react";
-import { nomePaginas } from "../utils/nomePaginas";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTipoAcessoContext } from "./tipoAcessoContext";
 

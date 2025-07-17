@@ -1,13 +1,9 @@
 import { View, ActivityIndicator, StyleSheet, Modal } from "react-native";
 
-type CarregandoProps = {
-  borda?: number;
-};
-
-export default function Carregando({ borda = 0 }: CarregandoProps) {
+export default function Carregando() {
   return (
     <Modal transparent={true} statusBarTranslucent={true}>
-      <View style={[styles.overlay, { borderRadius: borda }]}>
+      <View style={styles.overlay}>
         <ActivityIndicator size="large" color="#000" />
       </View>
     </Modal>

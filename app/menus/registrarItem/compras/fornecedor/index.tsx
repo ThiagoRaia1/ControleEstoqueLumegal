@@ -248,7 +248,7 @@ export default function Fornecedor() {
                   style={globalStyles.button}
                 >
                   <Text style={globalStyles.buttonText}>
-                    Adicionar fornecedor
+                    Adicionar endereço
                   </Text>
                 </TouchableOpacity>
               )}

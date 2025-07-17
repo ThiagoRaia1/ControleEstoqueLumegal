@@ -16,7 +16,7 @@ import {
 import { useAuth } from "../../context/auth";
 import { router } from "expo-router";
 
-export default function MenuSuperior({ style = {} }) {
+export default function MenuSuperior() {
   const { logout } = useAuth();
   const { tipoAcesso, setTipoAcesso } = useTipoAcessoContext();
   const { theme, toggleTheme } = useThemeContext();
