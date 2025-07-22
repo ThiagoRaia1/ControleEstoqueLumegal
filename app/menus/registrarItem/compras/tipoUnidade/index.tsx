@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, Modal } from "react-native";
 import * as Animatable from "react-native-animatable";
 import MenuSuperior from "../../../../components/MenuSuperior";
 import { useThemeContext } from "../../../../../context/ThemeContext";
@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import { registrarTipoUnidadeApi } from "../../../../../services/tipoUnidadeApi";
 import { ICriarTipoUnidade } from "../../../../../interfaces/tipoUnidade";
 import normalizeInsert from "../../../../../utils/normalizeInsert";
+import { nomePaginas } from "../../../../../utils/nomePaginas";
 
 export default function TipoUnidade() {
   const { theme } = useThemeContext();
@@ -31,6 +32,7 @@ export default function TipoUnidade() {
       const retornoDaApi = await registrarTipoUnidadeApi(tipoUnidade);
       alert("Tipo de unidade registrado com sucesso!");
       setTipo("");
+      router.push(nomePaginas.registrarItem.main);
     } catch (erro: any) {
       alert(erro.message);
     } finally {

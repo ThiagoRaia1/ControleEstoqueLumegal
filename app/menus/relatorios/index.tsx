@@ -370,14 +370,14 @@ export default function Relatorios() {
 
         // --- Tabela 1 Epi: Detalhada ---
         const columnsEpi = [
-          { header: "idEntradaSaida", dataKey: "id" },
+          // { header: "idEntradaSaida", dataKey: "id" },
           { header: "EPI", dataKey: "epi" },
           { header: "Quantidade", dataKey: "quantidade" },
           { header: "Data", dataKey: "data" },
         ];
 
         const rowsEpi = entradasSaidasEpi.map((entrada) => ({
-          id: entrada.id,
+          // id: entrada.id,
           epi: entrada.epi.nome,
           quantidade: entrada.quantidade,
           data: new Date(entrada.data).toLocaleString("pt-BR"),
@@ -434,14 +434,14 @@ export default function Relatorios() {
         if ([acessoCompras, acessoComprasAdm].includes(tipoAcesso)) {
           // --- Tabela 1 Suprimento: Detalhada ---
           const columnsSuprimento = [
-            { header: "idEntradaSaida", dataKey: "id" },
+            // { header: "idEntradaSaida", dataKey: "id" },
             { header: "Suprimento", dataKey: "suprimento" },
             { header: "Quantidade", dataKey: "quantidade" },
             { header: "Data", dataKey: "data" },
           ];
 
           const rowsSuprimento = entradasSaidasSuprimento.map((entrada) => ({
-            id: entrada.id,
+            // id: entrada.id,
             suprimento: entrada.suprimento.nome,
             quantidade: entrada.quantidade,
             data: new Date(entrada.data).toLocaleString("pt-BR"),
@@ -542,7 +542,17 @@ export default function Relatorios() {
           },
         ]}
       >
-        <View style={[styles.buttonsView, { alignItems: "flex-end" }]}>
+        <View
+          style={[
+            styles.buttonsView,
+            {
+              alignItems: "flex-end",
+              flexWrap: "wrap",
+              gap: 50,
+              alignContent: "flex-end",
+            },
+          ]}
+        >
           <View style={styles.alignButtons}>
             <Text
               style={[
@@ -703,6 +713,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: "center",
     gap: 10,
+    height: 50,
   },
   buttonsView: {
     flex: 1,

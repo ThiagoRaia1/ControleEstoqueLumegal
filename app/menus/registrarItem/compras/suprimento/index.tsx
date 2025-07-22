@@ -29,6 +29,7 @@ import MaskInput, { Masks } from "react-native-mask-input";
 import { ICriarSuprimento } from "../../../../../interfaces/suprimento";
 import { registrarSuprimentoApi } from "../../../../../services/suprimentoApi";
 import normalizeInsert from "../../../../../utils/normalizeInsert";
+import { nomePaginas } from "../../../../../utils/nomePaginas";
 
 export default function Suprimento() {
   const { theme } = useThemeContext();
@@ -58,17 +59,23 @@ export default function Suprimento() {
   useEffect(() => {
     async function carregarDados() {
       const listaTiposUnidadeDisponiveis = await getTiposUnidade();
-      const itensTiposUnidade = listaTiposUnidadeDisponiveis.map((f: any) => ({
-        label: f.tipo,
-        value: f.tipo, // use f.id se quiser o ID como value
-      }));
+      const itensTiposUnidade = listaTiposUnidadeDisponiveis
+        .map((f: any) => ({
+          label: f.tipo,
+          value: f.tipo,
+        }))
+        .sort((a: any, b: any) => a.label.localeCompare(b.label)); // ordena por nome
+
       setTiposUnidadeDisponiveis(itensTiposUnidade);
 
       const listaFornecedores = await getFornecedores();
-      const itensFornecedores = listaFornecedores.map((f: any) => ({
-        label: f.nome,
-        value: f.nome, // use f.id se quiser o ID como value
-      }));
+      const itensFornecedores = listaFornecedores
+        .map((f: any) => ({
+          label: f.nome,
+          value: f.nome,
+        }))
+        .sort((a: any, b: any) => a.label.localeCompare(b.label)); // ordena por nome
+
       setFornecedoresDisponiveis(itensFornecedores);
     }
     carregarDados();
@@ -155,6 +162,7 @@ export default function Suprimento() {
       setQuantidadeParaAviso("");
       setPreco("");
       setIpi("");
+      router.push(nomePaginas.registrarItem.main);
     } catch (erro: any) {
       alert(erro.message);
     } finally {
@@ -436,6 +444,7 @@ export default function Suprimento() {
                     height: "100%",
                     outlineStyle: "none" as any,
                     fontSize: 16,
+                    color: theme === "light" ? "black" : "white",
                   }}
                   placeholder="IPI do item"
                   placeholderTextColor="#888"
@@ -458,7 +467,13 @@ export default function Suprimento() {
                   }}
                   keyboardType="decimal-pad"
                 />
-                <Text style={{}}>%</Text>
+                <Text
+                  style={{
+                    color: theme === "light" ? "black" : "white",
+                  }}
+                >
+                  %
+                </Text>
               </View>
             </View>
           </View>

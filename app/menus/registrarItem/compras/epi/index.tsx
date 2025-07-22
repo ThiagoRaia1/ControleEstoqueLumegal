@@ -25,15 +25,17 @@ import {
 } from "../../../../../services/tipoUnidadeApi";
 import Carregando from "../../../../components/Carregando";
 import MenuInferior from "../../../../components/MenuInferior";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 import MaskInput, { Masks } from "react-native-mask-input";
 import {
+  acessoAlmoxarifadoAdm,
   acessoCompras,
   acessoComprasAdm,
   useTipoAcessoContext,
 } from "../../../../../context/tipoAcessoContext";
 import MenuSuperior from "../../../../components/MenuSuperior";
 import normalizeInsert from "../../../../../utils/normalizeInsert";
+import { nomePaginas } from "../../../../../utils/nomePaginas";
 
 export default function Epi() {
   const { tipoAcesso } = useTipoAcessoContext();
@@ -65,17 +67,23 @@ export default function Epi() {
   useEffect(() => {
     async function carregarDados() {
       const listaTiposUnidadeDisponiveis = await getTiposUnidade();
-      const itensTiposUnidade = listaTiposUnidadeDisponiveis.map((f: any) => ({
-        label: f.tipo,
-        value: f.tipo, // use f.id se quiser o ID como value
-      }));
+      const itensTiposUnidade = listaTiposUnidadeDisponiveis
+        .map((f: any) => ({
+          label: f.tipo,
+          value: f.tipo,
+        }))
+        .sort((a: any, b: any) => a.label.localeCompare(b.label)); // ordena por nome
+
       setTiposUnidadeDisponiveis(itensTiposUnidade);
 
       const listaFornecedores = await getFornecedores();
-      const itensFornecedores = listaFornecedores.map((f: any) => ({
-        label: f.nome,
-        value: f.nome, // use f.id se quiser o ID como value
-      }));
+      const itensFornecedores = listaFornecedores
+        .map((f: any) => ({
+          label: f.nome,
+          value: f.nome,
+        }))
+        .sort((a: any, b: any) => a.label.localeCompare(b.label)); // ordena por nome
+
       setFornecedoresDisponiveis(itensFornecedores);
     }
     carregarDados();
@@ -161,13 +169,35 @@ export default function Epi() {
       setQuantidade("");
       setQuantidadeParaAviso("");
       setPreco("");
-      setIpi("")
+      setIpi("");
+      router.push(nomePaginas.registrarItem.main);
     } catch (erro: any) {
       alert(erro.message);
     } finally {
       setCarregando(false);
     }
   };
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (
+      tipoAcesso === acessoComprasAdm &&
+      pathname !== nomePaginas.registrarItem.compras.registrarComprasEpi
+    ) {
+      router.replace(nomePaginas.registrarItem.compras.registrarComprasEpi);
+    }
+
+    if (
+      tipoAcesso === acessoAlmoxarifadoAdm &&
+      pathname !==
+        nomePaginas.registrarItem.almoxarifado.registrarAlmoxarifadoEpi
+    ) {
+      router.replace(
+        nomePaginas.registrarItem.almoxarifado.registrarAlmoxarifadoEpi
+      );
+    }
+  }, [tipoAcesso, pathname]);
 
   return (
     <View style={globalStyles.background}>
@@ -456,6 +486,7 @@ export default function Epi() {
                     height: "100%",
                     outlineStyle: "none" as any,
                     fontSize: 16,
+                    color: theme === "light" ? "black" : "white",
                   }}
                   placeholder="IPI do item"
                   placeholderTextColor="#888"
@@ -478,7 +509,9 @@ export default function Epi() {
                   }}
                   keyboardType="decimal-pad"
                 />
-                <Text style={{}}>%</Text>
+                <Text style={{ color: theme === "light" ? "black" : "white" }}>
+                  %
+                </Text>
               </View>
             </View>
           </View>
@@ -493,7 +526,7 @@ export default function Epi() {
           {[acessoCompras, acessoComprasAdm].includes(tipoAcesso) && (
             <TouchableOpacity
               style={[globalStyles.buttonCancelar, { flex: 1 }]}
-              onPress={() => router.back()}
+              onPress={() => router.push(nomePaginas.registrarItem.main)}
             >
               <Text style={globalStyles.buttonText}>Cancelar</Text>
             </TouchableOpacity>

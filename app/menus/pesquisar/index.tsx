@@ -791,7 +791,13 @@ export default function Pesquisar() {
                           }}
                           keyboardType="decimal-pad"
                         />
-                        <Text style={{}}>%</Text>
+                        <Text
+                          style={{
+                            color: theme === "light" ? "black" : "white",
+                          }}
+                        >
+                          %
+                        </Text>
                       </View>
                     </View>
                   </>

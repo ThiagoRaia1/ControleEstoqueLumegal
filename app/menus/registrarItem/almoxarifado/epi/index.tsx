@@ -25,9 +25,10 @@ import {
 } from "../../../../../services/tipoUnidadeApi";
 import Carregando from "../../../../components/Carregando";
 import MenuInferior from "../../../../components/MenuInferior";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 import MaskInput, { Masks } from "react-native-mask-input";
 import {
+  acessoAlmoxarifadoAdm,
   acessoCompras,
   acessoComprasAdm,
   useTipoAcessoContext,
@@ -61,20 +62,44 @@ export default function Epi() {
     { label: string; value: string }[]
   >([]);
 
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (
+      tipoAcesso === acessoComprasAdm &&
+      pathname !== "/menus/registrarItem/compras/epi"
+    ) {
+      router.replace("/menus/registrarItem/compras/epi");
+    }
+
+    if (
+      tipoAcesso === acessoAlmoxarifadoAdm &&
+      pathname !== "/menus/registrarItem/almoxarifado/epi"
+    ) {
+      router.replace("/menus/registrarItem/almoxarifado/epi");
+    }
+  }, [tipoAcesso, pathname]);
+
   useEffect(() => {
     async function carregarDados() {
       const listaTiposUnidadeDisponiveis = await getTiposUnidade();
-      const itensTiposUnidade = listaTiposUnidadeDisponiveis.map((f: any) => ({
-        label: f.tipo,
-        value: f.tipo, // use f.id se quiser o ID como value
-      }));
+      const itensTiposUnidade = listaTiposUnidadeDisponiveis
+        .map((f: any) => ({
+          label: f.tipo,
+          value: f.tipo,
+        }))
+        .sort((a: any, b: any) => a.label.localeCompare(b.label)); // ordena por nome
+
       setTiposUnidadeDisponiveis(itensTiposUnidade);
 
       const listaFornecedores = await getFornecedores();
-      const itensFornecedores = listaFornecedores.map((f: any) => ({
-        label: f.nome,
-        value: f.nome, // use f.id se quiser o ID como value
-      }));
+      const itensFornecedores = listaFornecedores
+        .map((f: any) => ({
+          label: f.nome,
+          value: f.nome,
+        }))
+        .sort((a: any, b: any) => a.label.localeCompare(b.label)); // ordena por nome
+
       setFornecedoresDisponiveis(itensFornecedores);
     }
     carregarDados();

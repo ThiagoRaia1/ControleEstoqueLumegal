@@ -102,7 +102,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      width: "100%",
+      flex: 1,
       minWidth: 300,
       height: 50,
       gap: 10,
