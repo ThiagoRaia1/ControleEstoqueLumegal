@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   TextInput,
   useWindowDimensions,
+  StyleSheet,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
@@ -340,67 +341,106 @@ export default function Pesquisar() {
     const isEpi = item.tipo === "epi";
 
     return (
-      <View style={globalStyles.item}>
-        <View style={globalStyles.leftSide}>
-          <ScrollView
-            contentContainerStyle={{ paddingRight: 10, borderRadius: 20 }}
+      <View
+        style={{
+          backgroundColor: theme === "light" ? "#fff" : "#1e1e1e",
+          borderRadius: 12,
+          padding: 16,
+          shadowColor: "#000",
+          shadowOpacity: 0.1,
+          shadowOffset: { width: 0, height: 2 },
+          shadowRadius: 4,
+          elevation: 3,
+          flexDirection: "column",
+          gap: 12,
+          borderWidth: 1,
+          borderColor: theme === "light" ? "#888" : "white",
+        }}
+      >
+        <View>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "bold",
+              color: theme === "light" ? "#000" : "#fff",
+              marginBottom: 4,
+            }}
           >
-            <Text style={globalStyles.dadosEpiText}>Nome: {item.nome}</Text>
+            {item.nome}
+          </Text>
+          <Text style={[globalStyles.dadosItem, { marginLeft: -3 }]}>
+            {isEpi ? "🧤 EPI" : "📦 Suprimento"}
+          </Text>
+          {isEpi && (
+            <Text
+              style={{
+                color: theme === "light" ? "black" : "#888",
+                fontWeight: "500",
+                fontSize: 14,
+                marginBottom: 4,
+              }}
+            >
+              C.A.: {(item as IEpi).certificadoAprovacao}
+            </Text>
+          )}
+          <Text style={globalStyles.dadosItem}>
+            Unidade: {item.tipoUnidade.tipo}
+          </Text>
+          <Text style={globalStyles.dadosItem}>
+            Quantidade: {item.quantidade} | Aviso: {item.quantidadeParaAviso}
+          </Text>
+        </View>
 
-            {isEpi && (
-              <Text style={globalStyles.dadosEpiText}>
-                C.A.: {(item as IEpi).certificadoAprovacao}
-              </Text>
-            )}
+        {item.descricao?.trim() !== "" && (
+          <View>
+            <Text style={[globalStyles.dadosItem, { fontWeight: "bold" }]}>
+              Descrição:
+            </Text>
+            <Text style={[globalStyles.dadosItem, { textAlign: "justify" }]}>
+              {item.descricao}
+            </Text>
+          </View>
+        )}
 
-            <Text style={globalStyles.dadosEpiText}>
-              Unidade/Par: {item.tipoUnidade.tipo}
-            </Text>
-            <Text style={globalStyles.dadosEpiText}>
-              Quantidade: {item.quantidade}
-            </Text>
-            <Text style={globalStyles.dadosEpiText}>
-              Quantidade para aviso: {item.quantidadeParaAviso}
-            </Text>
-            <Text style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}>
+        {item.fornecedores?.length > 0 && (
+          <View>
+            <Text
+              style={[
+                globalStyles.dadosItem,
+                { fontWeight: "bold", marginBottom: 0 },
+              ]}
+            >
               Fornecedores:
             </Text>
             {item.fornecedores.slice(0, 3).map((fornecedor, index) => (
-              <Text
-                key={index}
-                style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}
-              >
-                {"    -"} {fornecedor.nome}
+              <Text key={index} style={globalStyles.dadosItem}>
+                • {fornecedor.nome}
               </Text>
             ))}
-          </ScrollView>
-        </View>
-
-        <View style={globalStyles.rightSide}>
-          <Text style={[globalStyles.dadosEpiText, { marginBottom: -5 }]}>
-            Descrição:
-          </Text>
-          <ScrollView
-            contentContainerStyle={{ paddingRight: 10, borderRadius: 20 }}
-          >
-            <Text
-              style={[
-                globalStyles.dadosEpiText,
-                { flex: 1, marginBottom: 0, textAlign: "justify" },
-              ]}
-            >
-              {item.descricao}
-            </Text>
-          </ScrollView>
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <TouchableOpacity
-              style={[globalStyles.button, { height: 40 }]}
-              onPress={onEditar}
-            >
-              <Text style={globalStyles.buttonText}>Editar</Text>
-            </TouchableOpacity>
           </View>
-        </View>
+        )}
+
+        <TouchableOpacity
+          style={{
+            alignSelf: "flex-end",
+            backgroundColor: theme === "light" ? "#007bff" : "#444",
+            paddingVertical: 8,
+            paddingHorizontal: 16,
+            borderRadius: 8,
+            marginTop: 8,
+          }}
+          onPress={onEditar}
+        >
+          <Text
+            style={{
+              color: "#fff",
+              fontWeight: "bold",
+              fontSize: 14,
+            }}
+          >
+            Editar
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -444,25 +484,26 @@ export default function Pesquisar() {
             )}
             <ScrollView
               style={globalStyles.itensScroll}
-              contentContainerStyle={globalStyles.scrollContent}
-              persistentScrollbar={true}
+              contentContainerStyle={{
+                padding: 20,
+                gap: 20,
+              }}
+              persistentScrollbar
             >
-              <View style={{ padding: 20, gap: 20 }}>
-                {itensFiltrados.map((item: any, index: number) => (
-                  <Animatable.View
-                    key={
-                      "certificadoAprovacao" in item
-                        ? `epi-${item.id}`
-                        : `sup-${item.id}`
-                    }
-                    animation="fadeInUp"
-                    duration={1000}
-                    delay={index * 150}
-                  >
-                    <ItemUnificado item={item} />
-                  </Animatable.View>
-                ))}
-              </View>
+              {itensFiltrados.map((item: any, index: number) => (
+                <Animatable.View
+                  key={
+                    "certificadoAprovacao" in item
+                      ? `epi-${item.id}`
+                      : `sup-${item.id}`
+                  }
+                  animation="fadeInUp"
+                  duration={600}
+                  delay={index * 100}
+                >
+                  <ItemUnificado item={item} />
+                </Animatable.View>
+              ))}
             </ScrollView>
           </>
         ) : (
@@ -834,3 +875,7 @@ export default function Pesquisar() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  dadosItem: {},
+});

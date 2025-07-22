@@ -531,201 +531,175 @@ export default function Relatorios() {
   return (
     <View style={globalStyles.background}>
       <MenuSuperior />
-      <Text style={globalStyles.title}>GERAR RELATÓRIO</Text>
+      <Text
+        style={[globalStyles.title, { textAlign: "center", marginBottom: 20 }]}
+      >
+        GERAR RELATÓRIO
+      </Text>
+
       <Animatable.View
         animation="fadeInUp"
-        duration={1000}
-        style={[
-          globalStyles.mainContent,
-          {
-            gap: 100,
-          },
-        ]}
+        duration={800}
+        style={[globalStyles.mainContent, { gap: 40 }]}
       >
+        {/* Seleção de datas */}
         <View
-          style={[
-            styles.buttonsView,
-            {
-              alignItems: "flex-end",
-              flexWrap: "wrap",
-              gap: 50,
-              alignContent: "flex-end",
-            },
-          ]}
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 30,
+          }}
         >
-          <View style={styles.alignButtons}>
-            <Text
-              style={[
-                {
-                  fontSize: 20,
-                  color: theme === "light" ? "black" : "white",
-                },
-              ]}
-            >
-              Data inicial
-            </Text>
-            {Platform.OS === "web" ? (
-              <input
-                type="date"
-                value={dataInicial.toISOString().split("T")[0]}
-                onChange={(dataInicialStr) => {
-                  const novaData = new Date(dataInicialStr.target.value);
-                  if (!isNaN(novaData.getTime())) setDataInicial(novaData); // evita erro ao digitar
-                }}
-                style={globalStyles.dataPicker}
-              />
-            ) : (
-              <>
-                <TouchableOpacity
-                  onPress={() => setMostrarPickerInicial(true)}
-                  style={[
-                    styles.dataButton,
-                    theme === "light"
-                      ? { borderColor: "black", backgroundColor: "#fff" }
-                      : { borderColor: "white", backgroundColor: "#2a2a2a" },
-                  ]}
-                >
-                  <Text
+          {[
+            {
+              label: "Data Inicial",
+              value: dataInicial,
+              setValue: setDataInicial,
+              mostrar: mostrarPickerInicial,
+              setMostrar: setMostrarPickerInicial,
+            },
+            {
+              label: "Data Final",
+              value: dataFinal,
+              setValue: setDataFinal,
+              mostrar: mostrarPickerFinal,
+              setMostrar: setMostrarPickerFinal,
+            },
+          ].map(({ label, value, setValue, mostrar, setMostrar }, index) => (
+            <View key={index} style={styles.dateCard}>
+              <Text
+                style={[
+                  styles.dateLabel,
+                  { color: theme === "light" ? "#000" : "#fff" },
+                ]}
+              >
+                {label}
+              </Text>
+              {Platform.OS === "web" ? (
+                <input
+                  type="date"
+                  value={value.toISOString().split("T")[0]}
+                  onChange={(e) => {
+                    const novaData = new Date(e.target.value);
+                    if (!isNaN(novaData.getTime())) setValue(novaData);
+                  }}
+                  style={globalStyles.dataPicker}
+                />
+              ) : (
+                <>
+                  <TouchableOpacity
+                    onPress={() => setMostrar(true)}
                     style={[
-                      { fontSize: 16 },
+                      styles.dateTouchable,
                       theme === "light"
-                        ? { color: "black" }
-                        : { color: "white" },
+                        ? styles.lightBorder
+                        : styles.darkBorder,
                     ]}
                   >
-                    {dataInicial.toLocaleDateString("pt-BR")}
-                  </Text>
-                </TouchableOpacity>
-                <DateTimePickerModal
-                  isVisible={mostrarPickerInicial}
-                  mode="date"
-                  date={dataInicial}
-                  onConfirm={(date) => {
-                    setDataInicial(date);
-                    setMostrarPickerInicial(false);
-                  }}
-                  onCancel={() => setMostrarPickerInicial(false)}
-                  locale="pt-BR"
-                  display={Platform.OS === "ios" ? "inline" : "default"}
-                />
-              </>
-            )}
-          </View>
-
-          <View style={styles.alignButtons}>
-            <Text
-              style={[
-                { fontSize: 20 },
-                theme === "light" ? { color: "black" } : { color: "white" },
-              ]}
-            >
-              Data final
-            </Text>
-            {Platform.OS === "web" ? (
-              <input
-                type="date"
-                value={dataFinal.toISOString().split("T")[0]}
-                onChange={(dataFinalStr) => {
-                  const novaData = new Date(dataFinalStr.target.value);
-                  novaData.setHours(23, 59, 59, 59);
-                  if (!isNaN(novaData.getTime())) setDataFinal(novaData); // evita erro ao digitar
-                }}
-                style={globalStyles.dataPicker}
-              />
-            ) : (
-              <>
-                <TouchableOpacity
-                  onPress={() => setMostrarPickerFinal(true)}
-                  style={styles.dataButton}
-                >
-                  <Text
-                    style={[
-                      { fontSize: 16 },
-                      theme === "light"
-                        ? { color: "black" }
-                        : { color: "white" },
-                    ]}
-                  >
-                    {dataFinal.toLocaleDateString("pt-BR")}
-                  </Text>
-                </TouchableOpacity>
-                <DateTimePickerModal
-                  isVisible={mostrarPickerFinal}
-                  mode="date"
-                  date={dataFinal}
-                  onConfirm={(date) => {
-                    setDataFinal(date);
-                    setMostrarPickerFinal(false);
-                  }}
-                  onCancel={() => setMostrarPickerFinal(false)}
-                  locale="pt-BR"
-                  display={Platform.OS === "ios" ? "inline" : "default"}
-                />
-              </>
-            )}
-          </View>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: theme === "light" ? "#000" : "#fff",
+                      }}
+                    >
+                      {value.toLocaleDateString("pt-BR")}
+                    </Text>
+                  </TouchableOpacity>
+                  <DateTimePickerModal
+                    isVisible={mostrar}
+                    mode="date"
+                    date={value}
+                    onConfirm={(date) => {
+                      setValue(date);
+                      setMostrar(false);
+                    }}
+                    onCancel={() => setMostrar(false)}
+                    locale="pt-BR"
+                    display={Platform.OS === "ios" ? "inline" : "default"}
+                  />
+                </>
+              )}
+            </View>
+          ))}
         </View>
 
-        <View style={[styles.buttonsView, { flexWrap: "wrap" }]}>
-          <View style={styles.alignButtons}>
-            <TouchableOpacity
-              style={[
-                globalStyles.optionButton,
-                { maxWidth: 300, justifyContent: "center" },
-              ]}
-              onPress={() => gerarRelatorio("PDF")}
-            >
-              <Text style={globalStyles.optionButtonText}>Gerar PDF</Text>
-              <AntDesign
-                name="pdffile1"
-                size={24}
-                color={theme === "light" ? "black" : "white"}
-              />
-            </TouchableOpacity>
-          </View>
+        {/* Botões de gerar */}
+        <View style={styles.downloadContainer}>
+          <TouchableOpacity
+            style={[styles.downloadButton, { backgroundColor: "#e74c3c" }]}
+            onPress={() => gerarRelatorio("PDF")}
+          >
+            <AntDesign name="pdffile1" size={24} color="#fff" />
+            <Text style={styles.downloadButtonText}>Gerar PDF</Text>
+          </TouchableOpacity>
 
-          <View style={styles.alignButtons}>
-            <TouchableOpacity
-              style={[
-                globalStyles.optionButton,
-                { maxWidth: 300, justifyContent: "center" },
-              ]}
-              onPress={() => gerarRelatorio("XLSX")}
-            >
-              <Text style={globalStyles.optionButtonText}>Gerar XLSX</Text>
-              <MaterialCommunityIcons
-                name="microsoft-excel"
-                size={28}
-                color={theme === "light" ? "black" : "white"}
-              />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={[styles.downloadButton, { backgroundColor: "#2ecc71" }]}
+            onPress={() => gerarRelatorio("XLSX")}
+          >
+            <MaterialCommunityIcons
+              name="microsoft-excel"
+              size={28}
+              color="#fff"
+            />
+            <Text style={styles.downloadButtonText}>Gerar XLSX</Text>
+          </TouchableOpacity>
         </View>
       </Animatable.View>
-      <MenuInferior />
+
       {carregando && <Carregando />}
+      <MenuInferior />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  alignButtons: {
-    flexGrow: 1,
+  dateCard: {
+    padding: 20,
+    borderRadius: 12,
     alignItems: "center",
+    width: 160,
     gap: 10,
-    height: 50,
+    elevation: 3,
   },
-  buttonsView: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    width: "100%",
-    gap: 20,
+  dateLabel: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
-  dataButton: {
+  dateTouchable: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 10,
+    borderRadius: 8,
     borderWidth: 1,
+  },
+  lightBorder: {
+    borderColor: "#000",
+    backgroundColor: "#fff",
+  },
+  darkBorder: {
+    borderColor: "#fff",
+    backgroundColor: "#2a2a2a",
+  },
+  downloadContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 30,
+    flexWrap: "wrap",
+  },
+  downloadButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 10,
+    minWidth: 160,
+    justifyContent: "center",
+  },
+  downloadButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });

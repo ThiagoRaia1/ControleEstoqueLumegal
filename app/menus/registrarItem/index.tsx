@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+} from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
 import MenuSuperior from "../../components/MenuSuperior";
@@ -29,11 +36,87 @@ import { getCategoriasFornecedor } from "../../../services/categoriaFornecedorAp
 import { getFornecedores } from "../../../services/fornecedorApi";
 import { getTiposUnidade } from "../../../services/tipoUnidadeApi";
 
-export default function RegistrarEpi() {
+export default function RegistrarItem() {
   const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [modalVisible, setModalVisible] = useState(false);
+
+  const opcoes = [
+    {
+      titulo: "Suprimento",
+      registrar: nomePaginas.registrarItem.compras.registrarComprasSuprimento,
+      listar: "suprimento",
+      icone: (
+        <Entypo
+          name="shop"
+          size={28}
+          color={theme === "light" ? "black" : "white"}
+        />
+      ),
+    },
+    {
+      titulo: "EPI",
+      registrar: nomePaginas.registrarItem.compras.registrarComprasEpi,
+      listar: "epi",
+      icone: (
+        <MaterialCommunityIcons
+          name="warehouse"
+          size={28}
+          color={theme === "light" ? "black" : "white"}
+        />
+      ),
+    },
+    {
+      titulo: "Tipo de Unidade",
+      registrar: nomePaginas.registrarItem.compras.registrarComprastipoUnidade,
+      listar: "tipoUnidade",
+      icone: (
+        <AntDesign
+          name="tago"
+          size={28}
+          color={theme === "light" ? "black" : "white"}
+        />
+      ),
+    },
+    {
+      titulo: "Fornecedor",
+      registrar: nomePaginas.registrarItem.compras.registrarComprasFornecedor,
+      listar: "fornecedor",
+      icone: (
+        <AntDesign
+          name="contacts"
+          size={28}
+          color={theme === "light" ? "black" : "white"}
+        />
+      ),
+    },
+    {
+      titulo: "Categoria Fornecedor",
+      registrar:
+        nomePaginas.registrarItem.compras.registrarComprasCategoriaFornecedor,
+      listar: "categoriaFornecedor",
+      icone: (
+        <AntDesign
+          name="skin"
+          size={28}
+          color={theme === "light" ? "black" : "white"}
+        />
+      ),
+    },
+    {
+      titulo: "Endereço",
+      registrar: nomePaginas.registrarItem.compras.registrarComprasEndereco,
+      listar: "endereco",
+      icone: (
+        <Entypo
+          name="address"
+          size={28}
+          color={theme === "light" ? "black" : "white"}
+        />
+      ),
+    },
+  ] as const;
 
   useEffect(() => {
     if ([acessoAlmoxarifado, acessoAlmoxarifadoAdm].includes(tipoAcesso)) {
@@ -117,280 +200,63 @@ export default function RegistrarEpi() {
         duration={1000}
         style={globalStyles.mainContent}
       >
-        <View
-          style={{
-            flex: 1,
-            width: "100%",
-            justifyContent: "space-evenly",
-            gap: 20,
-          }}
+        <ScrollView
+          style={{ width: "100%" }}
+          contentContainerStyle={{ paddingHorizontal: 20 }}
         >
-          <View style={styles.buttonsRow}>
-            <TouchableOpacity
-              style={globalStyles.optionButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras.registrarComprasSuprimento
-                );
-              }}
+          {opcoes.map((opcao) => (
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: theme === "light" ? "#fff" : "#1e1e1e",
+                },
+              ]}
+              key={opcao.titulo}
             >
-              <Text style={globalStyles.optionButtonText}>
-                REGISTRAR SUPRIMENTO
-              </Text>
-              <Entypo
-                name="shop"
-                size={28}
-                color={theme === "light" ? "black" : "white"}
-              />
-            </TouchableOpacity>
+              <View style={styles.cardHeader}>
+                {opcao.icone}
+                <Text
+                  style={[
+                    styles.cardTitle,
+                    {
+                      color: theme === "light" ? "#000" : "#fff",
+                    },
+                  ]}
+                >
+                  {opcao.titulo}
+                </Text>
+              </View>
+              <View style={styles.buttonGroup}>
+                <TouchableOpacity
+                  style={styles.cardButton}
+                  onPress={() => router.push(opcao.registrar)}
+                >
+                  <Text style={styles.cardButtonText}>REGISTRAR</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras.registrarComprasSuprimento
-                );
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                EDITAR
-              </Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.cardButton}
+                  onPress={() => router.push(opcao.registrar)}
+                >
+                  <Text style={styles.cardButtonText}>EDITAR</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={async () => {
-                await setLista("suprimento");
-                setModalVisible(true);
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                LISTAR
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.buttonsRow}>
-            <TouchableOpacity
-              style={globalStyles.optionButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras.registrarComprasEpi
-                );
-              }}
-            >
-              <Text style={globalStyles.optionButtonText}>REGISTRAR EPI</Text>
-              <MaterialCommunityIcons
-                name="warehouse"
-                size={28}
-                color={theme === "light" ? "black" : "white"}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras.registrarComprasSuprimento
-                );
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                EDITAR
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={async () => {
-                await setLista("epi");
-                setModalVisible(true);
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                LISTAR
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.buttonsRow}>
-            <TouchableOpacity
-              style={globalStyles.optionButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras.registrarComprastipoUnidade
-                );
-              }}
-            >
-              <Text style={globalStyles.optionButtonText}>
-                REGISTRAR TIPO DE UNIDADE
-              </Text>
-              <AntDesign
-                name="tago"
-                size={28}
-                color={theme === "light" ? "black" : "white"}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras.registrarComprasSuprimento
-                );
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                EDITAR
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={async () => {
-                await setLista("tipoUnidade");
-                setModalVisible(true);
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                LISTAR
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.buttonsRow}>
-            <TouchableOpacity
-              style={globalStyles.optionButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras.registrarComprasFornecedor
-                );
-              }}
-            >
-              <Text style={globalStyles.optionButtonText}>
-                REGISTRAR FORNECEDOR
-              </Text>
-              <AntDesign
-                name="contacts"
-                size={28}
-                color={theme === "light" ? "black" : "white"}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras.registrarComprasSuprimento
-                );
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                EDITAR
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={async () => {
-                await setLista("fornecedor");
-                setModalVisible(true);
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                LISTAR
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.buttonsRow}>
-            <TouchableOpacity
-              style={globalStyles.optionButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras
-                    .registrarComprasCategoriaFornecedor
-                );
-              }}
-            >
-              <Text style={globalStyles.optionButtonText}>
-                REGISTRAR CATEGORIA FORNECEDOR
-              </Text>
-              <AntDesign
-                name="skin"
-                size={28}
-                color={theme === "light" ? "black" : "white"}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras.registrarComprasSuprimento
-                );
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                EDITAR
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={async () => {
-                await setLista("categoriaFornecedor");
-                setModalVisible(true);
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                LISTAR
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.buttonsRow}>
-            <TouchableOpacity
-              style={globalStyles.optionButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras.registrarComprasEndereco
-                );
-              }}
-            >
-              <Text style={globalStyles.optionButtonText}>
-                REGISTRAR ENDERECO
-              </Text>
-              <Entypo
-                name="address"
-                size={28}
-                color={theme === "light" ? "black" : "white"}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={() => {
-                router.push(
-                  nomePaginas.registrarItem.compras.registrarComprasSuprimento
-                );
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                EDITAR
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.editarListarButton}
-              onPress={async () => {
-                await setLista("endereco");
-                setModalVisible(true);
-              }}
-            >
-              <Text style={[globalStyles.optionButtonText, { color: "white" }]}>
-                LISTAR
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+                <TouchableOpacity
+                  style={styles.cardButton}
+                  onPress={async () => {
+                    await setLista(opcao.listar);
+                    setModalVisible(true);
+                  }}
+                >
+                  <Text style={styles.cardButtonText}>LISTAR</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
       </Animatable.View>
+
       <MenuInferior />
       {modalVisible && (
         <ModalConfirmacao
@@ -418,5 +284,41 @@ const styles = StyleSheet.create({
     boxShadow: "0px 5px 5px #000c27ff",
     borderRadius: 20,
     paddingHorizontal: 20,
+  },
+  card: {
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 16,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  buttonGroup: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  cardButton: {
+    flex: 1,
+    backgroundColor: "#0033A0",
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  cardButtonText: {
+    color: "white",
+    fontWeight: "600",
   },
 });

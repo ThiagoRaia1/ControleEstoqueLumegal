@@ -15,14 +15,14 @@ interface Props {
   mensagem?: string;
   textoConfirmar?: string;
   textoCancelar?: string;
-  itens?: any[]; // pode ser IEpi[], ISuprimento[], IFornecedor[] etc.
+  itens?: any[];
   tipoItens?:
     | "epi"
     | "suprimento"
     | "tipoUnidade"
     | "fornecedor"
     | "categoriaFornecedor"
-    | "endereco"; // indica qual tipo está sendo passado
+    | "endereco";
 }
 
 export default function ModalConfirmacao({
@@ -85,76 +85,73 @@ export default function ModalConfirmacao({
                   }
 
                   return itensOrdenados.map((item, index) => {
+                    const key = `${tipoItens}-${index}`;
                     switch (tipoItens) {
                       case "suprimento":
                         return (
-                          <View style={styles.itemRow}>
-                            <Text key={index} style={styles.item}>
-                              {`Nome do suprimento: ${item.nome || "Sem nome"}`}
+                          <View key={key} style={styles.itemCard}>
+                            <Text style={styles.itemTitulo}>
+                              {item.nome || "Sem nome"}
                             </Text>
-                            <Text
-                              key={index}
-                              style={[styles.item, { textAlign: "right" }]}
-                            >
-                              {`Quantidade: ${item.quantidade ?? ""}`}
+                            <Text style={styles.itemSub}>
+                              Quantidade: {item.quantidade ?? "0"}
                             </Text>
                           </View>
                         );
                       case "epi":
                         return (
-                          <View style={styles.itemRow}>
-                            <Text key={index} style={styles.item}>
-                              {`Nome do EPI: ${item.nome || "Sem nome"}`}
+                          <View key={key} style={styles.itemCard}>
+                            <Text style={styles.itemTitulo}>
+                              {item.nome || "Sem nome"}
                             </Text>
-                            <Text
-                              key={index}
-                              style={[styles.item, { textAlign: "right" }]}
-                            >
-                              {`Quantidade: ${item.quantidade ?? ""}`}
+                            <Text style={styles.itemSub}>
+                              Quantidade: {item.quantidade ?? "0"}
                             </Text>
                           </View>
                         );
                       case "tipoUnidade":
                         return (
-                          <View style={styles.itemRow}>
-                            <Text key={index} style={styles.item}>
-                              {`Tipo: ${item.tipo || "Sem tipo"}`}
+                          <View key={key} style={styles.itemCard}>
+                            <Text style={styles.itemTitulo}>
+                              {item.tipo || "Sem tipo"}
                             </Text>
                           </View>
                         );
                       case "fornecedor":
                         return (
-                          <View style={styles.itemRow}>
-                            <Text key={index} style={styles.item}>
-                              {`Nome do fornecedor: ${
-                                item.nome || "Sem nome"
-                              } \nEndereço principal: ${
-                                item.enderecos?.[0].cidade ?? ""
-                              }`}
+                          <View key={key} style={styles.itemCard}>
+                            <Text style={styles.itemTitulo}>
+                              {item.nome || "Sem nome"}
+                            </Text>
+                            <Text style={styles.itemSub}>
+                              Endereço principal:{" "}
+                              {item.enderecos?.[0]?.cidade ?? "N/A"}
                             </Text>
                           </View>
                         );
                       case "categoriaFornecedor":
                         return (
-                          <View style={styles.itemRow}>
-                            <Text key={index} style={styles.item}>
-                              {`Categoria: ${item.categoria || "Sem nome"}`}
+                          <View key={key} style={styles.itemCard}>
+                            <Text style={styles.itemTitulo}>
+                              {item.categoria || "Sem nome"}
                             </Text>
                           </View>
                         );
                       case "endereco":
                         return (
-                          <View style={styles.itemRow}>
-                            <Text key={index} style={styles.item}>
-                              {`Cidade: ${item.cidade || "Sem nome"}`}
+                          <View key={key} style={styles.itemCard}>
+                            <Text style={styles.itemTitulo}>
+                              {item.cidade || "Sem nome"}
                             </Text>
                           </View>
                         );
                       default:
                         return (
-                          <Text key={index} style={styles.item}>
-                            Item desconhecido
-                          </Text>
+                          <View key={key} style={styles.itemCard}>
+                            <Text style={styles.itemTitulo}>
+                              Item desconhecido
+                            </Text>
+                          </View>
                         );
                     }
                   });
@@ -162,13 +159,13 @@ export default function ModalConfirmacao({
               </View>
             ) : (
               <View style={styles.lista}>
-                <Text style={styles.item}>Não há registros.</Text>
+                <Text style={styles.itemTitulo}>Não há registros.</Text>
               </View>
             )}
           </ScrollView>
 
           <View style={styles.botoes}>
-            {onConfirmar !== undefined && (
+            {onConfirmar && (
               <TouchableOpacity
                 style={[styles.botao, styles.confirmar]}
                 onPress={onConfirmar}
@@ -195,59 +192,71 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.7)",
+    paddingHorizontal: 16,
   },
   container: {
     width: "100%",
-    maxWidth: 900,
+    maxWidth: 700,
     maxHeight: "80%",
-    backgroundColor: "white",
-    borderRadius: 10,
+    backgroundColor: "#FFF",
+    borderRadius: 16,
     overflow: "hidden",
+    paddingBottom: 10,
   },
   scrollContent: {
     padding: 20,
+    gap: 10,
   },
   mensagem: {
-    fontSize: 16,
-    marginBottom: 10,
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 12,
+    color: "#333",
   },
   lista: {
-    marginBottom: -20,
+    gap: 12,
   },
-  item: {
-    flex: 1,
-    fontSize: 18,
-    marginVertical: 5,
-    textAlign: "left",
-    padding: 20,
-  },
-  itemRow: {
-    flexDirection: "row",
-    width: "100%",
+  itemCard: {
     borderWidth: 1,
-    borderRadius: 10,
-    marginBottom: 20,
+    borderColor: "#aaa",
+    borderRadius: 12,
+    padding: 16,
+    backgroundColor: "#F9F9F9",
+  },
+  itemTitulo: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#222",
+  },
+  itemSub: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 4,
   },
   botoes: {
     flexDirection: "row",
-    justifyContent: "space-between",
     gap: 10,
-    padding: 15,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderColor: "#EEE",
   },
   botao: {
     flex: 1,
-    padding: 12,
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
+    justifyContent: "center",
   },
   cancelar: {
-    backgroundColor: "gray",
+    backgroundColor: "#555",
   },
   confirmar: {
     backgroundColor: "#0033A0",
   },
   textoBotao: {
     color: "white",
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontSize: 16,
   },
 });
