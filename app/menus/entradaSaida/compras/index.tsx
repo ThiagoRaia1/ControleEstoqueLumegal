@@ -45,128 +45,131 @@ function RenderItem({
   quantidadeASerMovida: number;
 }) {
   const isEpi = item.tipo === "epi";
+  const { theme } = useThemeContext();
+  const plusMinusSize = 25;
 
   return (
-    <View style={globalStyles.item}>
-      <View style={globalStyles.leftSide}>
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: "space-between",
-            paddingRight: 10,
-          }}
-        >
-          <Text style={globalStyles.dadosEpiText}>Nome: {item.nome}</Text>
-          {isEpi && (
-            <>
-              <Text style={globalStyles.dadosEpiText}>
-                C.A.: {(item as IEpi).certificadoAprovacao}
-              </Text>
-              <Text style={globalStyles.dadosEpiText}>
-                Unidade/Par: {(item as IEpi).tipoUnidade.tipo}
-              </Text>
-              <Text style={globalStyles.dadosEpiText}>
-                Quantidade: {item.quantidade}
-              </Text>
-              <Text style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}>
-                Quantidade para aviso: {(item as IEpi).quantidadeParaAviso}
-              </Text>
-            </>
-          )}
-          {!isEpi && (
-            <>
-              <Text style={globalStyles.dadosEpiText}>
-                Unidade: {(item as ISuprimento).tipoUnidade.tipo}
-              </Text>
-              <Text style={globalStyles.dadosEpiText}>
-                Quantidade: {item.quantidade}
-              </Text>
-              <Text style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}>
-                Quantidade para aviso:{" "}
-                {(item as ISuprimento).quantidadeParaAviso}
-              </Text>
-            </>
-          )}
-        </ScrollView>
+    <View
+      style={{
+        backgroundColor: globalStyles.card.backgroundColor,
+        borderRadius: 12,
+        padding: 16,
+        elevation: 3,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      {/* Lado Esquerdo: Info do item */}
+      <View style={{ flex: 1, paddingRight: 10 }}>
+        <Text style={globalStyles.itemTitle}>
+          {isEpi ? "🧤 EPI" : "📦 Suprimento"} - {item.nome}
+        </Text>
+        {isEpi ? (
+          <>
+            <Text style={globalStyles.itemDetail}>
+              C.A.: {(item as IEpi).certificadoAprovacao}
+            </Text>
+            <Text style={globalStyles.itemDetail}>
+              Unidade/Par: {(item as IEpi).tipoUnidade.tipo}
+            </Text>
+          </>
+        ) : (
+          <Text style={globalStyles.itemDetail}>
+            Unidade: {(item as ISuprimento).tipoUnidade.tipo}
+          </Text>
+        )}
+        <Text style={globalStyles.itemDetail}>
+          Quantidade atual: {item.quantidade}
+        </Text>
+        <Text style={globalStyles.itemDetail}>
+          Aviso a partir de: {item.quantidadeParaAviso}
+        </Text>
       </View>
 
+      {/* Lado Direito: Controles */}
       <View
-        style={[
-          globalStyles.rightSide,
-          {
-            justifyContent: "center",
-            alignSelf: "center",
-            height: "100%",
-            borderWidth: 1,
-            borderRadius: 20,
-            borderColor: "#888",
-            padding: 10,
-          },
-        ]}
+        style={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 10,
+        }}
       >
-        <View style={styles.plusMinusButtonContainer}>
+        <View
+          style={{
+            width: "100%",
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            gap: 20,
+          }}
+        >
           <TouchableOpacity
-            style={[styles.plusMinusButton, { backgroundColor: "green" }]}
-            onPress={() => {
-              setQuantidadeItem(item.id.toString(), quantidadeASerMovida + 1);
-            }}
+            onPress={() =>
+              setQuantidadeItem(item.id.toString(), quantidadeASerMovida + 1)
+            }
+            style={[
+              styles.plusMinusButton,
+              {
+                backgroundColor: "green",
+                borderColor: theme === "light" ? "black" : "white",
+              },
+            ]}
           >
-            <AntDesign name="pluscircleo" size={24} color="white" />
+            <AntDesign name="plus" size={plusMinusSize} color="white" />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.plusMinusButton, { backgroundColor: "#b30f02" }]}
             onPress={() => {
               const novaQuantidade = quantidadeASerMovida - 1;
               const max = item.quantidade ?? 0;
-
-              // Impede ultrapassar o limite de entrega
               if (novaQuantidade < 0 && Math.abs(novaQuantidade) > max) {
                 setQuantidadeItem(item.id.toString(), -max);
               } else {
                 setQuantidadeItem(item.id.toString(), novaQuantidade);
               }
             }}
+            style={[
+              styles.plusMinusButton,
+              {
+                backgroundColor: "#b30f02",
+                borderColor: theme === "light" ? "black" : "white",
+              },
+            ]}
           >
-            <AntDesign name="minuscircleo" size={24} color="white" />
+            <AntDesign name="minus" size={plusMinusSize} color="white" />
           </TouchableOpacity>
         </View>
 
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 5,
+        <TextInput
+          style={[
+            styles.quantidadeInput,
+            { color: theme === "light" ? "black" : "white" },
+          ]}
+          keyboardType="numeric"
+          value={quantidadeASerMovida.toString()}
+          onChangeText={(text: string) => {
+            const numericValue = text.replace(/(?!^-)-|[^0-9-]/g, "");
+            const id = item.id.toString();
+
+            if (numericValue === "" || numericValue === "-") {
+              setQuantidadeItem(id, numericValue === "-" ? -0 : 0);
+              return;
+            }
+
+            let valor = parseInt(numericValue, 10);
+            const max = item.quantidade ?? 0;
+            if (valor < 0 && Math.abs(valor) > max) {
+              valor = -max;
+            }
+
+            setQuantidadeItem(id, valor);
           }}
-        >
-          <Text style={[globalStyles.dadosEpiText, { textAlign: "center" }]}>
-            Quantidade a ser movida:
-          </Text>
-          <TextInput
-            style={styles.quantidadeInput}
-            keyboardType="numeric"
-            value={quantidadeASerMovida.toString()}
-            onChangeText={(text: string) => {
-              const numericValue = text.replace(/(?!^-)-|[^0-9-]/g, "");
-              const id = item.id.toString();
-
-              if (numericValue === "" || numericValue === "-") {
-                setQuantidadeItem(id, numericValue === "-" ? -0 : 0);
-                return;
-              }
-
-              let valor = parseInt(numericValue, 10);
-              const max = item.quantidade ?? 0;
-
-              if (valor < 0 && Math.abs(valor) > max) {
-                valor = -max;
-              }
-
-              setQuantidadeItem(id, valor);
-            }}
-          />
-        </View>
+        />
+        <Text style={{ fontSize: 12, color: "#888" }}>Quantidade a mover</Text>
       </View>
     </View>
   );
@@ -400,17 +403,13 @@ export default function EntradaSaida() {
 }
 
 const styles = StyleSheet.create({
-  plusMinusButtonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    gap: 10,
-  },
   plusMinusButton: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 20,
+    borderRadius: 100,
+    height: 45,
+    width: 45,
+    borderWidth: 3,
   },
   quantidadeInput: {
     width: "100%",

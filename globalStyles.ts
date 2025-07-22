@@ -102,7 +102,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      width: "100%",
+      flex: 1,
       minWidth: 300,
       height: 50,
       gap: 10,
@@ -175,7 +175,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       gap: 20,
       paddingHorizontal: 10,
       justifyContent: "center",
-      marginBottom: 20
+      marginBottom: 20,
     },
     // Exibição
     item: {
@@ -211,5 +211,26 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       justifyContent: "space-evenly",
       paddingVertical: 5,
       gap: 10,
+    },
+    itemTitle: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: theme === "light" ? "#000" : "#fff",
+      marginBottom: 4,
+    },
+
+    itemDetail: {
+      fontSize: 14,
+      color: theme === "light" ? "#333" : "#ccc",
+    },
+
+    card: {
+      backgroundColor: theme === "light" ? "#fff" : "#2b2b2b",
+    },
+
+    dadosItem: {
+      color: theme === "light" ? "#333" : "#aaa",
+      fontSize: 14,
+      marginBottom: 4,
     },
   });

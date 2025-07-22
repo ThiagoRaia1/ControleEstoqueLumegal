@@ -1,8 +1,4 @@
-import {
-  View,
-  Text,
-  ScrollView,
-} from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../../context/auth";
@@ -23,51 +19,48 @@ function RenderItemEmFalta({
 }) {
   return (
     <View
-      style={[
-        globalStyles.item,
-        {
-          height: 110,
-        },
-      ]}
+      style={{
+        backgroundColor: globalStyles.card.backgroundColor,
+        borderRadius: 12,
+        padding: 16,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        elevation: 3,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      }}
     >
-      <View style={globalStyles.leftSide}>
-        <ScrollView
-          contentContainerStyle={{ paddingRight: 10, borderRadius: 20 }}
-        >
-          <Text style={globalStyles.dadosEpiText}>Nome: {epi.nome}</Text>
-          <Text style={globalStyles.dadosEpiText}>
-            C.A.: {epi.certificadoAprovacao}
-          </Text>
-          <Text style={[globalStyles.dadosEpiText, { marginBottom: 0 }]}>
-            Unidade/Par: {epi.tipoUnidade.tipo}
-          </Text>
-        </ScrollView>
+      <View style={{ flex: 1, paddingRight: 12 }}>
+        <Text style={globalStyles.itemTitle}>
+          {"🧤 EPI"} - {epi.nome}
+        </Text>
+        <Text style={globalStyles.itemDetail}>
+          C.A.: {epi.certificadoAprovacao}
+        </Text>
+
+        <Text style={globalStyles.itemDetail}>
+          Tipo unidade: {epi.tipoUnidade.tipo}
+        </Text>
       </View>
 
       <View
-        style={[
-          globalStyles.rightSide,
-          {
-            justifyContent: "center",
-            alignSelf: "center",
-            backgroundColor: "#0033A0",
-            borderRadius: 10,
-          },
-        ]}
+        style={{
+          backgroundColor: "#0033A0",
+          borderRadius: 8,
+          paddingVertical: 10,
+          paddingHorizontal: 14,
+          minWidth: 100,
+          alignItems: "center",
+        }}
       >
-        <Text
-          style={[
-            globalStyles.dadosEpiText,
-            {
-              textAlign: "center",
-              color: "white",
-              fontSize: 18,
-              marginBottom: 0,
-            },
-          ]}
-        >
-          Quantidade:{"\n"}
+        <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>
           {epi.quantidade}/{epi.quantidadeParaAviso}
+        </Text>
+        <Text style={{ color: "white", fontSize: 12, marginTop: 4 }}>
+          Quantidade
         </Text>
       </View>
     </View>
@@ -114,18 +107,24 @@ export default function itensEmFalta() {
           persistentScrollbar={true}
         >
           <View style={{ padding: 20, gap: 20 }}>
-            {episEmFalta.map((epi: IEpi, index: number) => (
-              <Animatable.View
-                key={epi.id}
-                animation="fadeInUp"
-                duration={1000}
-                delay={index * 150}
+            {episEmFalta.length === 0 ? (
+              <Text
+                style={{ textAlign: "center", color: "#999", marginTop: 20 }}
               >
-                <View key={epi.id}>
+                Nenhum item em falta no momento.
+              </Text>
+            ) : (
+              episEmFalta.map((epi: IEpi, index) => (
+                <Animatable.View
+                  key={epi.id}
+                  animation="fadeInUp"
+                  duration={800}
+                  delay={index * 100}
+                >
                   <RenderItemEmFalta epi={epi} globalStyles={globalStyles} />
-                </View>
-              </Animatable.View>
-            ))}
+                </Animatable.View>
+              ))
+            )}
           </View>
         </ScrollView>
       </Animatable.View>

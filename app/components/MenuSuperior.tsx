@@ -28,9 +28,9 @@ export default function MenuSuperior() {
         {
           flexDirection: "row",
           width: "100%",
-          height: "5%",
+          height: 50,
           justifyContent: "space-between",
-          paddingHorizontal: 10,
+          padding: 10,
           marginBottom: 20,
           backgroundColor: "black",
         },
