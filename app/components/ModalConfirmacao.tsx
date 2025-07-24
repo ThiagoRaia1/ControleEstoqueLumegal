@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import React from "react";
 import {
   Modal,
@@ -16,7 +17,7 @@ interface Props {
   textoConfirmar?: string;
   textoCancelar?: string;
   itens?: any[];
-  tipoItens?:
+  tipoItem?:
     | "epi"
     | "suprimento"
     | "tipoUnidade"
@@ -33,7 +34,7 @@ export default function ModalConfirmacao({
   textoConfirmar = "Confirmar",
   textoCancelar = "Cancelar",
   itens,
-  tipoItens,
+  tipoItem,
 }: Props) {
   return (
     <Modal
@@ -51,7 +52,7 @@ export default function ModalConfirmacao({
               <View style={styles.lista}>
                 {(() => {
                   let itensOrdenados = [...itens];
-                  switch (tipoItens) {
+                  switch (tipoItem) {
                     case "suprimento":
                     case "epi":
                     case "fornecedor":
@@ -85,7 +86,7 @@ export default function ModalConfirmacao({
                   }
 
                   return itensOrdenados.map((item, index) => {
-                    const key = `${tipoItens}-${index}`;
+                    const key = `${tipoItem}-${index}`;
                     return (
                       <View
                         key={key}
@@ -120,12 +121,26 @@ export default function ModalConfirmacao({
                         <TouchableOpacity
                           style={styles.editarBotao}
                           onPress={() => {
-                            switch (tipoItens) {
+                            switch (tipoItem) {
                               case "suprimento":
-                                console.log("Suprimento");
+                                router.push({
+                                  pathname:
+                                    "/menus/registrarItem/compras/epi/editar",
+                                  params: {
+                                    tipoItem,
+                                    item: JSON.stringify(item), // precisa serializar o objeto
+                                  },
+                                });
                                 break;
                               case "epi":
-                                console.log("epi");
+                                router.push({
+                                  pathname:
+                                    "/menus/registrarItem/compras/epi/editar",
+                                  params: {
+                                    tipoItem,
+                                    item: JSON.stringify(item), // precisa serializar o objeto
+                                  },
+                                });
                                 break;
                               case "tipoUnidade":
                                 console.log("tipoUnidade");
@@ -141,6 +156,7 @@ export default function ModalConfirmacao({
                                 break;
                               default:
                                 console.log("Tipo não identificado.");
+                                console.log(tipoItem);
                             }
                           }}
                         >

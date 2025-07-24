@@ -40,8 +40,6 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       fontWeight: "700",
       textAlign: "center",
       color: theme === "light" ? "black" : "white",
-      marginBottom: 20,
-      paddingHorizontal: 20,
     },
     mainContent: {
       flex: 1,

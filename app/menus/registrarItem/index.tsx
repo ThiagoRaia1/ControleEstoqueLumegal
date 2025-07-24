@@ -260,7 +260,7 @@ export default function RegistrarItem() {
           onCancelar={closeModal}
           textoCancelar="Fechar"
           itens={itens ?? []}
-          tipoItens={tipoDaLista}
+          tipoItem={tipoDaLista}
         />
       )}
     </View>
