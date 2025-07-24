@@ -123,41 +123,42 @@ export default function ItensEmFalta() {
   return (
     <View style={globalStyles.background}>
       <MenuSuperior />
-
-      <Text style={globalStyles.title}>ITENS EM FALTA</Text>
-
       <Animatable.View
         animation="fadeInUp"
         duration={1000}
         style={globalStyles.mainContent}
       >
         <FiltroTipoItem valorSelecionado={filtro} onSelecionar={setFiltro} />
-        <ScrollView
-          style={globalStyles.itensScroll}
-          contentContainerStyle={globalStyles.scrollContent}
-          persistentScrollbar={true}
-        >
-          <View style={{ padding: 16, gap: 16 }}>
-            {itensFiltrados.length === 0 ? (
-              <Text
-                style={{ textAlign: "center", color: "#999", marginTop: 20 }}
-              >
-                Nenhum item em falta no momento.
-              </Text>
-            ) : (
-              itensFiltrados.map((item, index) => (
-                <Animatable.View
-                  key={`${item.tipo}-${item.id}`}
-                  animation="fadeInUp"
-                  duration={800}
-                  delay={index * 100}
+        <View style={globalStyles.itensScroll}>
+          <ScrollView
+            contentContainerStyle={globalStyles.scrollContent}
+            persistentScrollbar={true}
+          >
+            <View style={{ padding: 16, gap: 16 }}>
+              {itensFiltrados.length === 0 ? (
+                <Text
+                  style={{ textAlign: "center", color: "#999", marginTop: 20 }}
                 >
-                  <RenderItemEmFalta item={item} globalStyles={globalStyles} />
-                </Animatable.View>
-              ))
-            )}
-          </View>
-        </ScrollView>
+                  Nenhum item em falta no momento.
+                </Text>
+              ) : (
+                itensFiltrados.map((item, index) => (
+                  <Animatable.View
+                    key={`${item.tipo}-${item.id}`}
+                    animation="fadeInUp"
+                    duration={800}
+                    delay={index * 100}
+                  >
+                    <RenderItemEmFalta
+                      item={item}
+                      globalStyles={globalStyles}
+                    />
+                  </Animatable.View>
+                ))
+              )}
+            </View>
+          </ScrollView>
+        </View>
       </Animatable.View>
 
       <MenuInferior />

@@ -194,15 +194,18 @@ export default function RegistrarItem() {
   return (
     <View style={globalStyles.background}>
       <MenuSuperior />
-      <Text style={globalStyles.title}>REGISTRAR ITEM</Text>
       <Animatable.View
         animation="fadeInUp"
         duration={1000}
         style={globalStyles.mainContent}
       >
         <ScrollView
-          style={{ width: "100%" }}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
+          style={{ width: "100%", marginRight: -20 }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            paddingRight: 20,
+          }}
         >
           {opcoes.map((opcao) => (
             <View
@@ -237,19 +240,12 @@ export default function RegistrarItem() {
 
                 <TouchableOpacity
                   style={styles.cardButton}
-                  onPress={() => router.push(opcao.registrar)}
-                >
-                  <Text style={styles.cardButtonText}>EDITAR</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.cardButton}
                   onPress={async () => {
                     await setLista(opcao.listar);
                     setModalVisible(true);
                   }}
                 >
-                  <Text style={styles.cardButtonText}>LISTAR</Text>
+                  <Text style={styles.cardButtonText}>LISTAR/EDITAR</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -272,19 +268,6 @@ export default function RegistrarItem() {
 }
 
 const styles = StyleSheet.create({
-  buttonsRow: {
-    flexDirection: "row",
-    gap: 20,
-    justifyContent: "center",
-  },
-  editarListarButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#0033A0",
-    boxShadow: "0px 5px 5px #000c27ff",
-    borderRadius: 20,
-    paddingHorizontal: 20,
-  },
   card: {
     borderRadius: 16,
     padding: 16,

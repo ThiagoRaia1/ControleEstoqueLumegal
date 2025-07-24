@@ -253,7 +253,6 @@ export default function EntradaSaida() {
   return (
     <View style={globalStyles.background}>
       <MenuSuperior />
-      <Text style={globalStyles.title}>ENTRADA/SAÍDA</Text>
       <Animatable.View
         animation="fadeInUp"
         duration={1000}

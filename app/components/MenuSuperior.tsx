@@ -32,15 +32,11 @@ export default function MenuSuperior() {
           justifyContent: "space-between",
           padding: 10,
           marginBottom: 20,
-          backgroundColor: "black",
         },
         tipoAcesso !== acessoComprasAdm &&
           tipoAcesso !== acessoAlmoxarifadoAdm && {
             justifyContent: "flex-end",
           },
-        theme === "light"
-          ? { backgroundColor: "#0033A0" }
-          : { backgroundColor: "black" },
       ]}
     >
       {(tipoAcesso === acessoAlmoxarifadoAdm ||
@@ -57,7 +53,7 @@ export default function MenuSuperior() {
           <TouchableOpacity
             style={[
               tipoAcesso === acessoComprasAdm && {
-                backgroundColor: "white",
+                backgroundColor: theme === "light" ? "#0033A0" : "white",
               },
               {
                 borderRadius: 10,
@@ -70,14 +66,22 @@ export default function MenuSuperior() {
             <Entypo
               name="shop"
               size={30}
-              color={tipoAcesso === acessoComprasAdm ? "#0033A0" : "white"}
+              color={
+                tipoAcesso === acessoComprasAdm && theme === "light"
+                  ? "white"
+                  : tipoAcesso === acessoComprasAdm && theme === "dark"
+                  ? "#0033A0"
+                  : tipoAcesso !== acessoComprasAdm && theme === "light"
+                  ? "black"
+                  : "white"
+              }
             />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
               tipoAcesso === acessoAlmoxarifadoAdm && {
-                backgroundColor: "white",
+                backgroundColor: theme === "light" ? "#0033A0" : "white",
               },
               {
                 borderRadius: 10,
@@ -90,12 +94,24 @@ export default function MenuSuperior() {
             <MaterialCommunityIcons
               name="warehouse"
               size={30}
-              color={tipoAcesso === acessoAlmoxarifadoAdm ? "#0033A0" : "white"}
+              color={
+                tipoAcesso === acessoAlmoxarifadoAdm && theme === "light"
+                  ? "white"
+                  : tipoAcesso === acessoAlmoxarifadoAdm && theme === "dark"
+                  ? "#0033A0"
+                  : tipoAcesso !== acessoAlmoxarifadoAdm && theme === "light"
+                  ? "black"
+                  : "white"
+              }
             />
           </TouchableOpacity>
           <Text
             style={[
-              { color: "white", paddingVertical: 5, paddingHorizontal: 10 },
+              {
+                color: theme === "light" ? "black" : "white",
+                paddingVertical: 5,
+                paddingHorizontal: 10,
+              },
               width > 532
                 ? { fontSize: 20 }
                 : width > 495
@@ -121,7 +137,7 @@ export default function MenuSuperior() {
           <Feather
             name={theme === "light" ? "sun" : "moon"}
             size={30}
-            color={"white"}
+            color={theme === "light" ? "black" : "white"}
           />
         </TouchableOpacity>
 
@@ -131,7 +147,11 @@ export default function MenuSuperior() {
             router.push("/");
           }}
         >
-          <Feather name="log-out" size={30} color={"white"} />
+          <Feather
+            name="log-out"
+            size={30}
+            color={theme === "light" ? "black" : "white"}
+          />
         </TouchableOpacity>
       </View>
     </View>

@@ -86,74 +86,68 @@ export default function ModalConfirmacao({
 
                   return itensOrdenados.map((item, index) => {
                     const key = `${tipoItens}-${index}`;
-                    switch (tipoItens) {
-                      case "suprimento":
-                        return (
-                          <View key={key} style={styles.itemCard}>
-                            <Text style={styles.itemTitulo}>
-                              {item.nome || "Sem nome"}
-                            </Text>
+                    return (
+                      <View
+                        key={key}
+                        style={[
+                          styles.itemCard,
+                          {
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                          },
+                        ]}
+                      >
+                        <View style={styles.itemInfo}>
+                          <Text style={styles.itemTitulo}>
+                            {item.nome ||
+                              item.tipo ||
+                              item.categoria ||
+                              item.cidade ||
+                              "Sem nome"}
+                          </Text>
+                          {item.quantidade !== undefined && (
                             <Text style={styles.itemSub}>
-                              Quantidade: {item.quantidade ?? "0"}
+                              Quantidade: {item.quantidade}
                             </Text>
-                          </View>
-                        );
-                      case "epi":
-                        return (
-                          <View key={key} style={styles.itemCard}>
-                            <Text style={styles.itemTitulo}>
-                              {item.nome || "Sem nome"}
-                            </Text>
+                          )}
+                          {item.enderecos?.[0]?.cidade && (
                             <Text style={styles.itemSub}>
-                              Quantidade: {item.quantidade ?? "0"}
+                              Endereço principal: {item.enderecos[0].cidade}
                             </Text>
-                          </View>
-                        );
-                      case "tipoUnidade":
-                        return (
-                          <View key={key} style={styles.itemCard}>
-                            <Text style={styles.itemTitulo}>
-                              {item.tipo || "Sem tipo"}
-                            </Text>
-                          </View>
-                        );
-                      case "fornecedor":
-                        return (
-                          <View key={key} style={styles.itemCard}>
-                            <Text style={styles.itemTitulo}>
-                              {item.nome || "Sem nome"}
-                            </Text>
-                            <Text style={styles.itemSub}>
-                              Endereço principal:{" "}
-                              {item.enderecos?.[0]?.cidade ?? "N/A"}
-                            </Text>
-                          </View>
-                        );
-                      case "categoriaFornecedor":
-                        return (
-                          <View key={key} style={styles.itemCard}>
-                            <Text style={styles.itemTitulo}>
-                              {item.categoria || "Sem nome"}
-                            </Text>
-                          </View>
-                        );
-                      case "endereco":
-                        return (
-                          <View key={key} style={styles.itemCard}>
-                            <Text style={styles.itemTitulo}>
-                              {item.cidade || "Sem nome"}
-                            </Text>
-                          </View>
-                        );
-                      default:
-                        return (
-                          <View key={key} style={styles.itemCard}>
-                            <Text style={styles.itemTitulo}>
-                              Item desconhecido
-                            </Text>
-                          </View>
-                        );
-                    }
+                          )}
+                        </View>
+                        <TouchableOpacity
+                          style={styles.editarBotao}
+                          onPress={() => {
+                            switch (tipoItens) {
+                              case "suprimento":
+                                console.log("Suprimento");
+                                break;
+                              case "epi":
+                                console.log("epi");
+                                break;
+                              case "tipoUnidade":
+                                console.log("tipoUnidade");
+                                break;
+                              case "fornecedor":
+                                console.log("Fornecedor");
+                                break;
+                              case "categoriaFornecedor":
+                                console.log("categoriaFornecedor");
+                                break;
+                              case "endereco":
+                                console.log("Endereco");
+                                break;
+                              default:
+                                console.log("Tipo não identificado.");
+                            }
+                          }}
+                        >
+                          <Text style={styles.editarTexto}>Editar</Text>
+                        </TouchableOpacity>
+                      </View>
+                    );
                   });
                 })()}
               </View>
@@ -258,5 +252,20 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
     fontSize: 16,
+  },
+  itemInfo: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  editarBotao: {
+    backgroundColor: "#007BFF",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  editarTexto: {
+    color: "#FFF",
+    fontWeight: "600",
+    fontSize: 14,
   },
 });

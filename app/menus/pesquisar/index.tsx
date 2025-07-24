@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   TextInput,
   useWindowDimensions,
-  StyleSheet,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
@@ -82,31 +81,47 @@ export default function Pesquisar() {
     { label: string; value: string }[]
   >([]);
 
+  async function carregarTiposUnidadeEFornecedores() {
+    try {
+      setCarregando(true);
+      const listaTiposUnidadeDisponiveis = await getTiposUnidade();
+      const itensTiposUnidade = listaTiposUnidadeDisponiveis.map(
+        (f: ITipoUnidade) => ({
+          label: f.tipo,
+          value: f.tipo, // use f.id se quiser o ID como value
+        })
+      );
+      setTiposUnidadeDisponiveis(itensTiposUnidade);
+
+      const listaFornecedores = await getFornecedores();
+      const itensFornecedores = listaFornecedores.map((f: IFornecedor) => ({
+        label: f.nome,
+        value: f.nome, // use f.id se quiser o ID como value
+      }));
+      setFornecedoresDisponiveis(itensFornecedores);
+    } catch (erro: any) {
+      alert(erro.message);
+    } finally {
+      setCarregando(false);
+    }
+  }
+
   useEffect(() => {
-    async function carregarDados() {
+    const carregarDados = async () => {
       try {
         setCarregando(true);
-        const listaTiposUnidadeDisponiveis = await getTiposUnidade();
-        const itensTiposUnidade = listaTiposUnidadeDisponiveis.map(
-          (f: ITipoUnidade) => ({
-            label: f.tipo,
-            value: f.tipo, // use f.id se quiser o ID como value
-          })
-        );
-        setTiposUnidadeDisponiveis(itensTiposUnidade);
-
-        const listaFornecedores = await getFornecedores();
-        const itensFornecedores = listaFornecedores.map((f: IFornecedor) => ({
-          label: f.nome,
-          value: f.nome, // use f.id se quiser o ID como value
-        }));
-        setFornecedoresDisponiveis(itensFornecedores);
+        if ([acessoCompras, acessoComprasAdm].includes(tipoAcesso)) {
+          await Promise.all([carregarEpis(), carregarSuprimentos()]);
+        } else {
+          await carregarEpis();
+        }
+        await carregarTiposUnidadeEFornecedores();
       } catch (erro: any) {
         alert(erro.message);
       } finally {
         setCarregando(false);
       }
-    }
+    };
 
     carregarDados();
   }, []);
@@ -135,20 +150,6 @@ export default function Pesquisar() {
       alert(erro.message);
     }
   };
-
-  useEffect(() => {
-    try {
-      setCarregando(true);
-      carregarEpis();
-      if ([acessoCompras, acessoComprasAdm].includes(tipoAcesso)) {
-        carregarSuprimentos();
-      }
-    } catch (erro: any) {
-      alert(erro.message);
-    } finally {
-      setCarregando(false);
-    }
-  }, []);
 
   const listaUnificada = [
     ...epis.map((item) => ({ ...item, tipo: "epi" })),
@@ -460,9 +461,6 @@ export default function Pesquisar() {
   return (
     <View style={globalStyles.background}>
       <MenuSuperior />
-      <Text style={globalStyles.title}>
-        {!editando ? "PESQUISAR" : "EDITANDO"}
-      </Text>
       <Animatable.View
         animation="fadeInUp"
         duration={1000}
@@ -482,32 +480,34 @@ export default function Pesquisar() {
                 onSelecionar={setFiltro}
               />
             )}
-            <ScrollView
-              style={globalStyles.itensScroll}
-              contentContainerStyle={{
-                padding: 20,
-                gap: 20,
-              }}
-              persistentScrollbar
-            >
-              {itensFiltrados.map((item: any, index: number) => (
-                <Animatable.View
-                  key={
-                    "certificadoAprovacao" in item
-                      ? `epi-${item.id}`
-                      : `sup-${item.id}`
-                  }
-                  animation="fadeInUp"
-                  duration={600}
-                  delay={index * 100}
-                >
-                  <ItemUnificado item={item} />
-                </Animatable.View>
-              ))}
-            </ScrollView>
+            <View style={globalStyles.itensScroll}>
+              <ScrollView
+                contentContainerStyle={{
+                  padding: 20,
+                  gap: 20,
+                }}
+                persistentScrollbar
+              >
+                {itensFiltrados.map((item: any, index: number) => (
+                  <Animatable.View
+                    key={
+                      "certificadoAprovacao" in item
+                        ? `epi-${item.id}`
+                        : `sup-${item.id}`
+                    }
+                    animation="fadeInUp"
+                    duration={600}
+                    delay={index * 100}
+                  >
+                    <ItemUnificado item={item} />
+                  </Animatable.View>
+                ))}
+              </ScrollView>
+            </View>
           </>
         ) : (
           <>
+            <Text style={globalStyles.title}>EDITANDO</Text>
             <ScrollView
               style={{ width: "100%" }}
               contentContainerStyle={[
@@ -875,7 +875,3 @@ export default function Pesquisar() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  dadosItem: {},
-});

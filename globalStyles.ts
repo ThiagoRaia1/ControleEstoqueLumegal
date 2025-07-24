@@ -51,7 +51,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       alignItems: "center",
       justifyContent: "center",
       gap: 20,
-      marginBottom: 30,
+      marginBottom: 20,
     },
     // Pesquisa
     searchBar: {
@@ -164,6 +164,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       alignSelf: "center",
       width: "100%",
       ...getBoxShadow(theme),
+      overflow: "hidden",
     },
     scrollContent: {
       flexGrow: 1,
