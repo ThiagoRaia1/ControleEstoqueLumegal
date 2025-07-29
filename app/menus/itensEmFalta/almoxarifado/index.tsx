@@ -9,6 +9,13 @@ import { getEpisEmFalta } from "../../../../services/epiApi";
 import Carregando from "../../../components/Carregando";
 import MenuInferior from "../../../components/MenuInferior";
 import MenuSuperior from "../../../components/MenuSuperior";
+import { router, usePathname } from "expo-router";
+import {
+  acessoComprasAdm,
+  acessoAlmoxarifadoAdm,
+  useTipoAcessoContext,
+} from "../../../../context/tipoAcessoContext";
+import { nomePaginas } from "../../../../utils/nomePaginas";
 
 function RenderItemEmFalta({
   epi,
@@ -68,11 +75,30 @@ function RenderItemEmFalta({
 }
 
 export default function itensEmFalta() {
+  const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const { isAuthenticated } = useAuth();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
   const [episEmFalta, setEpisEmFalta] = useState([]);
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (
+      tipoAcesso === acessoComprasAdm &&
+      pathname !== nomePaginas.itensEmFalta.compras
+    ) {
+      router.replace(nomePaginas.itensEmFalta.compras);
+    }
+
+    if (
+      tipoAcesso === acessoAlmoxarifadoAdm &&
+      pathname !== nomePaginas.itensEmFalta.almoxarifado
+    ) {
+      router.replace(nomePaginas.itensEmFalta.almoxarifado);
+    }
+  }, [tipoAcesso, pathname]);
 
   useEffect(() => {
     if (isAuthenticated) {

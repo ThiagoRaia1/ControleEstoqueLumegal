@@ -20,7 +20,7 @@ export default function FiltroTipoItem({
         width: "100%",
         flexDirection: "row",
         justifyContent: "space-evenly",
-        paddingVertical: 10,
+        paddingVertical: 5,
         gap: 20,
       }}
     >
@@ -33,7 +33,7 @@ export default function FiltroTipoItem({
             backgroundColor: valorSelecionado === tipo ? "#0033A0" : "#ddd",
             paddingVertical: 8,
             paddingHorizontal: 12,
-            borderRadius: 10,
+            borderRadius: 20,
             alignItems: "center",
             justifyContent: "center",
           }}

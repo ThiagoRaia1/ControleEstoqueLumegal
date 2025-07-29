@@ -48,7 +48,7 @@ export default function MenuSuperior() {
           alignItems: "center",
         }}
       >
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{
             paddingVertical: 5,
             paddingHorizontal: 5,
@@ -59,7 +59,7 @@ export default function MenuSuperior() {
             size={30}
             color={theme === "light" ? "black" : "white"}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         {(tipoAcesso === acessoAlmoxarifadoAdm ||
           tipoAcesso === acessoComprasAdm) && (
           <>

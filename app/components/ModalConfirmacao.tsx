@@ -121,43 +121,13 @@ export default function ModalConfirmacao({
                         <TouchableOpacity
                           style={styles.editarBotao}
                           onPress={() => {
-                            switch (tipoItem) {
-                              case "suprimento":
-                                router.push({
-                                  pathname:
-                                    "/menus/registrarItem/compras/epi/editar",
-                                  params: {
-                                    tipoItem,
-                                    item: JSON.stringify(item), // precisa serializar o objeto
-                                  },
-                                });
-                                break;
-                              case "epi":
-                                router.push({
-                                  pathname:
-                                    "/menus/registrarItem/compras/epi/editar",
-                                  params: {
-                                    tipoItem,
-                                    item: JSON.stringify(item), // precisa serializar o objeto
-                                  },
-                                });
-                                break;
-                              case "tipoUnidade":
-                                console.log("tipoUnidade");
-                                break;
-                              case "fornecedor":
-                                console.log("Fornecedor");
-                                break;
-                              case "categoriaFornecedor":
-                                console.log("categoriaFornecedor");
-                                break;
-                              case "endereco":
-                                console.log("Endereco");
-                                break;
-                              default:
-                                console.log("Tipo não identificado.");
-                                console.log(tipoItem);
-                            }
+                            router.push({
+                              pathname: "/menus/registrarItem/editar",
+                              params: {
+                                tipoItem,
+                                item: JSON.stringify(item), // precisa serializar o objeto
+                              },
+                            });
                           }}
                         >
                           <Text style={styles.editarTexto}>Editar</Text>

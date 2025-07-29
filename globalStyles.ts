@@ -48,7 +48,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       alignSelf: "center",
       alignItems: "center",
       justifyContent: "center",
-      gap: 20,
+      gap: 10,
       marginBottom: 20,
     },
     // Pesquisa
@@ -61,7 +61,6 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       paddingHorizontal: 10,
       borderColor: "#888",
       backgroundColor: theme === "light" ? "white" : "#1C1C1C",
-      ...getBoxShadow(theme),
     },
     //Botoes
     button: {
@@ -161,7 +160,6 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       borderColor: "#888",
       alignSelf: "center",
       width: "100%",
-      ...getBoxShadow(theme),
       overflow: "hidden",
     },
     scrollContent: {
@@ -217,16 +215,13 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       color: theme === "light" ? "#000" : "#fff",
       marginBottom: 4,
     },
-
     itemDetail: {
       fontSize: 14,
       color: theme === "light" ? "#333" : "#ccc",
     },
-
     card: {
       backgroundColor: theme === "light" ? "#fff" : "#2b2b2b",
     },
-
     dadosItem: {
       color: theme === "light" ? "#333" : "#aaa",
       fontSize: 14,

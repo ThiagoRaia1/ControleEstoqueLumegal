@@ -28,7 +28,7 @@ export default function CategoriaFornecedor() {
       const resultado = await registrarCategoriaFornecedorApi(
         categoriaFornecedor
       );
-      console.log(resultado);
+      
       alert("Categoria registrada com sucesso!");
       router.push(nomePaginas.registrarItem.main);
     } catch (erro: any) {

@@ -280,8 +280,6 @@ export default function Pesquisar() {
 
           const editado = await editarEpiApi(itemSelecionado.nome, epiEditado);
           alert("EPI editado com sucesso!");
-          console.log("Editando EPI selecionado: ", itemSelecionado.nome);
-          console.log(editado);
 
           await carregarEpis();
         } else if (itemSelecionado.tipo === "suprimento") {
@@ -299,11 +297,7 @@ export default function Pesquisar() {
 
           await editarSuprimentoApi(itemSelecionado.nome, suprimentoEditado);
           alert("Suprimento editado com sucesso!");
-          console.log(
-            "Editando suprimento selecionado: ",
-            itemSelecionado.nome
-          );
-
+          
           await carregarSuprimentos();
         } else {
           alert("Tipo de item desconhecido.");

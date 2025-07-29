@@ -19,6 +19,13 @@ import Carregando from "../../../components/Carregando";
 import MenuInferior from "../../../components/MenuInferior";
 import MenuSuperior from "../../../components/MenuSuperior";
 import SearchBar from "../../../components/SearchBar";
+import { usePathname, router } from "expo-router";
+import {
+  acessoComprasAdm,
+  acessoAlmoxarifadoAdm,
+  useTipoAcessoContext,
+} from "../../../../context/tipoAcessoContext";
+import { nomePaginas } from "../../../../utils/nomePaginas";
 
 function RenderItem({
   globalStyles,
@@ -160,6 +167,7 @@ function RenderItem({
 }
 
 export default function EntradaSaida() {
+  const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
@@ -168,6 +176,24 @@ export default function EntradaSaida() {
     [key: string]: number;
   }>({});
   const [pesquisa, setPesquisa] = useState("");
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (
+      tipoAcesso === acessoComprasAdm &&
+      pathname !== nomePaginas.entradaSaida.compras
+    ) {
+      router.replace(nomePaginas.entradaSaida.compras);
+    }
+
+    if (
+      tipoAcesso === acessoAlmoxarifadoAdm &&
+      pathname !== nomePaginas.entradaSaida.almoxarifado
+    ) {
+      router.replace(nomePaginas.entradaSaida.almoxarifado);
+    }
+  }, [tipoAcesso, pathname]);
 
   const normalizar = (texto: string) =>
     texto
@@ -264,54 +290,55 @@ export default function EntradaSaida() {
           placeholder="Pesquisar por nome ou C.A."
         />
 
-        <ScrollView
-          style={globalStyles.itensScroll}
-          contentContainerStyle={globalStyles.scrollContent}
-          persistentScrollbar={true}
-        >
-          <View style={{ padding: 20, gap: 20 }}>
-            {epis
-              .slice()
-              .sort((a, b) =>
-                (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
-                  sensitivity: "base",
-                })
-              )
-              .filter((item) => {
-                const termo = normalizar(pesquisa);
-                const nome = normalizar(item.nome || "");
-                const ca = normalizar(
-                  typeof item.certificadoAprovacao === "string"
-                    ? item.certificadoAprovacao
-                    : ""
-                );
+        <View style={globalStyles.itensScroll}>
+          <ScrollView
+            contentContainerStyle={globalStyles.scrollContent}
+            persistentScrollbar={true}
+          >
+            <View style={{ padding: 20, gap: 20 }}>
+              {epis
+                .slice()
+                .sort((a, b) =>
+                  (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+                    sensitivity: "base",
+                  })
+                )
+                .filter((item) => {
+                  const termo = normalizar(pesquisa);
+                  const nome = normalizar(item.nome || "");
+                  const ca = normalizar(
+                    typeof item.certificadoAprovacao === "string"
+                      ? item.certificadoAprovacao
+                      : ""
+                  );
 
-                return nome.startsWith(termo) || ca.startsWith(termo);
-              })
-              .map((item, index: number) => {
-                const uniqueKey = `epi-${item.id}`;
-                return (
-                  <Animatable.View
-                    key={uniqueKey}
-                    animation="fadeInUp"
-                    duration={1000}
-                    delay={index * 150}
-                  >
-                    <RenderItem
-                      globalStyles={globalStyles}
-                      item={item}
-                      setQuantidadeItem={(id, novaQuantidade) =>
-                        setQuantidadeItem(id, novaQuantidade)
-                      }
-                      quantidadeASerMovida={
-                        quantidadeASerMovida[`epi-${item.id}`] || 0
-                      }
-                    />
-                  </Animatable.View>
-                );
-              })}
-          </View>
-        </ScrollView>
+                  return nome.startsWith(termo) || ca.startsWith(termo);
+                })
+                .map((item, index: number) => {
+                  const uniqueKey = `epi-${item.id}`;
+                  return (
+                    <Animatable.View
+                      key={uniqueKey}
+                      animation="fadeInUp"
+                      duration={1000}
+                      delay={index * 150}
+                    >
+                      <RenderItem
+                        globalStyles={globalStyles}
+                        item={item}
+                        setQuantidadeItem={(id, novaQuantidade) =>
+                          setQuantidadeItem(id, novaQuantidade)
+                        }
+                        quantidadeASerMovida={
+                          quantidadeASerMovida[`epi-${item.id}`] || 0
+                        }
+                      />
+                    </Animatable.View>
+                  );
+                })}
+            </View>
+          </ScrollView>
+        </View>
         <TouchableOpacity
           onPress={handleConfirmarMovimentacoes}
           style={globalStyles.button}

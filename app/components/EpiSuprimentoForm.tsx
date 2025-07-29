@@ -182,8 +182,6 @@ export default function EpiSuprimentoForm({
 
         const editado = await editarEpiApi(itemSelecionado.nome, epiEditado);
         alert("EPI editado com sucesso!");
-        console.log("Editando EPI selecionado: ", itemSelecionado.nome);
-        console.log(editado);
       } else if (tipoItem === "suprimento") {
         // Montar objeto para edição de suprimento
         const suprimentoEditado = {
@@ -198,7 +196,6 @@ export default function EpiSuprimentoForm({
 
         await editarSuprimentoApi(itemSelecionado.nome, suprimentoEditado);
         alert("Suprimento editado com sucesso!");
-        console.log("Editando suprimento selecionado: ", itemSelecionado.nome);
       } else {
         alert("Tipo de item desconhecido.");
       }
@@ -225,7 +222,10 @@ export default function EpiSuprimentoForm({
       setTipoUnidade("");
     }
 
-    if (Array.isArray(itemSelecionado.fornecedores)) {
+    if (
+      Array.isArray(itemSelecionado.fornecedores) &&
+      itemSelecionado.fornecedores.length > 0
+    ) {
       if (typeof itemSelecionado.fornecedores[0] === "object") {
         setFornecedores(
           itemSelecionado.fornecedores.map((f: any) => f.nome ?? "")
@@ -435,6 +435,7 @@ export default function EpiSuprimentoForm({
           })}
 
           {fornecedores.length < 3 &&
+            fornecedores.length > 0 &&
             fornecedores[fornecedores.length - 1].trim() !== "" && (
               <TouchableOpacity
                 onPress={() => setFornecedores((prev) => [...prev, ""])}

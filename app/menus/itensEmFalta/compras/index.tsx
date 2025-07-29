@@ -12,6 +12,13 @@ import Carregando from "../../../components/Carregando";
 import MenuInferior from "../../../components/MenuInferior";
 import MenuSuperior from "../../../components/MenuSuperior";
 import FiltroTipoItem from "../../../components/FiltroTipoItem";
+import { router, usePathname } from "expo-router";
+import {
+  acessoComprasAdm,
+  acessoAlmoxarifadoAdm,
+  useTipoAcessoContext,
+} from "../../../../context/tipoAcessoContext";
+import { nomePaginas } from "../../../../utils/nomePaginas";
 
 type ItemUnificado = (IEpi | ISuprimento) & {
   tipo: "epi" | "suprimento";
@@ -78,12 +85,31 @@ function RenderItemEmFalta({
 }
 
 export default function ItensEmFalta() {
+  const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const { isAuthenticated } = useAuth();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
   const [itensEmFalta, setItensEmFalta] = useState<ItemUnificado[]>([]);
   const [filtro, setFiltro] = useState<"todos" | "epi" | "suprimento">("todos");
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (
+      tipoAcesso === acessoComprasAdm &&
+      pathname !== nomePaginas.itensEmFalta.compras
+    ) {
+      router.replace(nomePaginas.itensEmFalta.compras);
+    }
+
+    if (
+      tipoAcesso === acessoAlmoxarifadoAdm &&
+      pathname !== nomePaginas.itensEmFalta.almoxarifado
+    ) {
+      router.replace(nomePaginas.itensEmFalta.almoxarifado);
+    }
+  }, [tipoAcesso, pathname]);
 
   useEffect(() => {
     if (isAuthenticated) {

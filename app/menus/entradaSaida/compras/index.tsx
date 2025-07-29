@@ -13,6 +13,7 @@ import {
   useTipoAcessoContext,
   acessoCompras,
   acessoComprasAdm,
+  acessoAlmoxarifadoAdm,
 } from "../../../../context/tipoAcessoContext";
 import { getGlobalStyles } from "../../../../globalStyles";
 import { IMovimentacaoItem } from "../../../../interfaces/entradaSaida";
@@ -30,6 +31,8 @@ import MenuSuperior from "../../../components/MenuSuperior";
 import SearchBar from "../../../components/SearchBar";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FiltroTipoItem from "../../../components/FiltroTipoItem";
+import { usePathname, router } from "expo-router";
+import { nomePaginas } from "../../../../utils/nomePaginas";
 
 type ItemUnificado = (IEpi | ISuprimento) & { tipo: "epi" | "suprimento" };
 
@@ -190,6 +193,24 @@ export default function EntradaSaida() {
   }>({});
   const [pesquisa, setPesquisa] = useState("");
   const [filtro, setFiltro] = useState<"todos" | "epi" | "suprimento">("todos");
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (
+      tipoAcesso === acessoComprasAdm &&
+      pathname !== nomePaginas.entradaSaida.compras
+    ) {
+      router.replace(nomePaginas.entradaSaida.compras);
+    }
+
+    if (
+      tipoAcesso === acessoAlmoxarifadoAdm &&
+      pathname !== nomePaginas.entradaSaida.almoxarifado
+    ) {
+      router.replace(nomePaginas.entradaSaida.almoxarifado);
+    }
+  }, [tipoAcesso, pathname]);
 
   const normalizar = (texto: string) =>
     texto

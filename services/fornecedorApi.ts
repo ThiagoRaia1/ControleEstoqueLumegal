@@ -14,9 +14,18 @@ export async function getFornecedorPorNome(nome: string) {
 }
 
 export async function registrarFornecedorApi(fornecedor: ICriarFornecedor) {
-  console.log(fornecedor);
   return await httpClient("/fornecedor", {
     method: "POST",
+    body: JSON.stringify(fornecedor),
+  });
+}
+
+export async function editarFornecedorApi(
+  nomeOriginal: string,
+  fornecedor: ICriarFornecedor
+) {
+  return await httpClient(`/fornecedor/editar/${nomeOriginal}`, {
+    method: "PATCH",
     body: JSON.stringify(fornecedor),
   });
 }
