@@ -9,6 +9,13 @@ import { getEpisEmFalta } from "../../../../services/epiApi";
 import Carregando from "../../../components/Carregando";
 import MenuInferior from "../../../components/MenuInferior";
 import MenuSuperior from "../../../components/MenuSuperior";
+import { router, usePathname } from "expo-router";
+import {
+  acessoComprasAdm,
+  acessoAlmoxarifadoAdm,
+  useTipoAcessoContext,
+} from "../../../../context/tipoAcessoContext";
+import { nomePaginas } from "../../../../utils/nomePaginas";
 
 function RenderItemEmFalta({
   epi,
@@ -68,11 +75,30 @@ function RenderItemEmFalta({
 }
 
 export default function itensEmFalta() {
+  const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const { isAuthenticated } = useAuth();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
   const [episEmFalta, setEpisEmFalta] = useState([]);
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (
+      tipoAcesso === acessoComprasAdm &&
+      pathname !== nomePaginas.itensEmFalta.compras
+    ) {
+      router.replace(nomePaginas.itensEmFalta.compras);
+    }
+
+    if (
+      tipoAcesso === acessoAlmoxarifadoAdm &&
+      pathname !== nomePaginas.itensEmFalta.almoxarifado
+    ) {
+      router.replace(nomePaginas.itensEmFalta.almoxarifado);
+    }
+  }, [tipoAcesso, pathname]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -94,39 +120,38 @@ export default function itensEmFalta() {
   return (
     <View style={globalStyles.background}>
       <MenuSuperior />
-
-      <Text style={globalStyles.title}>ITENS EM FALTA</Text>
       <Animatable.View
         animation="fadeInUp"
         duration={1000}
         style={globalStyles.mainContent}
       >
-        <ScrollView
-          style={globalStyles.itensScroll}
-          contentContainerStyle={globalStyles.scrollContent}
-          persistentScrollbar={true}
-        >
-          <View style={{ padding: 20, gap: 20 }}>
-            {episEmFalta.length === 0 ? (
-              <Text
-                style={{ textAlign: "center", color: "#999", marginTop: 20 }}
-              >
-                Nenhum item em falta no momento.
-              </Text>
-            ) : (
-              episEmFalta.map((epi: IEpi, index) => (
-                <Animatable.View
-                  key={epi.id}
-                  animation="fadeInUp"
-                  duration={800}
-                  delay={index * 100}
+        <View style={globalStyles.itensScroll}>
+          <ScrollView
+            contentContainerStyle={globalStyles.scrollContent}
+            persistentScrollbar={true}
+          >
+            <View style={{ padding: 20, gap: 20 }}>
+              {episEmFalta.length === 0 ? (
+                <Text
+                  style={{ textAlign: "center", color: "#999", marginTop: 20 }}
                 >
-                  <RenderItemEmFalta epi={epi} globalStyles={globalStyles} />
-                </Animatable.View>
-              ))
-            )}
-          </View>
-        </ScrollView>
+                  Nenhum item em falta no momento.
+                </Text>
+              ) : (
+                episEmFalta.map((epi: IEpi, index) => (
+                  <Animatable.View
+                    key={epi.id}
+                    animation="fadeInUp"
+                    duration={800}
+                    delay={index * 100}
+                  >
+                    <RenderItemEmFalta epi={epi} globalStyles={globalStyles} />
+                  </Animatable.View>
+                ))
+              )}
+            </View>
+          </ScrollView>
+        </View>
       </Animatable.View>
 
       <MenuInferior />

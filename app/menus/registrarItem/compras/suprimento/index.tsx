@@ -137,8 +137,6 @@ export default function Suprimento() {
         return comDecimal; // retorna como "12.34"
       }
 
-      // console.log(fornecedoresIds);
-      // console.log(preco);
       const suprimento: ICriarSuprimento = {
         nome: nome.trim(),
         descricao: descricao.trim(),

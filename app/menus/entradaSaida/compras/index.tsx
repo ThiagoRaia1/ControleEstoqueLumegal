@@ -13,6 +13,7 @@ import {
   useTipoAcessoContext,
   acessoCompras,
   acessoComprasAdm,
+  acessoAlmoxarifadoAdm,
 } from "../../../../context/tipoAcessoContext";
 import { getGlobalStyles } from "../../../../globalStyles";
 import { IMovimentacaoItem } from "../../../../interfaces/entradaSaida";
@@ -30,6 +31,8 @@ import MenuSuperior from "../../../components/MenuSuperior";
 import SearchBar from "../../../components/SearchBar";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FiltroTipoItem from "../../../components/FiltroTipoItem";
+import { usePathname, router } from "expo-router";
+import { nomePaginas } from "../../../../utils/nomePaginas";
 
 type ItemUnificado = (IEpi | ISuprimento) & { tipo: "epi" | "suprimento" };
 
@@ -62,10 +65,11 @@ function RenderItem({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        gap: 10,
       }}
     >
       {/* Lado Esquerdo: Info do item */}
-      <View style={{ flex: 1, paddingRight: 10 }}>
+      <View style={{ flex: 1, height: "100%" }}>
         <Text style={globalStyles.itemTitle}>
           {isEpi ? "🧤 EPI" : "📦 Suprimento"} - {item.nome}
         </Text>
@@ -94,9 +98,11 @@ function RenderItem({
       {/* Lado Direito: Controles */}
       <View
         style={{
+          flex: 1,
           alignItems: "center",
           justifyContent: "space-between",
           gap: 10,
+          height: "100%",
         }}
       >
         <View
@@ -188,6 +194,24 @@ export default function EntradaSaida() {
   const [pesquisa, setPesquisa] = useState("");
   const [filtro, setFiltro] = useState<"todos" | "epi" | "suprimento">("todos");
 
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (
+      tipoAcesso === acessoComprasAdm &&
+      pathname !== nomePaginas.entradaSaida.compras
+    ) {
+      router.replace(nomePaginas.entradaSaida.compras);
+    }
+
+    if (
+      tipoAcesso === acessoAlmoxarifadoAdm &&
+      pathname !== nomePaginas.entradaSaida.almoxarifado
+    ) {
+      router.replace(nomePaginas.entradaSaida.almoxarifado);
+    }
+  }, [tipoAcesso, pathname]);
+
   const normalizar = (texto: string) =>
     texto
       .normalize("NFD")
@@ -211,17 +235,22 @@ export default function EntradaSaida() {
   };
 
   useEffect(() => {
-    try {
-      setCarregando(true);
-      carregarEpis();
-      if ([acessoCompras, acessoComprasAdm].includes(tipoAcesso)) {
-        carregarSuprimentos();
+    const carregarDados = async () => {
+      try {
+        setCarregando(true);
+        if ([acessoCompras, acessoComprasAdm].includes(tipoAcesso)) {
+          await Promise.all([carregarEpis(), carregarSuprimentos()]);
+        } else {
+          await carregarEpis();
+        }
+      } catch (erro: any) {
+        alert(erro.message);
+      } finally {
+        setCarregando(false);
       }
-    } catch (erro: any) {
-      alert(erro.message);
-    } finally {
-      setCarregando(false);
-    }
+    };
+
+    carregarDados();
   }, []);
 
   const listaUnificada: ItemUnificado[] = [
@@ -313,14 +342,9 @@ export default function EntradaSaida() {
     }
   };
 
-  useEffect(() => {
-    carregarEpis();
-  }, []);
-
   return (
     <View style={globalStyles.background}>
       <MenuSuperior />
-      <Text style={globalStyles.title}>ENTRADA/SAÍDA</Text>
       <Animatable.View
         animation="fadeInUp"
         duration={1000}
@@ -333,61 +357,61 @@ export default function EntradaSaida() {
         />
 
         <FiltroTipoItem valorSelecionado={filtro} onSelecionar={setFiltro} />
+        <View style={globalStyles.itensScroll}>
+          <ScrollView
+            contentContainerStyle={globalStyles.scrollContent}
+            persistentScrollbar={true}
+          >
+            <View style={{ padding: 20, gap: 20 }}>
+              {listaUnificada
+                .slice()
+                .sort((a, b) =>
+                  (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+                    sensitivity: "base",
+                  })
+                )
+                .filter((item) => {
+                  if (filtro !== "todos" && item.tipo !== filtro) return false;
 
-        <ScrollView
-          style={globalStyles.itensScroll}
-          contentContainerStyle={globalStyles.scrollContent}
-          persistentScrollbar={true}
-        >
-          <View style={{ padding: 20, gap: 20 }}>
-            {listaUnificada
-              .slice()
-              .sort((a, b) =>
-                (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
-                  sensitivity: "base",
+                  const termo = normalizar(pesquisa);
+                  const nome = normalizar(item.nome || "");
+                  const ca = normalizar(
+                    "certificadoAprovacao" in item &&
+                      typeof item.certificadoAprovacao === "string"
+                      ? item.certificadoAprovacao
+                      : ""
+                  );
+
+                  return nome.startsWith(termo) || ca.startsWith(termo);
                 })
-              )
-              .filter((item) => {
-                if (filtro !== "todos" && item.tipo !== filtro) return false;
 
-                const termo = normalizar(pesquisa);
-                const nome = normalizar(item.nome || "");
-                const ca = normalizar(
-                  "certificadoAprovacao" in item &&
-                    typeof item.certificadoAprovacao === "string"
-                    ? item.certificadoAprovacao
-                    : ""
-                );
-
-                return nome.startsWith(termo) || ca.startsWith(termo);
-              })
-
-              .map((item: ItemUnificado, index: number) => {
-                const uniqueKey = `${item.tipo}-${item.id}`;
-                return (
-                  <Animatable.View
-                    key={uniqueKey}
-                    animation="fadeInUp"
-                    duration={1000}
-                    delay={index * 150}
-                  >
-                    <View key={uniqueKey}>
-                      <RenderItem
-                        globalStyles={globalStyles}
-                        item={item}
-                        setQuantidadeItem={(id, novaQuantidade) =>
-                          setQuantidadeItem(id, item.tipo, novaQuantidade)
-                        }
-                        quantidadeASerMovida={
-                          quantidadeASerMovida[`${item.tipo}-${item.id}`] || 0
-                        }
-                      />
-                    </View>
-                  </Animatable.View>
-                );
-              })}
-          </View>
-        </ScrollView>
+                .map((item: ItemUnificado, index: number) => {
+                  const uniqueKey = `${item.tipo}-${item.id}`;
+                  return (
+                    <Animatable.View
+                      key={uniqueKey}
+                      animation="fadeInUp"
+                      duration={1000}
+                      delay={index * 150}
+                    >
+                      <View key={uniqueKey}>
+                        <RenderItem
+                          globalStyles={globalStyles}
+                          item={item}
+                          setQuantidadeItem={(id, novaQuantidade) =>
+                            setQuantidadeItem(id, item.tipo, novaQuantidade)
+                          }
+                          quantidadeASerMovida={
+                            quantidadeASerMovida[`${item.tipo}-${item.id}`] || 0
+                          }
+                        />
+                      </View>
+                    </Animatable.View>
+                  );
+                })}
+            </View>
+          </ScrollView>
+        </View>
         <TouchableOpacity
           onPress={handleConfirmarMovimentacoes}
           style={globalStyles.button}

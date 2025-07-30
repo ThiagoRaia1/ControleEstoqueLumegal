@@ -32,81 +32,111 @@ export default function MenuSuperior() {
           justifyContent: "space-between",
           padding: 10,
           marginBottom: 20,
-          backgroundColor: "black",
         },
         tipoAcesso !== acessoComprasAdm &&
           tipoAcesso !== acessoAlmoxarifadoAdm && {
             justifyContent: "flex-end",
           },
-        theme === "light"
-          ? { backgroundColor: "#0033A0" }
-          : { backgroundColor: "black" },
       ]}
     >
-      {(tipoAcesso === acessoAlmoxarifadoAdm ||
-        tipoAcesso === acessoComprasAdm) && (
-        <View
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          gap: 10,
+          height: "100%",
+          alignItems: "center",
+        }}
+      >
+        {/* <TouchableOpacity
           style={{
-            flex: 1,
-            flexDirection: "row",
-            gap: 10,
-            height: "100%",
-            alignItems: "center",
+            paddingVertical: 5,
+            paddingHorizontal: 5,
           }}
         >
-          <TouchableOpacity
-            style={[
-              tipoAcesso === acessoComprasAdm && {
-                backgroundColor: "white",
-              },
-              {
-                borderRadius: 10,
-                paddingVertical: 5,
-                paddingHorizontal: 10,
-              },
-            ]}
-            onPress={() => setTipoAcesso(acessoComprasAdm)}
-          >
-            <Entypo
-              name="shop"
-              size={30}
-              color={tipoAcesso === acessoComprasAdm ? "#0033A0" : "white"}
-            />
-          </TouchableOpacity>
+          <Entypo
+            name="menu"
+            size={30}
+            color={theme === "light" ? "black" : "white"}
+          />
+        </TouchableOpacity> */}
+        {(tipoAcesso === acessoAlmoxarifadoAdm ||
+          tipoAcesso === acessoComprasAdm) && (
+          <>
+            <TouchableOpacity
+              style={[
+                tipoAcesso === acessoComprasAdm && {
+                  backgroundColor: theme === "light" ? "#0033A0" : "white",
+                },
+                {
+                  borderRadius: 10,
+                  paddingVertical: 5,
+                  paddingHorizontal: 10,
+                },
+              ]}
+              onPress={() => setTipoAcesso(acessoComprasAdm)}
+            >
+              <Entypo
+                name="shop"
+                size={30}
+                color={
+                  tipoAcesso === acessoComprasAdm && theme === "light"
+                    ? "white"
+                    : tipoAcesso === acessoComprasAdm && theme === "dark"
+                    ? "#0033A0"
+                    : tipoAcesso !== acessoComprasAdm && theme === "light"
+                    ? "black"
+                    : "white"
+                }
+              />
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              tipoAcesso === acessoAlmoxarifadoAdm && {
-                backgroundColor: "white",
-              },
-              {
-                borderRadius: 10,
-                paddingVertical: 5,
-                paddingHorizontal: 10,
-              },
-            ]}
-            onPress={() => setTipoAcesso(acessoAlmoxarifadoAdm)}
-          >
-            <MaterialCommunityIcons
-              name="warehouse"
-              size={30}
-              color={tipoAcesso === acessoAlmoxarifadoAdm ? "#0033A0" : "white"}
-            />
-          </TouchableOpacity>
-          <Text
-            style={[
-              { color: "white", paddingVertical: 5, paddingHorizontal: 10 },
-              width > 532
-                ? { fontSize: 20 }
-                : width > 495
-                ? { fontSize: 18 }
-                : { fontSize: 16 },
-            ]}
-          >
-            {"Tipo de acesso: " + tipoAcesso}
-          </Text>
-        </View>
-      )}
+            <TouchableOpacity
+              style={[
+                tipoAcesso === acessoAlmoxarifadoAdm && {
+                  backgroundColor: theme === "light" ? "#0033A0" : "white",
+                },
+                {
+                  borderRadius: 10,
+                  paddingVertical: 5,
+                  paddingHorizontal: 10,
+                },
+              ]}
+              onPress={() => setTipoAcesso(acessoAlmoxarifadoAdm)}
+            >
+              <MaterialCommunityIcons
+                name="warehouse"
+                size={30}
+                color={
+                  tipoAcesso === acessoAlmoxarifadoAdm && theme === "light"
+                    ? "white"
+                    : tipoAcesso === acessoAlmoxarifadoAdm && theme === "dark"
+                    ? "#0033A0"
+                    : tipoAcesso !== acessoAlmoxarifadoAdm && theme === "light"
+                    ? "black"
+                    : "white"
+                }
+              />
+            </TouchableOpacity>
+            <Text
+              style={[
+                {
+                  color: theme === "light" ? "black" : "white",
+                  paddingVertical: 5,
+                  paddingHorizontal: 10,
+                },
+                width > 532
+                  ? { fontSize: 20 }
+                  : width > 495
+                  ? { fontSize: 18 }
+                  : { fontSize: 16 },
+              ]}
+            >
+              {"Tipo de acesso: " + tipoAcesso}
+            </Text>
+          </>
+        )}
+      </View>
       <View
         style={{
           width: "18%",
@@ -121,7 +151,7 @@ export default function MenuSuperior() {
           <Feather
             name={theme === "light" ? "sun" : "moon"}
             size={30}
-            color={"white"}
+            color={theme === "light" ? "black" : "white"}
           />
         </TouchableOpacity>
 
@@ -131,7 +161,11 @@ export default function MenuSuperior() {
             router.push("/");
           }}
         >
-          <Feather name="log-out" size={30} color={"white"} />
+          <Feather
+            name="log-out"
+            size={30}
+            color={theme === "light" ? "black" : "white"}
+          />
         </TouchableOpacity>
       </View>
     </View>

@@ -1,31 +1,44 @@
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
-import * as Animatable from "react-native-animatable";
-import MenuSuperior from "../../../../components/MenuSuperior";
-import { useThemeContext } from "../../../../../context/ThemeContext";
-import { getGlobalStyles } from "../../../../../globalStyles";
-import MenuInferior from "../../../../components/MenuInferior";
-import Carregando from "../../../../components/Carregando";
-import { useEffect, useState } from "react";
-import { router } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 import {
-  getEnderecoPorCidade,
-  getEnderecos,
-} from "../../../../../services/enderecoApi";
-import { IEndereco } from "../../../../../interfaces/endereco";
-import { ICriarFornecedor } from "../../../../../interfaces/fornecedor";
+  ScrollView,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  useWindowDimensions,
+} from "react-native";
+import normalizeInsert from "../../utils/normalizeInsert";
+import { getGlobalStyles } from "../../globalStyles";
+import { useThemeContext } from "../../context/ThemeContext";
+import { useEffect, useState } from "react";
+import { ICriarFornecedor, IFornecedor } from "../../interfaces/fornecedor";
+import { ITipoUnidade } from "../../interfaces/tipoUnidade";
+import {
+  editarFornecedorApi,
+  getFornecedores,
+  getFornecedorPorNome,
+} from "../../services/fornecedorApi";
+import { getTiposUnidade } from "../../services/tipoUnidadeApi";
+import { router } from "expo-router";
+import { IEndereco } from "../../interfaces/endereco";
+import { getEnderecoPorCidade, getEnderecos } from "../../services/enderecoApi";
+import { ICategoriaFornecedor } from "../../interfaces/categoriaFornecedor";
 import {
   getCategoriasFornecedor,
   getCategoriasFornecedorPorCategoria,
-} from "../../../../../services/categoriaFornecedorApi";
-import { nomePaginas } from "../../../../../utils/nomePaginas";
-import { registrarFornecedorApi } from "../../../../../services/fornecedorApi";
-import { ICategoriaFornecedor } from "../../../../../interfaces/categoriaFornecedor";
-import normalizeInsert from "../../../../../utils/normalizeInsert";
+} from "../../services/categoriaFornecedorApi";
+import { nomePaginas } from "../../utils/nomePaginas";
 
-export default function Fornecedor() {
+interface FornecedorFormProps {
+  itemSelecionado: IFornecedor;
+}
+
+export default function FornecedorForm({
+  itemSelecionado,
+}: FornecedorFormProps) {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
+  const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
 
   const [nome, setNome] = useState("");
@@ -39,33 +52,74 @@ export default function Fornecedor() {
     { label: string; value: string }[]
   >([]);
 
-  // Estado com lista completa de categorias vindos do backend
-  const [categoriasDisponiveis, setCategoriasDisponiveis] = useState<
-    { label: string; value: string }[]
-  >([]);
+  // Estado com lista completa de categorias de fornecedor vindas do backend
+  const [categoriasFornecedorDisponiveis, setCategoriasFornecedorDisponiveis] =
+    useState<{ label: string; value: string }[]>([]);
 
-  useEffect(() => {
-    async function carregarDados() {
+  async function carregarCategoriasFornecedoresEEnderecos() {
+    try {
+      setCarregando(true);
+      const listaCategoriasFornecedorDisponiveis =
+        await getCategoriasFornecedor();
+      const itensCategoriasFornecedor =
+        listaCategoriasFornecedorDisponiveis.map((f: ICategoriaFornecedor) => ({
+          label: f.categoria,
+          value: f.categoria, // use f.id se quiser o ID como value
+        }));
+      setCategoriasFornecedorDisponiveis(itensCategoriasFornecedor);
+
       const listaEnderecos = await getEnderecos();
       const itensEnderecos = listaEnderecos.map((f: IEndereco) => ({
         label: f.cidade,
         value: f.cidade, // use f.id se quiser o ID como value
       }));
       setEnderecosDisponiveis(itensEnderecos);
-
-      const listaCategorias = await getCategoriasFornecedor();
-      const itensCategorias = listaCategorias.map(
-        (f: ICategoriaFornecedor) => ({
-          label: f.categoria,
-          value: f.categoria, // use f.id se quiser o ID como value
-        })
-      );
-      setCategoriasDisponiveis(itensCategorias);
+    } catch (erro: any) {
+      alert(erro.message);
+    } finally {
+      setCarregando(false);
     }
+  }
+
+  useEffect(() => {
+    const carregarDados = async () => {
+      try {
+        setCarregando(true);
+        await carregarCategoriasFornecedoresEEnderecos();
+      } catch (erro: any) {
+        alert(erro.message);
+      } finally {
+        setCarregando(false);
+      }
+    };
+
     carregarDados();
+
+    setNome(itemSelecionado.nome ?? "");
+
+    if (itemSelecionado.enderecos.length > 0) {
+      setEnderecos(
+        itemSelecionado.enderecos.map(
+          (endereco: IEndereco) => endereco.cidade ?? ""
+        )
+      );
+    } else {
+      setEnderecos([""]);
+    }
+
+    if (itemSelecionado.categoriasFornecedor.length > 0) {
+      setCategoriasFornecedor(
+        itemSelecionado.categoriasFornecedor.map(
+          (categoriaFornecedor: ICategoriaFornecedor) =>
+            categoriaFornecedor.categoria ?? ""
+        )
+      );
+    } else {
+      setCategoriasFornecedor([""]);
+    }
   }, []);
 
-  // Função para setar fornecedor selecionado no índice
+  // Função para setar endereco selecionado no índice
   const setEndereco = (index: number, valor: string) => {
     setEnderecos((prev) => {
       const novos = [...prev];
@@ -74,8 +128,8 @@ export default function Fornecedor() {
     });
   };
 
-  // Função para setar fornecedor selecionado no índice
-  const setCategoria = (index: number, valor: string) => {
+  // Função para setar categoria selecionada no índice
+  const setCategoriaFornecedor = (index: number, valor: string) => {
     setCategoriasFornecedor((prev) => {
       const novos = [...prev];
       novos[index] = valor;
@@ -83,38 +137,64 @@ export default function Fornecedor() {
     });
   };
 
-  const registrarFornecedor = async () => {
+  const editar = async () => {
+    // Validação
+
+    if (!itemSelecionado) {
+      alert("Nenhum item selecionado para edição.");
+      return;
+    }
+
+    if (!nome.trim()) {
+      alert("Nome é obrigatório.");
+      return;
+    }
+
+    if (enderecos.length === 0) {
+      alert("O fornecedor deve ter ao menos um endereço.");
+      return;
+    }
+
+    if (categoriasFornecedor.length === 0) {
+      alert("O fornecedor deve ter ao menos uma categoria.");
+      return;
+    }
+
     try {
-      const enderecosValidos = enderecos.filter((f) => f.trim() !== "");
+      setCarregando(true);
+
+      const enderecosValidos = enderecos.filter(
+        (endereco) => typeof endereco === "string" && endereco.trim() !== ""
+      );
       let enderecosIds: number[] = [];
-      for (let i: number = 0; i < enderecosValidos.length; i++) {
+      for (let i = 0; i < enderecosValidos.length; i++) {
         const enderecoObj: IEndereco = await getEnderecoPorCidade(
           enderecosValidos[i]
         );
         enderecosIds.push(enderecoObj.id);
       }
 
-      const categoriasFornecedorValidos = categoriasFornecedor.filter(
-        (f) => f.trim() !== ""
+      const categoriasFornecedorValidas = categoriasFornecedor.filter(
+        (f) => typeof f === "string" && f.trim() !== ""
       );
-      let categoriasFornecedorIds: number[] = [];
-      for (let i: number = 0; i < categoriasFornecedorValidos.length; i++) {
-        const categoriaFornecedorObj: ICategoriaFornecedor =
+      let categoriasIds: number[] = [];
+      for (let i = 0; i < categoriasFornecedorValidas.length; i++) {
+        const categoriasObj: ICategoriaFornecedor =
           await getCategoriasFornecedorPorCategoria(
-            categoriasFornecedorValidos[i]
+            categoriasFornecedorValidas[i]
           );
-        categoriasFornecedorIds.push(categoriaFornecedorObj.id);
+        categoriasIds.push(categoriasObj.id);
       }
 
-      const fornecedor: ICriarFornecedor = {
-        nome: nome.trim(),
+      // Montar objeto para edição de suprimento
+      const editado: ICriarFornecedor = {
+        nome,
         enderecos: enderecosIds,
-        categoriasFornecedor: categoriasFornecedorIds,
+        categoriasFornecedor: categoriasIds,
       };
-      setCarregando(true);
-      const resultado = await registrarFornecedorApi(fornecedor);
-      
-      alert("Fornecedor registrado com sucesso!");
+
+      await editarFornecedorApi(itemSelecionado.nome, editado);
+      alert("Fornecedor editado com sucesso!");
       router.push(nomePaginas.registrarItem.main);
     } catch (erro: any) {
       alert(erro.message);
@@ -124,13 +204,16 @@ export default function Fornecedor() {
   };
 
   return (
-    <View style={globalStyles.background}>
-      <MenuSuperior />
-      <Text style={globalStyles.title}>REGISTRAR FORNECEDOR</Text>
-      <Animatable.View
-        animation="fadeInUp"
-        duration={1000}
-        style={globalStyles.mainContent}
+    <>
+      <Text style={globalStyles.title}>EDITANDO</Text>
+      <ScrollView
+        style={{ width: "100%" }}
+        contentContainerStyle={[
+          globalStyles.scrollContentForm,
+          height < 973 && { paddingRight: 20 },
+          height < 997 && width < 534 && { paddingRight: 20 },
+        ]}
+        persistentScrollbar={true}
       >
         <View
           style={{
@@ -155,7 +238,6 @@ export default function Fornecedor() {
             <Text style={globalStyles.label}>ENDEREÇOS: ¹*</Text>
 
             {enderecos.map((endereco, index) => {
-              // Filtra os enderecos já selecionados, exceto o atual
               const usados = enderecos.filter((_, i) => i !== index);
               const opcoesFiltradas = enderecosDisponiveis.filter(
                 (f) => !usados.includes(f.value)
@@ -258,9 +340,8 @@ export default function Fornecedor() {
             <Text style={globalStyles.label}>CATEGORIAS DO FORNECEDOR: ¹*</Text>
 
             {categoriasFornecedor.map((categoria, index) => {
-              // Filtra os enderecos já selecionados, exceto o atual
               const usados = categoriasFornecedor.filter((_, i) => i !== index);
-              const opcoesFiltradas = categoriasDisponiveis.filter(
+              const opcoesFiltradas = categoriasFornecedorDisponiveis.filter(
                 (f) => !usados.includes(f.value)
               );
 
@@ -286,7 +367,9 @@ export default function Fornecedor() {
                   >
                     <Picker
                       selectedValue={categoriasFornecedor[index]}
-                      onValueChange={(valor) => setCategoria(index, valor)}
+                      onValueChange={(valor) =>
+                        setCategoriaFornecedor(index, valor)
+                      }
                       style={[
                         globalStyles.inputEditar,
                         {
@@ -310,7 +393,7 @@ export default function Fornecedor() {
                         value=""
                         color={"#888"}
                       />
-                      {opcoesFiltradas.map((categoria) => (
+                      {opcoesFiltradas.map((categoria: any) => (
                         <Picker.Item
                           key={categoria.value}
                           label={categoria.label}
@@ -360,24 +443,21 @@ export default function Fornecedor() {
               )}
           </View>
         </View>
-
-        <View style={globalStyles.buttonRowContainer}>
-          <TouchableOpacity
-            style={[globalStyles.button, { flex: 1 }]}
-            onPress={registrarFornecedor}
-          >
-            <Text style={globalStyles.buttonText}>Salvar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[globalStyles.buttonCancelar, { flex: 1 }]}
-            onPress={() => router.back()}
-          >
-            <Text style={globalStyles.buttonText}>Cancelar</Text>
-          </TouchableOpacity>
-        </View>
-      </Animatable.View>
-      <MenuInferior />
-      {carregando && <Carregando />}
-    </View>
+      </ScrollView>
+      <View style={globalStyles.buttonRowContainer}>
+        <TouchableOpacity
+          style={[globalStyles.button, { flex: 1 }]}
+          onPress={editar}
+        >
+          <Text style={globalStyles.buttonText}>Salvar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[globalStyles.buttonCancelar, { flex: 1 }]}
+          onPress={() => router.back()}
+        >
+          <Text style={globalStyles.buttonText}>Cancelar</Text>
+        </TouchableOpacity>
+      </View>
+    </>
   );
 }
