@@ -22,7 +22,6 @@ import {
   getTipoUnidade,
 } from "../../../../../services/tipoUnidadeApi";
 import Carregando from "../../../../components/Carregando";
-import MenuInferior from "../../../../components/MenuInferior";
 import MenuSuperior from "../../../../components/MenuSuperior";
 import { router } from "expo-router";
 import MaskInput, { Masks } from "react-native-mask-input";
@@ -30,12 +29,14 @@ import { ICriarSuprimento } from "../../../../../interfaces/suprimento";
 import { registrarSuprimentoApi } from "../../../../../services/suprimentoApi";
 import normalizeInsert from "../../../../../utils/normalizeInsert";
 import { nomePaginas } from "../../../../../utils/nomePaginas";
+import MenuLateral from "../../../../components/MenuLateral";
 
 export default function Suprimento() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
 
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -491,7 +492,10 @@ export default function Suprimento() {
           </TouchableOpacity>
         </View>
       </Animatable.View>
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
       {carregando && <Carregando />}
     </View>
   );

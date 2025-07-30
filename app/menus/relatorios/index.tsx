@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import MenuInferior from "../../components/MenuInferior";
 import { useThemeContext } from "../../../context/ThemeContext";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -32,11 +31,13 @@ import {
   useTipoAcessoContext,
 } from "../../../context/tipoAcessoContext";
 import MenuSuperior from "../../components/MenuSuperior";
+import MenuLateral from "../../components/MenuLateral";
 
 export default function Relatorios() {
   const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
 
   const hojeComecoDoDia = new Date();
   hojeComecoDoDia.setUTCHours(0, 0, 0, 0);
@@ -88,11 +89,6 @@ export default function Relatorios() {
         // ==== Primeira tabela: Entradas e Saídas EPI ====
         // Define colunas da primeira tabela
         worksheetEpi.columns = [
-          {
-            header: "idEntradaSaida",
-            key: "idEntradaSaida",
-            width: columnsWidth,
-          },
           { header: "EPI", key: "epi", width: columnsWidth },
           { header: "Quantidade", key: "quantidade", width: columnsWidth },
           { header: "Data", key: "data", width: columnsWidth },
@@ -120,7 +116,6 @@ export default function Relatorios() {
         // Preenche os dados da primeira tabela
         entradasSaidasEpi.forEach((entradaSaida, index) => {
           const row = worksheetEpi.addRow({
-            idEntradaSaida: entradaSaida.id,
             epi: entradaSaida.epi.nome,
             quantidade: entradaSaida.quantidade,
             data: new Date(entradaSaida.data).toLocaleString("pt-BR"),
@@ -228,11 +223,6 @@ export default function Relatorios() {
           // ==== Primeira tabela: Entradas e Saídas Suprimento ====
           // Define colunas da primeira tabela
           worksheetSuprimento.columns = [
-            {
-              header: "idEntradaSaida",
-              key: "idEntradaSaida",
-              width: columnsWidth,
-            },
             { header: "Suprimento", key: "suprimento", width: columnsWidth },
             { header: "Quantidade", key: "quantidade", width: columnsWidth },
             { header: "Data", key: "data", width: columnsWidth },
@@ -241,7 +231,6 @@ export default function Relatorios() {
           // Preenche os dados da primeira tabela
           entradasSaidasSuprimento.forEach((entradaSaida, index) => {
             const row = worksheetSuprimento.addRow({
-              idEntradaSaida: entradaSaida.id,
               suprimento: entradaSaida.suprimento.nome,
               quantidade: entradaSaida.quantidade,
               data: new Date(entradaSaida.data).toLocaleString("pt-BR"),
@@ -531,16 +520,12 @@ export default function Relatorios() {
   return (
     <View style={globalStyles.background}>
       <MenuSuperior />
-      <Text
-        style={[globalStyles.title, { textAlign: "center", marginBottom: 20 }]}
-      >
-        GERAR RELATÓRIO
-      </Text>
+      <Text style={globalStyles.title}>GERAR RELATÓRIO</Text>
 
       <Animatable.View
         animation="fadeInUp"
         duration={800}
-        style={[globalStyles.mainContent, { gap: 40 }]}
+        style={[globalStyles.mainContent, { gap: 40, marginTop: -20 }]}
       >
         {/* Seleção de datas */}
         <View
@@ -649,7 +634,10 @@ export default function Relatorios() {
       </Animatable.View>
 
       {carregando && <Carregando />}
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
     </View>
   );
 }

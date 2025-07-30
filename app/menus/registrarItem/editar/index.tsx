@@ -2,17 +2,19 @@ import { View } from "react-native-animatable";
 import { getGlobalStyles } from "../../../../globalStyles";
 import { useThemeContext } from "../../../../context/ThemeContext";
 import MenuSuperior from "../../../components/MenuSuperior";
-import MenuInferior from "../../../components/MenuInferior";
 import EpiSuprimentoForm from "../../../components/EpiSuprimentoForm";
 import { useLocalSearchParams } from "expo-router";
 import TipoUnidadeForm from "../../../components/TipoUnidadeForm";
 import FornecedorForm from "../../../components/FornecedorForm";
 import EnderecoForm from "../../../components/EnderecoForm";
 import CategoriaFornecedorForm from "../../../components/CategoriaFornecedorForm";
+import MenuLateral from "../../../components/MenuLateral";
+import { useState } from "react";
 
 export default function Editar() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
 
   const params = useLocalSearchParams();
 
@@ -44,7 +46,10 @@ export default function Editar() {
           <EnderecoForm itemSelecionado={itemSelecionado} />
         )}
       </View>
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
     </View>
   );
 }

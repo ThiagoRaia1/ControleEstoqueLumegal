@@ -3,7 +3,6 @@ import * as Animatable from "react-native-animatable";
 import MenuSuperior from "../../../../components/MenuSuperior";
 import { useThemeContext } from "../../../../../context/ThemeContext";
 import { getGlobalStyles } from "../../../../../globalStyles";
-import MenuInferior from "../../../../components/MenuInferior";
 import Carregando from "../../../../components/Carregando";
 import { useState } from "react";
 import { router } from "expo-router";
@@ -11,11 +10,13 @@ import { ICriarEndereco } from "../../../../../interfaces/endereco";
 import { registrarEnderecoApi } from "../../../../../services/enderecoApi";
 import { nomePaginas } from "../../../../../utils/nomePaginas";
 import normalizeInsert from "../../../../../utils/normalizeInsert";
+import MenuLateral from "../../../../components/MenuLateral";
 
 export default function Endereco() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
 
   const [cidade, setCidade] = useState("");
 
@@ -71,7 +72,10 @@ export default function Endereco() {
           </TouchableOpacity>
         </View>
       </Animatable.View>
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
       {carregando && <Carregando />}
     </View>
   );

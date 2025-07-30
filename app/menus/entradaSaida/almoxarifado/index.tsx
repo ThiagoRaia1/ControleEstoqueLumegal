@@ -16,7 +16,6 @@ import { IEpi } from "../../../../interfaces/epi";
 import { entradaSaidaEpiApi } from "../../../../services/entradaSaidaApi";
 import { getEpis } from "../../../../services/epiApi";
 import Carregando from "../../../components/Carregando";
-import MenuInferior from "../../../components/MenuInferior";
 import MenuSuperior from "../../../components/MenuSuperior";
 import SearchBar from "../../../components/SearchBar";
 import { usePathname, router } from "expo-router";
@@ -26,6 +25,7 @@ import {
   useTipoAcessoContext,
 } from "../../../../context/tipoAcessoContext";
 import { nomePaginas } from "../../../../utils/nomePaginas";
+import MenuLateral from "../../../components/MenuLateral";
 
 function RenderItem({
   globalStyles,
@@ -171,6 +171,8 @@ export default function EntradaSaida() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
+
   const [epis, setEpis] = useState<IEpi[]>([]);
   const [quantidadeASerMovida, setQuantidadeASerMovida] = useState<{
     [key: string]: number;
@@ -347,7 +349,10 @@ export default function EntradaSaida() {
         </TouchableOpacity>
       </Animatable.View>
 
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
       {carregando && <Carregando />}
     </View>
   );

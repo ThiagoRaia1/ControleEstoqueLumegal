@@ -7,7 +7,6 @@ import { getGlobalStyles } from "../../../../globalStyles";
 import { IEpi } from "../../../../interfaces/epi";
 import { getEpisEmFalta } from "../../../../services/epiApi";
 import Carregando from "../../../components/Carregando";
-import MenuInferior from "../../../components/MenuInferior";
 import MenuSuperior from "../../../components/MenuSuperior";
 import { router, usePathname } from "expo-router";
 import {
@@ -16,6 +15,7 @@ import {
   useTipoAcessoContext,
 } from "../../../../context/tipoAcessoContext";
 import { nomePaginas } from "../../../../utils/nomePaginas";
+import MenuLateral from "../../../components/MenuLateral";
 
 function RenderItemEmFalta({
   epi,
@@ -80,6 +80,8 @@ export default function itensEmFalta() {
   const { isAuthenticated } = useAuth();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
+
   const [episEmFalta, setEpisEmFalta] = useState([]);
 
   const pathname = usePathname();
@@ -154,7 +156,10 @@ export default function itensEmFalta() {
         </View>
       </Animatable.View>
 
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
       {carregando && <Carregando />}
     </View>
   );

@@ -26,13 +26,13 @@ import {
 import { getEpis } from "../../../../services/epiApi";
 import { getSuprimentos } from "../../../../services/suprimentoApi";
 import Carregando from "../../../components/Carregando";
-import MenuInferior from "../../../components/MenuInferior";
 import MenuSuperior from "../../../components/MenuSuperior";
 import SearchBar from "../../../components/SearchBar";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FiltroTipoItem from "../../../components/FiltroTipoItem";
 import { usePathname, router } from "expo-router";
 import { nomePaginas } from "../../../../utils/nomePaginas";
+import MenuLateral from "../../../components/MenuLateral";
 
 type ItemUnificado = (IEpi | ISuprimento) & { tipo: "epi" | "suprimento" };
 
@@ -186,6 +186,8 @@ export default function EntradaSaida() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
+
   const [epis, setEpis] = useState<IEpi[]>([]);
   const [suprimentos, setSuprimentos] = useState<ISuprimento[]>([]);
   const [quantidadeASerMovida, setQuantidadeASerMovida] = useState<{
@@ -419,9 +421,11 @@ export default function EntradaSaida() {
           <Text style={globalStyles.buttonText}>Confirmar movimentações</Text>
         </TouchableOpacity>
       </Animatable.View>
-
-      <MenuInferior />
       {carregando && <Carregando />}
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
     </View>
   );
 }
