@@ -54,10 +54,11 @@ function RenderItem({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        gap: 10,
       }}
     >
       {/* Lado Esquerdo: Info do item */}
-      <View style={{ flex: 1, paddingRight: 10 }}>
+      <View style={{ flex: 1, height: "100%" }}>
         <Text style={globalStyles.itemTitle}>
           {"🧤 EPI"} - {item.nome}
         </Text>

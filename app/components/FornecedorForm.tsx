@@ -12,13 +12,9 @@ import { getGlobalStyles } from "../../globalStyles";
 import { useThemeContext } from "../../context/ThemeContext";
 import { useEffect, useState } from "react";
 import { ICriarFornecedor, IFornecedor } from "../../interfaces/fornecedor";
-import { ITipoUnidade } from "../../interfaces/tipoUnidade";
 import {
   editarFornecedorApi,
-  getFornecedores,
-  getFornecedorPorNome,
 } from "../../services/fornecedorApi";
-import { getTiposUnidade } from "../../services/tipoUnidadeApi";
 import { router } from "expo-router";
 import { IEndereco } from "../../interfaces/endereco";
 import { getEnderecoPorCidade, getEnderecos } from "../../services/enderecoApi";

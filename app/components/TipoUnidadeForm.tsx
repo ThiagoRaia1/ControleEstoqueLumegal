@@ -6,7 +6,6 @@ import {
   Text,
   useWindowDimensions,
 } from "react-native";
-import { useTipoAcessoContext } from "../../context/tipoAcessoContext";
 import normalizeInsert from "../../utils/normalizeInsert";
 import { getGlobalStyles } from "../../globalStyles";
 import { useThemeContext } from "../../context/ThemeContext";

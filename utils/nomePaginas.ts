@@ -7,7 +7,6 @@ export const nomePaginas = {
   registrarItem: {
     main: "/menus/registrarItem",
     compras: {
-      main: "/menus/registrarItem/compras",
       registrarComprasCategoriaFornecedor:
         "/menus/registrarItem/compras/categoriaFornecedor",
       registrarComprasEndereco: "/menus/registrarItem/compras/endereco",
@@ -17,19 +16,9 @@ export const nomePaginas = {
       registrarComprastipoUnidade: "/menus/registrarItem/compras/tipoUnidade",
     },
     almoxarifado: {
-      main: "/menus/registrarItem/almoxarifado",
-      registrarAlmoxarifadoCategoriaFornecedor:
-        "/menus/registrarItem/almoxarifado/categoriaFornecedor",
-      registrarAlmoxarifadoEndereco:
-        "/menus/registrarItem/almoxarifado/endereco",
       registrarAlmoxarifadoEpi: "/menus/registrarItem/almoxarifado/epi",
-      registrarAlmoxarifadoFornecedor:
-        "/menus/registrarItem/almoxarifado/fornecedor",
-      registrarAlmoxarifadoSuprimento:
-        "/menus/registrarItem/almoxarifado/suprimento",
-      registrarAlmoxarifadotipoUnidade:
-        "/menus/registrarItem/almoxarifado/tipoUnidade",
     },
+    editar: "/menus/registrarItem/editar",
   },
   entradaSaida: {
     main: "/menus/entradaSaida",
