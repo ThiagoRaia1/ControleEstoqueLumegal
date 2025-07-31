@@ -212,14 +212,18 @@ export default function EntradaSaida() {
   };
 
   useEffect(() => {
-    try {
-      setCarregando(true);
-      carregarEpis();
-    } catch (erro: any) {
-      alert(erro.message);
-    } finally {
-      setCarregando(false);
-    }
+    const carregarDados = async () => {
+      try {
+        setCarregando(true);
+        await carregarEpis();
+      } catch (erro: any) {
+        alert(erro.message);
+      } finally {
+        setCarregando(false);
+      }
+    };
+
+    carregarDados();
   }, []);
 
   const setQuantidadeItem = (id: string, novaQuantidade: number) => {

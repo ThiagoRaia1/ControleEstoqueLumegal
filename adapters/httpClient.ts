@@ -1,7 +1,4 @@
 export async function httpClient(endpoint: string, options: RequestInit) {
-  // console.log(
-  //   `Requisição para: ${process.env.EXPO_PUBLIC_LOCAL_API_URL}${endpoint}`
-  // );
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_LOCAL_API_URL}${endpoint}`,
     {
