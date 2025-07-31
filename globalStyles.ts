@@ -36,6 +36,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       ...getBoxShadow(theme),
     },
     title: {
+      marginTop: 20,
       fontSize: 30,
       fontWeight: "700",
       textAlign: "center",
@@ -49,7 +50,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       alignItems: "center",
       justifyContent: "center",
       gap: 10,
-      marginBottom: 20,
+      marginVertical: 40,
     },
     // Pesquisa
     searchBar: {

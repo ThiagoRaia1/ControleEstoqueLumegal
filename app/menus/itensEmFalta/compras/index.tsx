@@ -9,7 +9,6 @@ import { ISuprimento } from "../../../../interfaces/suprimento";
 import { getEpisEmFalta } from "../../../../services/epiApi";
 import { getSuprimentosEmFalta } from "../../../../services/suprimentoApi";
 import Carregando from "../../../components/Carregando";
-import MenuInferior from "../../../components/MenuInferior";
 import MenuSuperior from "../../../components/MenuSuperior";
 import FiltroTipoItem from "../../../components/FiltroTipoItem";
 import { router, usePathname } from "expo-router";
@@ -19,6 +18,7 @@ import {
   useTipoAcessoContext,
 } from "../../../../context/tipoAcessoContext";
 import { nomePaginas } from "../../../../utils/nomePaginas";
+import MenuLateral from "../../../components/MenuLateral";
 
 type ItemUnificado = (IEpi | ISuprimento) & {
   tipo: "epi" | "suprimento";
@@ -90,6 +90,8 @@ export default function ItensEmFalta() {
   const { isAuthenticated } = useAuth();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
+
   const [itensEmFalta, setItensEmFalta] = useState<ItemUnificado[]>([]);
   const [filtro, setFiltro] = useState<"todos" | "epi" | "suprimento">("todos");
 
@@ -187,7 +189,10 @@ export default function ItensEmFalta() {
         </View>
       </Animatable.View>
 
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
       {carregando && <Carregando />}
     </View>
   );

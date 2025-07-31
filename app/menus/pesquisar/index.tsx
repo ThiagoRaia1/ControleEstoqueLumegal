@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
-import MenuInferior from "../../components/MenuInferior";
 import Carregando from "../../components/Carregando";
 import { useEffect, useState } from "react";
 import ModalConfirmacao from "../../components/ModalConfirmacao";
@@ -41,6 +40,7 @@ import {
 import MenuSuperior from "../../components/MenuSuperior";
 import FiltroTipoItem from "../../components/FiltroTipoItem";
 import normalizeInsert from "../../../utils/normalizeInsert";
+import MenuLateral from "../../components/MenuLateral";
 
 export default function Pesquisar() {
   const { tipoAcesso } = useTipoAcessoContext();
@@ -48,6 +48,8 @@ export default function Pesquisar() {
   const globalStyles = getGlobalStyles(theme);
   const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
+
   const [epis, setEpis] = useState<IEpi[]>([]);
   const [suprimentos, setSuprimentos] = useState<ISuprimento[]>([]);
   const [filtro, setFiltro] = useState<"todos" | "epi" | "suprimento">("todos");
@@ -297,7 +299,7 @@ export default function Pesquisar() {
 
           await editarSuprimentoApi(itemSelecionado.nome, suprimentoEditado);
           alert("Suprimento editado com sucesso!");
-          
+
           await carregarSuprimentos();
         } else {
           alert("Tipo de item desconhecido.");
@@ -856,7 +858,10 @@ export default function Pesquisar() {
           </>
         )}
       </Animatable.View>
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
       {carregando && <Carregando />}
       <ModalConfirmacao
         visivel={modalVisible}

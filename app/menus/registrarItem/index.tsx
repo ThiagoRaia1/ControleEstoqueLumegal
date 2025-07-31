@@ -9,7 +9,6 @@ import {
 import * as Animatable from "react-native-animatable";
 import { useThemeContext } from "../../../context/ThemeContext";
 import MenuSuperior from "../../components/MenuSuperior";
-import MenuInferior from "../../components/MenuInferior";
 import { useEffect, useState } from "react";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -35,12 +34,14 @@ import { getEnderecos } from "../../../services/enderecoApi";
 import { getCategoriasFornecedor } from "../../../services/categoriaFornecedorApi";
 import { getFornecedores } from "../../../services/fornecedorApi";
 import { getTiposUnidade } from "../../../services/tipoUnidadeApi";
+import MenuLateral from "../../components/MenuLateral";
 
 export default function RegistrarItem() {
   const { tipoAcesso } = useTipoAcessoContext();
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
 
   const opcoes = [
     {
@@ -253,7 +254,10 @@ export default function RegistrarItem() {
         </ScrollView>
       </Animatable.View>
 
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
       {modalVisible && (
         <ModalConfirmacao
           visivel={modalVisible}

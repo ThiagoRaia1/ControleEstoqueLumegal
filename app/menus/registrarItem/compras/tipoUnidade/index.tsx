@@ -3,7 +3,6 @@ import * as Animatable from "react-native-animatable";
 import MenuSuperior from "../../../../components/MenuSuperior";
 import { useThemeContext } from "../../../../../context/ThemeContext";
 import { getGlobalStyles } from "../../../../../globalStyles";
-import MenuInferior from "../../../../components/MenuInferior";
 import Carregando from "../../../../components/Carregando";
 import { useState } from "react";
 import { router } from "expo-router";
@@ -11,11 +10,13 @@ import { registrarTipoUnidadeApi } from "../../../../../services/tipoUnidadeApi"
 import { ICriarTipoUnidade } from "../../../../../interfaces/tipoUnidade";
 import normalizeInsert from "../../../../../utils/normalizeInsert";
 import { nomePaginas } from "../../../../../utils/nomePaginas";
+import MenuLateral from "../../../../components/MenuLateral";
 
 export default function TipoUnidade() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
 
   const [tipo, setTipo] = useState("");
 
@@ -76,7 +77,10 @@ export default function TipoUnidade() {
           </TouchableOpacity>
         </View>
       </Animatable.View>
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
       {carregando && <Carregando />}
     </View>
   );

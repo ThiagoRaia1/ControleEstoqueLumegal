@@ -3,7 +3,6 @@ import * as Animatable from "react-native-animatable";
 import MenuSuperior from "../../../../components/MenuSuperior";
 import { useThemeContext } from "../../../../../context/ThemeContext";
 import { getGlobalStyles } from "../../../../../globalStyles";
-import MenuInferior from "../../../../components/MenuInferior";
 import Carregando from "../../../../components/Carregando";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
@@ -22,11 +21,13 @@ import { nomePaginas } from "../../../../../utils/nomePaginas";
 import { registrarFornecedorApi } from "../../../../../services/fornecedorApi";
 import { ICategoriaFornecedor } from "../../../../../interfaces/categoriaFornecedor";
 import normalizeInsert from "../../../../../utils/normalizeInsert";
+import MenuLateral from "../../../../components/MenuLateral";
 
 export default function Fornecedor() {
   const { theme } = useThemeContext();
   const globalStyles = getGlobalStyles(theme);
   const [carregando, setCarregando] = useState(false);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
 
   const [nome, setNome] = useState("");
   const [enderecos, setEnderecos] = useState<string[]>([""]);
@@ -113,7 +114,7 @@ export default function Fornecedor() {
       };
       setCarregando(true);
       const resultado = await registrarFornecedorApi(fornecedor);
-      
+
       alert("Fornecedor registrado com sucesso!");
       router.push(nomePaginas.registrarItem.main);
     } catch (erro: any) {
@@ -376,7 +377,10 @@ export default function Fornecedor() {
           </TouchableOpacity>
         </View>
       </Animatable.View>
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
       {carregando && <Carregando />}
     </View>
   );

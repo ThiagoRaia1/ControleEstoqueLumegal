@@ -24,7 +24,6 @@ import {
   getTipoUnidade,
 } from "../../../../../services/tipoUnidadeApi";
 import Carregando from "../../../../components/Carregando";
-import MenuInferior from "../../../../components/MenuInferior";
 import { router, usePathname } from "expo-router";
 import MaskInput, { Masks } from "react-native-mask-input";
 import {
@@ -35,6 +34,7 @@ import {
 } from "../../../../../context/tipoAcessoContext";
 import MenuSuperior from "../../../../components/MenuSuperior";
 import normalizeInsert from "../../../../../utils/normalizeInsert";
+import MenuLateral from "../../../../components/MenuLateral";
 
 export default function Epi() {
   const { tipoAcesso } = useTipoAcessoContext();
@@ -42,6 +42,7 @@ export default function Epi() {
   const globalStyles = getGlobalStyles(theme);
   const { width, height } = useWindowDimensions();
   const [carregando, setCarregando] = useState(false);
+  const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
 
   const [nome, setNome] = useState("");
   const [certificadoAprovacao, setCertificadoAprovacao] = useState("");
@@ -478,7 +479,10 @@ export default function Epi() {
           )}
         </View>
       </Animatable.View>
-      <MenuInferior />
+      <MenuLateral
+        visivel={isMenuLateralVisivel}
+        setVisivel={setIsMenuLateralVisivel}
+      />
       {carregando && <Carregando />}
     </View>
   );

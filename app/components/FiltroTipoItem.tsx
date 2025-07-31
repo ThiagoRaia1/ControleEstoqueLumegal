@@ -39,7 +39,11 @@ export default function FiltroTipoItem({
           }}
         >
           <Text
-            style={{ color: valorSelecionado === tipo ? "white" : "black" }}
+            style={{
+              color: valorSelecionado === tipo ? "white" : "black",
+              fontWeight: 600,
+              fontSize: 18,
+            }}
           >
             {tipo === "todos"
               ? "Todos"
