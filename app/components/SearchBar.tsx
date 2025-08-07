@@ -1,6 +1,6 @@
 import { View, TextInput, StyleSheet } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import { useThemeContext } from "../../context/ThemeContext";
+import { useThemeContext } from "../../context/themeContext";
 import { getGlobalStyles } from "../../globalStyles";
 
 interface SearchBarProps {

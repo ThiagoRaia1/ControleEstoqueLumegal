@@ -1,6 +1,6 @@
 import { View } from "react-native-animatable";
 import { getGlobalStyles } from "../../../../globalStyles";
-import { useThemeContext } from "../../../../context/ThemeContext";
+import { useThemeContext } from "../../../../context/themeContext";
 import MenuSuperior from "../../../components/MenuSuperior";
 import EpiSuprimentoForm from "../../../components/EpiSuprimentoForm";
 import { useLocalSearchParams } from "expo-router";

@@ -7,7 +7,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
-import { useThemeContext } from "../../../context/ThemeContext";
+import { useThemeContext } from "../../../context/themeContext";
 import Carregando from "../../components/Carregando";
 import { useEffect, useState } from "react";
 import ModalConfirmacao from "../../components/ModalConfirmacao";

@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
-import { useThemeContext } from "../../../../context/ThemeContext";
+import { useThemeContext } from "../../../../context/themeContext";
 import {
   useTipoAcessoContext,
   acessoCompras,

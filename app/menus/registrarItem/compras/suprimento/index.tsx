@@ -9,7 +9,7 @@ import {
 import * as Animatable from "react-native-animatable";
 import { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
-import { useThemeContext } from "../../../../../context/ThemeContext";
+import { useThemeContext } from "../../../../../context/themeContext";
 import { getGlobalStyles } from "../../../../../globalStyles";
 import { IFornecedor } from "../../../../../interfaces/fornecedor";
 import { ITipoUnidade } from "../../../../../interfaces/tipoUnidade";

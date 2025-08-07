@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import normalizeInsert from "../../utils/normalizeInsert";
 import { getGlobalStyles } from "../../globalStyles";
-import { useThemeContext } from "../../context/ThemeContext";
+import { useThemeContext } from "../../context/themeContext";
 import { useEffect, useState } from "react";
 import { ICriarTipoUnidade, ITipoUnidade } from "../../interfaces/tipoUnidade";
 import { router } from "expo-router";

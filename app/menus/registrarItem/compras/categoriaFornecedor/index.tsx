@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import * as Animatable from "react-native-animatable";
 import MenuSuperior from "../../../../components/MenuSuperior";
-import { useThemeContext } from "../../../../../context/ThemeContext";
+import { useThemeContext } from "../../../../../context/themeContext";
 import { getGlobalStyles } from "../../../../../globalStyles";
 import Carregando from "../../../../components/Carregando";
 import { useState } from "react";

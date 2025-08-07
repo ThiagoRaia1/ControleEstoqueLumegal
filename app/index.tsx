@@ -9,9 +9,9 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "../context/auth";
 import Carregando from "./components/Carregando";
-import { useThemeContext } from "../context/ThemeContext";
+import { useThemeContext } from "../context/themeContext";
 import { getGlobalStyles } from "../globalStyles";
-import { login as loginApi } from "../services/AuthService";
+import { login as loginApi } from "../services/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   acessoAlmoxarifado,

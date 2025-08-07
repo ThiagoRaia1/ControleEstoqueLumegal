@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import normalizeInsert from "../../utils/normalizeInsert";
 import { getGlobalStyles } from "../../globalStyles";
-import { useThemeContext } from "../../context/ThemeContext";
+import { useThemeContext } from "../../context/themeContext";
 import { useEffect, useState } from "react";
 import { ICriarFornecedor, IFornecedor } from "../../interfaces/fornecedor";
 import { editarFornecedorApi } from "../../services/fornecedorApi";

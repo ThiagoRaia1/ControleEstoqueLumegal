@@ -2,7 +2,7 @@ import { View, Text, ScrollView } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../../context/auth";
-import { useThemeContext } from "../../../../context/ThemeContext";
+import { useThemeContext } from "../../../../context/themeContext";
 import { getGlobalStyles } from "../../../../globalStyles";
 import { IEpi } from "../../../../interfaces/epi";
 import { getEpisEmFalta } from "../../../../services/epiApi";

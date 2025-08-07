@@ -9,7 +9,7 @@ import {
 import * as Animatable from "react-native-animatable";
 import { useEffect, useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { useThemeContext } from "../../../../context/ThemeContext";
+import { useThemeContext } from "../../../../context/themeContext";
 import { getGlobalStyles } from "../../../../globalStyles";
 import { IMovimentacaoItem } from "../../../../interfaces/entradaSaida";
 import { IEpi } from "../../../../interfaces/epi";

@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
-import { useThemeContext } from "../../../context/ThemeContext";
+import { useThemeContext } from "../../../context/themeContext";
 import MenuSuperior from "../../components/MenuSuperior";
 import { useEffect, useState } from "react";
 import Entypo from "@expo/vector-icons/Entypo";

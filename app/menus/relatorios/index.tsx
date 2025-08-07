@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { useThemeContext } from "../../../context/ThemeContext";
+import { useThemeContext } from "../../../context/themeContext";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";

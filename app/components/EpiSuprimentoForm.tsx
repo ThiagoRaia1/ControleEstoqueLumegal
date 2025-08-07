@@ -15,7 +15,7 @@ import {
 } from "../../context/tipoAcessoContext";
 import normalizeInsert from "../../utils/normalizeInsert";
 import { getGlobalStyles } from "../../globalStyles";
-import { useThemeContext } from "../../context/ThemeContext";
+import { useThemeContext } from "../../context/themeContext";
 import { useEffect, useState } from "react";
 import { IFornecedor } from "../../interfaces/fornecedor";
 import { ITipoUnidade } from "../../interfaces/tipoUnidade";

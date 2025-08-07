@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Entypo, Feather } from "@expo/vector-icons";
 import { nomePaginas } from "../../utils/nomePaginas";
-import { useThemeContext } from "../../context/ThemeContext";
+import { useThemeContext } from "../../context/themeContext";
 import {
   acessoAlmoxarifado,
   acessoAlmoxarifadoAdm,
