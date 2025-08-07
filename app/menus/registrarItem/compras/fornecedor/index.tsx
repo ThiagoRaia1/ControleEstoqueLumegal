@@ -15,7 +15,7 @@ import { IEndereco } from "../../../../../interfaces/endereco";
 import { ICriarFornecedor } from "../../../../../interfaces/fornecedor";
 import {
   getCategoriasFornecedor,
-  getCategoriasFornecedorPorCategoria,
+  getCategoriaFornecedorPorCategoria,
 } from "../../../../../services/categoriaFornecedorApi";
 import { nomePaginas } from "../../../../../utils/nomePaginas";
 import { registrarFornecedorApi } from "../../../../../services/fornecedorApi";
@@ -101,7 +101,7 @@ export default function Fornecedor() {
       let categoriasFornecedorIds: number[] = [];
       for (let i: number = 0; i < categoriasFornecedorValidos.length; i++) {
         const categoriaFornecedorObj: ICategoriaFornecedor =
-          await getCategoriasFornecedorPorCategoria(
+          await getCategoriaFornecedorPorCategoria(
             categoriasFornecedorValidos[i]
           );
         categoriasFornecedorIds.push(categoriaFornecedorObj.id);

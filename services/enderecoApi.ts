@@ -1,5 +1,5 @@
 import { httpClient } from "../adapters/httpClient";
-import { ICriarEndereco } from "../interfaces/endereco";
+import { ICriarEndereco, IEndereco } from "../interfaces/endereco";
 
 export async function registrarEnderecoApi(endereco: ICriarEndereco) {
   return await httpClient("/endereco", {
@@ -15,9 +15,16 @@ export async function getEnderecoPorCidade(cidade: string) {
 }
 
 export async function getEnderecos() {
-  return await httpClient("/endereco", {
+  const enderecos: IEndereco[] = await httpClient("/endereco", {
     method: "GET",
   });
+
+  // Ordena por nome em ordem alfabética
+  enderecos.sort((a, b) =>
+    a.cidade.localeCompare(b.cidade, "pt-BR", { sensitivity: "base" })
+  );
+
+  return enderecos;
 }
 
 export async function editarEnderecoApi(

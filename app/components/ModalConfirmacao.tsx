@@ -51,41 +51,7 @@ export default function ModalConfirmacao({
             {itens && itens.length > 0 ? (
               <View style={styles.lista}>
                 {(() => {
-                  let itensOrdenados = [...itens];
-                  switch (tipoItem) {
-                    case "suprimento":
-                    case "epi":
-                    case "fornecedor":
-                      itensOrdenados.sort((a, b) =>
-                        a.nome.localeCompare(b.nome, "pt-BR", {
-                          sensitivity: "base",
-                        })
-                      );
-                      break;
-                    case "tipoUnidade":
-                      itensOrdenados.sort((a, b) =>
-                        a.tipo.localeCompare(b.tipo, "pt-BR", {
-                          sensitivity: "base",
-                        })
-                      );
-                      break;
-                    case "categoriaFornecedor":
-                      itensOrdenados.sort((a, b) =>
-                        a.categoria.localeCompare(b.categoria, "pt-BR", {
-                          sensitivity: "base",
-                        })
-                      );
-                      break;
-                    case "endereco":
-                      itensOrdenados.sort((a, b) =>
-                        a.cidade.localeCompare(b.cidade, "pt-BR", {
-                          sensitivity: "base",
-                        })
-                      );
-                      break;
-                  }
-
-                  return itensOrdenados.map((item, index) => {
+                  return itens.map((item, index) => {
                     const key = `${tipoItem}-${index}`;
                     return (
                       <View

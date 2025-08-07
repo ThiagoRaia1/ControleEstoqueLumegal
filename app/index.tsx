@@ -88,7 +88,7 @@ export default function TelaLogin() {
             color: theme === "light" ? "black" : "white",
           }}
         >
-          Controle de estoque Lumegal
+          CONTROLE DE ESTOQUE LUMEGAL
         </Text>
         <View style={globalStyles.loginInputContainer}>
           <Feather

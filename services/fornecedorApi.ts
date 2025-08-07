@@ -1,10 +1,17 @@
 import { httpClient } from "../adapters/httpClient";
-import { ICriarFornecedor } from "../interfaces/fornecedor";
+import { ICriarFornecedor, IFornecedor } from "../interfaces/fornecedor";
 
 export async function getFornecedores() {
-  return await httpClient("/fornecedor", {
+  const fornecedores: IFornecedor[] = await httpClient("/fornecedor", {
     method: "GET",
   });
+
+  // Ordena por nome em ordem alfabética
+  fornecedores.sort((a, b) =>
+    a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+  );
+
+  return fornecedores;
 }
 
 export async function getFornecedorPorNome(nome: string) {

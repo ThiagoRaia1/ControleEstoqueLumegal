@@ -124,22 +124,6 @@ export default function MenuSuperior() {
                   }
                 />
               </TouchableOpacity>
-              <Text
-                style={[
-                  {
-                    color: theme === "light" ? "black" : "white",
-                    paddingVertical: 5,
-                    paddingHorizontal: 10,
-                  },
-                  width > 532
-                    ? { fontSize: 20 }
-                    : width > 495
-                    ? { fontSize: 18 }
-                    : { fontSize: 16 },
-                ]}
-              >
-                {"Tipo de acesso: " + tipoAcesso}
-              </Text>
             </>
           )}
         </View>
@@ -181,6 +165,25 @@ export default function MenuSuperior() {
           setVisivel={setIsMenuLateralVisible}
         />
       )}
+
+      <Text
+        style={[
+          {
+            color: theme === "light" ? "black" : "white",
+            paddingVertical: 5,
+            position: "absolute",
+            bottom: 0,
+            right: 10,
+          },
+          width > 532
+            ? { fontSize: 20 }
+            : width > 495
+            ? { fontSize: 18 }
+            : { fontSize: 16 },
+        ]}
+      >
+        V2.3.2
+      </Text>
     </>
   );
 }

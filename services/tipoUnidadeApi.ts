@@ -1,14 +1,21 @@
 import { httpClient } from "../adapters/httpClient";
-import { ICriarTipoUnidade } from "../interfaces/tipoUnidade";
+import { ICriarTipoUnidade, ITipoUnidade } from "../interfaces/tipoUnidade";
+
+export async function getTiposUnidade() {
+  const tiposUnidade: ITipoUnidade[] = await httpClient(`/tipo-unidade`, {
+    method: "GET",
+  });
+
+  // Ordena por nome em ordem alfabética
+  tiposUnidade.sort((a, b) =>
+    a.tipo.localeCompare(b.tipo, "pt-BR", { sensitivity: "base" })
+  );
+
+  return tiposUnidade;
+}
 
 export async function getTipoUnidade(tipo: string) {
   return await httpClient(`/tipo-unidade/tipo/${tipo}`, {
-    method: "GET",
-  });
-}
-
-export async function getTiposUnidade() {
-  return await httpClient(`/tipo-unidade`, {
     method: "GET",
   });
 }

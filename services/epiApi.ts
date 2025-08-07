@@ -1,16 +1,30 @@
 import { httpClient } from "../adapters/httpClient";
-import { ICriarEpi } from "../interfaces/epi";
+import { ICriarEpi, IEpi } from "../interfaces/epi";
 
 export async function getEpis() {
-  return await httpClient("/epi", {
+  const epis: IEpi[] = await httpClient("/epi", {
     method: "GET",
   });
+
+  // Ordena por nome em ordem alfabética
+  epis.sort((a, b) =>
+    a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+  );
+
+  return epis;
 }
 
 export async function getEpisEmFalta() {
-  return await httpClient("/epi/emFalta", {
+  const episEmFalta: IEpi[] = await httpClient("/epi/emFalta", {
     method: "GET",
   });
+
+  // Ordena por nome em ordem alfabética
+  episEmFalta.sort((a, b) =>
+    a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+  );
+
+  return episEmFalta;
 }
 
 export async function registrarEpiApi(epi: ICriarEpi) {

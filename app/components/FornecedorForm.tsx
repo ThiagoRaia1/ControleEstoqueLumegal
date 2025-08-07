@@ -12,18 +12,17 @@ import { getGlobalStyles } from "../../globalStyles";
 import { useThemeContext } from "../../context/ThemeContext";
 import { useEffect, useState } from "react";
 import { ICriarFornecedor, IFornecedor } from "../../interfaces/fornecedor";
-import {
-  editarFornecedorApi,
-} from "../../services/fornecedorApi";
+import { editarFornecedorApi } from "../../services/fornecedorApi";
 import { router } from "expo-router";
 import { IEndereco } from "../../interfaces/endereco";
 import { getEnderecoPorCidade, getEnderecos } from "../../services/enderecoApi";
 import { ICategoriaFornecedor } from "../../interfaces/categoriaFornecedor";
 import {
   getCategoriasFornecedor,
-  getCategoriasFornecedorPorCategoria,
+  getCategoriaFornecedorPorCategoria,
 } from "../../services/categoriaFornecedorApi";
 import { nomePaginas } from "../../utils/nomePaginas";
+import Carregando from "./Carregando";
 
 interface FornecedorFormProps {
   itemSelecionado: IFornecedor;
@@ -54,7 +53,6 @@ export default function FornecedorForm({
 
   async function carregarCategoriasFornecedoresEEnderecos() {
     try {
-      setCarregando(true);
       const listaCategoriasFornecedorDisponiveis =
         await getCategoriasFornecedor();
       const itensCategoriasFornecedor =
@@ -72,46 +70,44 @@ export default function FornecedorForm({
       setEnderecosDisponiveis(itensEnderecos);
     } catch (erro: any) {
       alert(erro.message);
-    } finally {
-      setCarregando(false);
     }
   }
 
   useEffect(() => {
-    const carregarDados = async () => {
-      try {
-        setCarregando(true);
+    try {
+      setCarregando(true);
+      const carregarDados = async () => {
         await carregarCategoriasFornecedoresEEnderecos();
-      } catch (erro: any) {
-        alert(erro.message);
-      } finally {
-        setCarregando(false);
+      };
+
+      carregarDados();
+
+      setNome(itemSelecionado.nome ?? "");
+
+      if (itemSelecionado.enderecos.length > 0) {
+        setEnderecos(
+          itemSelecionado.enderecos.map(
+            (endereco: IEndereco) => endereco.cidade ?? ""
+          )
+        );
+      } else {
+        setEnderecos([""]);
       }
-    };
 
-    carregarDados();
-
-    setNome(itemSelecionado.nome ?? "");
-
-    if (itemSelecionado.enderecos.length > 0) {
-      setEnderecos(
-        itemSelecionado.enderecos.map(
-          (endereco: IEndereco) => endereco.cidade ?? ""
-        )
-      );
-    } else {
-      setEnderecos([""]);
-    }
-
-    if (itemSelecionado.categoriasFornecedor.length > 0) {
-      setCategoriasFornecedor(
-        itemSelecionado.categoriasFornecedor.map(
-          (categoriaFornecedor: ICategoriaFornecedor) =>
-            categoriaFornecedor.categoria ?? ""
-        )
-      );
-    } else {
-      setCategoriasFornecedor([""]);
+      if (itemSelecionado.categoriasFornecedor.length > 0) {
+        setCategoriasFornecedor(
+          itemSelecionado.categoriasFornecedor.map(
+            (categoriaFornecedor: ICategoriaFornecedor) =>
+              categoriaFornecedor.categoria ?? ""
+          )
+        );
+      } else {
+        setCategoriasFornecedor([""]);
+      }
+    } catch (erro: any) {
+      alert(erro.message);
+    } finally {
+      setCarregando(false);
     }
   }, []);
 
@@ -176,7 +172,7 @@ export default function FornecedorForm({
       let categoriasIds: number[] = [];
       for (let i = 0; i < categoriasFornecedorValidas.length; i++) {
         const categoriasObj: ICategoriaFornecedor =
-          await getCategoriasFornecedorPorCategoria(
+          await getCategoriaFornecedorPorCategoria(
             categoriasFornecedorValidas[i]
           );
         categoriasIds.push(categoriasObj.id);
@@ -201,7 +197,7 @@ export default function FornecedorForm({
 
   return (
     <>
-      <Text style={globalStyles.title}>EDITANDO</Text>
+      <Text style={globalStyles.title}>EDITANDO FORNECEDOR</Text>
       <ScrollView
         style={{ width: "100%" }}
         contentContainerStyle={[
@@ -454,6 +450,7 @@ export default function FornecedorForm({
           <Text style={globalStyles.buttonText}>Cancelar</Text>
         </TouchableOpacity>
       </View>
+      {carregando && <Carregando />}
     </>
   );
 }

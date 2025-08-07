@@ -1,5 +1,8 @@
 import { httpClient } from "../adapters/httpClient";
-import { ICriarCategoriaFornecedor } from "../interfaces/categoriaFornecedor";
+import {
+  ICategoriaFornecedor,
+  ICriarCategoriaFornecedor,
+} from "../interfaces/categoriaFornecedor";
 
 export async function registrarCategoriaFornecedorApi(
   categoriaFornecedor: ICriarCategoriaFornecedor
@@ -11,12 +14,22 @@ export async function registrarCategoriaFornecedorApi(
 }
 
 export async function getCategoriasFornecedor() {
-  return await httpClient("/categoria-fornecedor", {
-    method: "GET",
-  });
+  const categoriasFornecedor: ICategoriaFornecedor[] = await httpClient(
+    "/categoria-fornecedor",
+    {
+      method: "GET",
+    }
+  );
+
+  // Ordena por nome em ordem alfabética
+  categoriasFornecedor.sort((a, b) =>
+    a.categoria.localeCompare(b.categoria, "pt-BR", { sensitivity: "base" })
+  );
+
+  return categoriasFornecedor;
 }
 
-export async function getCategoriasFornecedorPorCategoria(categoria: string) {
+export async function getCategoriaFornecedorPorCategoria(categoria: string) {
   return await httpClient(`/categoria-fornecedor/categoria/${categoria}`, {
     method: "GET",
   });

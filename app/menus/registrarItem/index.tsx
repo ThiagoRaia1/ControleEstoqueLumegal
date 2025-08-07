@@ -35,6 +35,7 @@ import { getCategoriasFornecedor } from "../../../services/categoriaFornecedorAp
 import { getFornecedores } from "../../../services/fornecedorApi";
 import { getTiposUnidade } from "../../../services/tipoUnidadeApi";
 import MenuLateral from "../../components/MenuLateral";
+import Carregando from "../../components/Carregando";
 
 export default function RegistrarItem() {
   const { tipoAcesso } = useTipoAcessoContext();
@@ -42,6 +43,7 @@ export default function RegistrarItem() {
   const globalStyles = getGlobalStyles(theme);
   const [modalVisible, setModalVisible] = useState(false);
   const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
+  const [carregando, setCarregando] = useState(false);
 
   const opcoes = [
     {
@@ -157,34 +159,41 @@ export default function RegistrarItem() {
       | "endereco"
       | undefined
   ) => {
-    setTipoDaLista(tipoDoItem);
-    switch (tipoDoItem) {
-      case "suprimento":
-        setItens(await getSuprimentos());
-        break;
+    try {
+      setCarregando(true);
+      setTipoDaLista(tipoDoItem);
+      switch (tipoDoItem) {
+        case "suprimento":
+          setItens(await getSuprimentos());
+          break;
 
-      case "epi":
-        setItens(await getEpis());
-        break;
+        case "epi":
+          setItens(await getEpis());
+          break;
 
-      case "tipoUnidade":
-        setItens(await getTiposUnidade());
-        break;
+        case "tipoUnidade":
+          setItens(await getTiposUnidade());
+          break;
 
-      case "fornecedor":
-        setItens(await getFornecedores());
-        break;
+        case "fornecedor":
+          setItens(await getFornecedores());
+          break;
 
-      case "categoriaFornecedor":
-        setItens(await getCategoriasFornecedor());
-        break;
+        case "categoriaFornecedor":
+          setItens(await getCategoriasFornecedor());
+          break;
 
-      case "endereco":
-        setItens(await getEnderecos());
-        break;
+        case "endereco":
+          setItens(await getEnderecos());
+          break;
 
-      default:
-        "Tipo inválido";
+        default:
+          "Tipo inválido";
+      }
+    } catch (erro: any) {
+      alert(erro);
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -267,6 +276,7 @@ export default function RegistrarItem() {
           tipoItem={tipoDaLista}
         />
       )}
+      {carregando && <Carregando />}
     </View>
   );
 }

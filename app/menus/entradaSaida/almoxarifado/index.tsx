@@ -82,9 +82,11 @@ function RenderItem({
       {/* Lado Direito: Controles */}
       <View
         style={{
+          flex: 1,
           alignItems: "center",
           justifyContent: "space-between",
           gap: 10,
+          height: "100%",
         }}
       >
         <View
