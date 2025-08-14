@@ -82,7 +82,7 @@ export default function itensEmFalta() {
   const [carregando, setCarregando] = useState(false);
   const [isMenuLateralVisivel, setIsMenuLateralVisivel] = useState(false);
 
-  const [episEmFalta, setEpisEmFalta] = useState([]);
+  const [episEmFalta, setEpisEmFalta] = useState<IEpi[]>([]);
 
   const pathname = usePathname();
 
@@ -132,7 +132,7 @@ export default function itensEmFalta() {
             contentContainerStyle={globalStyles.scrollContent}
             persistentScrollbar={true}
           >
-            <View style={{ padding: 20, gap: 20 }}>
+            <View style={{ gap: 20 }}>
               {episEmFalta.length === 0 ? (
                 <Text
                   style={{ textAlign: "center", color: "#999", marginTop: 20 }}

@@ -210,11 +210,11 @@ export default function RegistrarItem() {
         style={globalStyles.mainContent}
       >
         <ScrollView
-          style={{ width: "100%", marginRight: -20 }}
+          style={{ width: "100%" }}
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: "center",
-            paddingRight: 20,
+            gap: 20,
           }}
         >
           {opcoes.map((opcao) => (
@@ -283,9 +283,9 @@ export default function RegistrarItem() {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    flex: 1,
+    borderRadius: 20,
+    padding: 10,
     elevation: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

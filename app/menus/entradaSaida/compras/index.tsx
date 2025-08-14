@@ -364,7 +364,7 @@ export default function EntradaSaida() {
             contentContainerStyle={globalStyles.scrollContent}
             persistentScrollbar={true}
           >
-            <View style={{ padding: 20, gap: 20 }}>
+            <View style={{ gap: 20 }}>
               {listaUnificada
                 .slice()
                 .sort((a, b) =>

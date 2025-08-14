@@ -124,10 +124,10 @@ export default function ItensEmFalta() {
           ]);
 
           const itensUnificados: ItemUnificado[] = [
-            ...epis.map((e: IEpi) => ({ ...e, tipo: "epi" })),
+            ...epis.map((e: IEpi) => ({ ...e, tipo: "epi" as const })),
             ...suprimentos.map((s: ISuprimento) => ({
               ...s,
-              tipo: "suprimento",
+              tipo: "suprimento" as const,
             })),
           ];
 
@@ -162,7 +162,7 @@ export default function ItensEmFalta() {
             contentContainerStyle={globalStyles.scrollContent}
             persistentScrollbar={true}
           >
-            <View style={{ padding: 16, gap: 16 }}>
+            <View style={{ gap: 20 }}>
               {itensFiltrados.length === 0 ? (
                 <Text
                   style={{ textAlign: "center", color: "#999", marginTop: 20 }}
