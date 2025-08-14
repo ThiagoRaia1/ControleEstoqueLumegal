@@ -1,4 +1,5 @@
 <h1 align="center">Controle de Estoque Lumegal</h1>
+<h2 align="center">Frontend</h2>
 
 <p>
   Este projeto é uma aplicação multiplataforma desenvolvida para o gerenciamento eficiente de estoque, 
