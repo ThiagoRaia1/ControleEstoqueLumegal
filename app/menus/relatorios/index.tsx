@@ -525,7 +525,7 @@ export default function Relatorios() {
       <Animatable.View
         animation="fadeInUp"
         duration={800}
-        style={[globalStyles.mainContent, { gap: 40, marginTop: -20 }]}
+        style={[globalStyles.mainContent, { gap: 40, marginTop: -80 }]}
       >
         {/* Seleção de datas */}
         <View

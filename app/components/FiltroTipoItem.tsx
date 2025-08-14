@@ -42,7 +42,7 @@ export default function FiltroTipoItem({
             style={{
               color: valorSelecionado === tipo ? "white" : "black",
               fontWeight: 600,
-              fontSize: 18,
+              fontSize: 14,
             }}
           >
             {tipo === "todos"

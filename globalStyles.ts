@@ -44,13 +44,15 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
     },
     mainContent: {
       flex: 1,
-      width: "90%",
+      width: "95%",
       maxWidth: 1000,
       alignSelf: "center",
       alignItems: "center",
       justifyContent: "center",
       gap: 10,
-      marginVertical: 40,
+      marginTop: 10,
+      marginBottom: 30,
+      // backgroundColor: "red"
     },
     // Pesquisa
     searchBar: {
@@ -63,7 +65,7 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
       borderColor: "#888",
       backgroundColor: theme === "light" ? "white" : "#1C1C1C",
     },
-    //Botoes
+    // Botoes
     button: {
       width: "100%",
       height: 50,
@@ -157,7 +159,6 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
     itensScroll: {
       flex: 1,
       borderRadius: 20,
-      borderWidth: 3,
       borderColor: "#888",
       alignSelf: "center",
       width: "100%",
@@ -166,7 +167,6 @@ export const getGlobalStyles = (theme: "light" | "dark") =>
     scrollContent: {
       flexGrow: 1,
       justifyContent: "flex-start",
-      backgroundColor: theme === "light" ? "white" : "#5e5e5e",
     },
     scrollContentForm: {
       flexGrow: 1,

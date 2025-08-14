@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     setIsAuthenticated(false);
     await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("tipoAcesso");
     setTipoAcesso("");
   };
 

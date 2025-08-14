@@ -341,7 +341,7 @@ export default function Pesquisar() {
       <View
         style={{
           backgroundColor: theme === "light" ? "#fff" : "#1e1e1e",
-          borderRadius: 12,
+          borderRadius: 20,
           padding: 16,
           shadowColor: "#000",
           shadowOpacity: 0.1,
@@ -478,10 +478,7 @@ export default function Pesquisar() {
             )}
             <View style={globalStyles.itensScroll}>
               <ScrollView
-                contentContainerStyle={{
-                  padding: 20,
-                  gap: 20,
-                }}
+                contentContainerStyle={{ gap: 20 }}
                 persistentScrollbar
               >
                 {itensFiltrados.map((item: any, index: number) => (
