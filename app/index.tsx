@@ -102,7 +102,7 @@ export default function TelaLogin() {
             placeholder="Email"
             placeholderTextColor="#ccc"
             onChangeText={(text) => setLoginInput(text)}
-            onSubmitEditing={login}
+            onSubmitEditing={handleLogin}
           />
           <View style={styles.iconSpace}></View>
         </View>
@@ -115,7 +115,7 @@ export default function TelaLogin() {
             placeholderTextColor="#ccc"
             secureTextEntry={!mostrarSenha}
             onChangeText={(text) => setSenha(text)}
-            onSubmitEditing={login}
+            onSubmitEditing={handleLogin}
           />
           <TouchableOpacity
             onPress={() => setMostrarSenha(!mostrarSenha)}

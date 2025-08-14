@@ -490,7 +490,7 @@ export default function Pesquisar() {
                     }
                     animation="fadeInUp"
                     duration={600}
-                    delay={index * 100}
+                    delay={index * 50}
                   >
                     <ItemUnificado item={item} />
                   </Animatable.View>

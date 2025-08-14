@@ -1,6 +1,6 @@
 export async function httpClient(endpoint: string, options: RequestInit) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_LOCAL_API_URL}${endpoint}`,
+    `${process.env.EXPO_PUBLIC_BACKEND_API_URL}${endpoint}`,
     {
       ...options,
       headers: {

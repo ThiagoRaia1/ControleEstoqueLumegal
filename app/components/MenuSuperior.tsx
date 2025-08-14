@@ -170,9 +170,8 @@ export default function MenuSuperior() {
         style={[
           {
             color: theme === "light" ? "black" : "white",
-            paddingVertical: 5,
             position: "absolute",
-            bottom: 0,
+            bottom: 5,
             right: 10,
           },
           width > 532
@@ -182,7 +181,10 @@ export default function MenuSuperior() {
             : { fontSize: 16 },
         ]}
       >
-        V2.3.2
+        {(tipoAcesso === acessoAlmoxarifadoAdm ||
+          tipoAcesso === acessoComprasAdm) &&
+          `${tipoAcesso} - `}
+        V2.4.1
       </Text>
     </>
   );
